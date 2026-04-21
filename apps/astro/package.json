@@ -1,0 +1,6 @@
+{
+  "name": "aje-poc-astro",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Al Jazeera English PoC — Astro 6 + Preact implementation"
+}

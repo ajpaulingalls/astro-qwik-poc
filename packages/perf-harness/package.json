@@ -1,0 +1,9 @@
+{
+  "name": "@aje-poc/perf-harness",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Shared Playwright + Lighthouse performance harness for the AJE Astro and Qwik PoCs",
+  "scripts": {
+    "run": "echo 'Not implemented yet — see docs/MILESTONES.md M2 in either app' && exit 1"
+  }
+}

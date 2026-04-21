@@ -1,0 +1,21 @@
+{
+  "name": "aje-poc",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Al Jazeera English frontend rebuild PoC — Astro 6 vs Qwik 2, with shared mock API and performance harness",
+  "workspaces": [
+    "apps/astro",
+    "apps/qwik",
+    "packages/perf-harness"
+  ],
+  "scripts": {
+    "mock-api": "cd packages/mock-api && deno run --allow-net --allow-read --allow-env server.ts",
+    "dev:astro": "bun --filter aje-poc-astro dev",
+    "dev:qwik": "bun --filter aje-poc-qwik dev",
+    "build:astro": "bun --filter aje-poc-astro build",
+    "build:qwik": "bun --filter aje-poc-qwik build",
+    "perf": "bun --filter @aje-poc/perf-harness run",
+    "perf:astro": "bun --filter @aje-poc/perf-harness run -- --target=astro",
+    "perf:qwik": "bun --filter @aje-poc/perf-harness run -- --target=qwik"
+  }
+}

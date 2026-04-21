@@ -1,0 +1,63 @@
+# --- Top-level shared ignores ---
+
+# Dependencies
+node_modules/
+
+# Lockfiles from package managers we don't use (bun.lock IS committed)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build / framework output (any app)
+dist/
+.astro/
+.output/
+.qwik/
+build/
+
+# Vite cache
+.vite/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Environment variables — commit .env.example, never the real ones
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# Test + perf tooling output
+coverage/
+.nyc_output/
+playwright-report/
+playwright/.cache/
+test-results/
+.lighthouseci/
+perf-results/
+
+# Deno (only created when local cache / vendor dirs are enabled)
+.deno/
+vendor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+
+# Claude Code per-user settings (shared settings.json IS committed)
+.claude/settings.local.json
