@@ -1,0 +1,12 @@
+{
+  "data": {
+    "breakingNews": {
+      "post": null,
+      "tickerTitle": null,
+      "tickerText": null,
+      "modified": null,
+      "link": null,
+      "__typename": "BreakingNews"
+    }
+  }
+}

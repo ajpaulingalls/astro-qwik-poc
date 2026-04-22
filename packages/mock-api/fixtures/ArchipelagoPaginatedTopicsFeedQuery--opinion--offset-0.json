@@ -1,0 +1,1029 @@
+{
+  "data": {
+    "topicsFeedData": {
+      "articles": [
+        {
+          "id": "4496936",
+          "title": "Why the Iran war did not go according to US plans",
+          "excerpt": "Washington misread Iran, overestimated its own leverage and found itself trapped in a costly 40-day war of attrition.",
+          "date": "2026-04-16T12:29:51",
+          "link": "/opinions/2026/4/16/why-the-iran-war-did-not-go-according-to-us-plans",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/lc0mmv",
+          "proxyShortUrl": "https://aje.news/5q245i",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "4497355",
+              "name": "Allameh Azizi",
+              "link": "/author/allameh-azizi",
+              "description": "Political analyst and Director General of the Information Council of the Government of the Islamic Republic of Iran",
+              "slug": "allameh-azizi",
+              "twitter": "",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2026/04/azizi-1776342541.jpg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2026/04/azizi-1776342541.jpg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2026/04/azizi-1776342541.jpg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2026/04/azizi-1776342541.jpg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "Director General of the Information Council of the Government of the Islamic Republic of Iran",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 1,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4478711",
+            "sourceUrl": "/wp-content/uploads/2026/04/reuters_69d82911-1775773969.jpg",
+            "credit": "Reuters",
+            "caption": "A tanker sits anchored as the traffic is down in the Strait of Hormuz, amid the US-Israel war on Iran, in Muscat, Oman, March 10, 2026. Benoit Tessier/File Photo/Reuters]",
+            "alt": "FILE PHOTO: FILE PHOTO: The Callisto tanker sits anchored as the traffic is down in the Strait of Hormuz, amid the U.S.-Israeli conflict with Iran, in Muscat, Oman, March 10, 2026. REUTERS/Benoit Tessier/File Photo/File Photo/File Photo",
+            "width": 4557,
+            "height": 3038,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4478711",
+            "sourceUrl": "/wp-content/uploads/2026/04/reuters_69d82911-1775773969.jpg",
+            "credit": "Reuters",
+            "caption": "A tanker sits anchored as the traffic is down in the Strait of Hormuz, amid the US-Israel war on Iran, in Muscat, Oman, March 10, 2026. Benoit Tessier/File Photo/Reuters]",
+            "alt": "FILE PHOTO: FILE PHOTO: The Callisto tanker sits anchored as the traffic is down in the Strait of Hormuz, amid the U.S.-Israeli conflict with Iran, in Muscat, Oman, March 10, 2026. REUTERS/Benoit Tessier/File Photo/File Photo/File Photo",
+            "width": 4557,
+            "height": 3038,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "eb7159fe-8f49-43b1-bb2e-b42e00ce2b7d",
+          "audioDuration": "356.075102",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4496936/aje_4496936_2026-04-16T12-30-27.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4496390",
+          "title": "The pope has shown the world how to stand up to Trump",
+          "excerpt": "Far too many world leaders have chosen to mollify the bullying US president. Pope Leo has shown there’s another way.",
+          "date": "2026-04-16T05:35:31",
+          "link": "/opinions/2026/4/16/the-pope-has-shown-the-world-how-to-stand-up-to-trump",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/tslxzj",
+          "proxyShortUrl": "https://aje.news/n7iyy2",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "923164",
+              "name": "Andrew Mitrovica",
+              "link": "/author/andrew_mitrovica_160713071508161",
+              "description": "Andrew Mitrovica is an Al Jazeera columnist based in Toronto.",
+              "slug": "andrew_mitrovica_160713071508161",
+              "twitter": "",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2019/02/d1535e9ea42e4579a8ef03c3a28b7fc9_6.jpeg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2019/02/d1535e9ea42e4579a8ef03c3a28b7fc9_6.jpeg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2019/02/d1535e9ea42e4579a8ef03c3a28b7fc9_6.jpeg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2019/02/d1535e9ea42e4579a8ef03c3a28b7fc9_6.jpeg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "Al Jazeera columnist",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 287,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4496445",
+            "sourceUrl": "/wp-content/uploads/2026/04/AP26104274533547-1776317283.jpg",
+            "credit": "AP",
+            "caption": "President Donald Trump and Pope Leo XIV [AP Photo]",
+            "alt": "President Donald Trump and Pope Leo XIV",
+            "width": 5000,
+            "height": 3333,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4496445",
+            "sourceUrl": "/wp-content/uploads/2026/04/AP26104274533547-1776317283.jpg",
+            "credit": "AP",
+            "caption": "President Donald Trump and Pope Leo XIV [AP Photo]",
+            "alt": "President Donald Trump and Pope Leo XIV",
+            "width": 5000,
+            "height": 3333,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "e85e457e-5b60-4f28-b2b8-b42e005c53be",
+          "audioDuration": "409.835102",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4496390/aje_4496390_2026-04-16T05-36-04.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4494516",
+          "title": "Netanyahu sees Lebanon as his last chance for a ‘win’",
+          "excerpt": "After the failure in Gaza and Iran, the Israeli prime minister hopes he can be triumphant in Lebanon.",
+          "date": "2026-04-15T16:38:12",
+          "link": "/opinions/2026/4/15/netanyahu-sees-lebanon-as-his-last-chance-for-a",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/1ghapx",
+          "proxyShortUrl": "https://aje.news/n8ropk",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "3776630",
+              "name": "Ori Goldberg",
+              "link": "/author/ori-goldberg",
+              "description": "Ori Goldberg holds a PhD in Middle Eastern Studies with a specialisation in Iranian affairs. He is a former university professor and national security consultant. Today he is an independent analyst and commentator.",
+              "slug": "ori-goldberg",
+              "twitter": "",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2025/06/IMG_4276-1749982984.jpg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2025/06/IMG_4276-1749982984.jpg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2025/06/IMG_4276-1749982984.jpg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2025/06/IMG_4276-1749982984.jpg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "Independent analyst",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 7,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4445824",
+            "sourceUrl": "/wp-content/uploads/2026/03/2026-03-25T134314Z_340509604_RC2U7KANSWTQ_RTRMADP_3_IRAN-CRISIS-ISRAEL-POLITICS-1774855152.jpg",
+            "credit": "Reuters",
+            "caption": "Israeli Prime Minister Benjamin Netanyahu speaks during a news conference in Jerusalem on March 19, 2026 [Ronen Zvulun/Pool via Reuters]",
+            "alt": "Israeli Prime Minister Benjamin Netanyahu.",
+            "width": 3463,
+            "height": 2309,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4445824",
+            "sourceUrl": "/wp-content/uploads/2026/03/2026-03-25T134314Z_340509604_RC2U7KANSWTQ_RTRMADP_3_IRAN-CRISIS-ISRAEL-POLITICS-1774855152.jpg",
+            "credit": "Reuters",
+            "caption": "Israeli Prime Minister Benjamin Netanyahu speaks during a news conference in Jerusalem on March 19, 2026 [Ronen Zvulun/Pool via Reuters]",
+            "alt": "Israeli Prime Minister Benjamin Netanyahu.",
+            "width": 3463,
+            "height": 2309,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "2eac7b29-22b9-460a-a053-b42d01125474",
+          "audioDuration": "335.986939",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4494516/aje_4494516_2026-04-15T16-38-44.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4491771",
+          "title": "Justice, in ICC Prosecutor Khan’s case, resides in the reasoning of judges",
+          "excerpt": "The Judicial Panel’s conclusion on Mr Khan’s case should not be discarded because some parties find it inconvenient.",
+          "date": "2026-04-14T19:00:17",
+          "link": "/opinions/2026/4/14/the-process-of-justice-must-be-observed-in-icc-prosecutor-karim-khans-case",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/3ockno",
+          "proxyShortUrl": "https://aje.news/j09hdb",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "4491772",
+              "name": "Sareta Ashraph",
+              "link": "/author/sareta-ashraph",
+              "description": "Sareta Ashraph is Lead Counsel for Karim A A Khan KC, Prosecutor of the International Criminal Court.",
+              "slug": "sareta-ashraph",
+              "twitter": "",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2026/04/Ashraph-1776184987.jpg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2026/04/Ashraph-1776184987.jpg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2026/04/Ashraph-1776184987.jpg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2026/04/Ashraph-1776184987.jpg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 1,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4144124",
+            "sourceUrl": "/wp-content/uploads/2025/12/ap_692e24d54407f-1764631765.jpg",
+            "credit": "AP",
+            "caption": "A general view of the exterior of the International Criminal Court is seen in The Hague, Netherlands on March 12, 2025 [File: Omar Havana/AP]",
+            "alt": "FILE - A general view of the exterior of the International Criminal Court is seen in The Hague, Netherlands, March 12, 2025. (AP Photo/Omar Havana, File)",
+            "width": 5154,
+            "height": 3436,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4144124",
+            "sourceUrl": "/wp-content/uploads/2025/12/ap_692e24d54407f-1764631765.jpg",
+            "credit": "AP",
+            "caption": "A general view of the exterior of the International Criminal Court is seen in The Hague, Netherlands on March 12, 2025 [File: Omar Havana/AP]",
+            "alt": "FILE - A general view of the exterior of the International Criminal Court is seen in The Hague, Netherlands, March 12, 2025. (AP Photo/Omar Havana, File)",
+            "width": 5154,
+            "height": 3436,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "1c4d97b9-39d6-4542-95ca-b42c01395f83",
+          "audioDuration": "431.699592",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4491771/aje_4491771_2026-04-15T03-58-13.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4491547",
+          "title": "It is time for a ceasefire in Sudan and a new way forward",
+          "excerpt": "The SAF and the RSF cannot shape the future of Sudan alone. All political actors and the Sudanese people must join.",
+          "date": "2026-04-14T17:16:03",
+          "link": "/opinions/2026/4/14/it-is-time-for-a-ceasefire-in-sudan-and-a-new-way-forward",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/0ewwrg",
+          "proxyShortUrl": "https://aje.news/ehmyqt",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "923782",
+              "name": "Hala Al-Karib",
+              "link": "/author/hala_al_karib_181212165529440",
+              "description": "Hala Al-Karib is an activist and research practitioner from Sudan. She is the Regional Director of the Strategic Initiative for Women in the Horn of Africa (SIHA)  and the editorial head of the annual journal \"Women in Islam\".",
+              "slug": "hala_al_karib_181212165529440",
+              "twitter": "https://twitter.com/Halayalkarib",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2020/09/Hala-1776186638.jpg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2020/09/Hala-1776186638.jpg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2020/09/Hala-1776186638.jpg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2020/09/Hala-1776186638.jpg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "Hala Al-Karib is the Regional Director of the Strategic Initiative for Women in the Horn of Africa (SIHA).",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 4,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4084680",
+            "sourceUrl": "/wp-content/uploads/2025/11/afp_690a7eac7b3a-1762295468.jpg",
+            "credit": "AFP",
+            "caption": "A Sudanese student holds a sign that reads in Arabic, &quot;We are all El-Fasher&quot; during a protest against the atrocities committed by the Rapid Support Forces (RSF) against the people of El- Fasher, in Khartoum on November 3, 2025 [AFP]",
+            "alt": "A Sudanese Student from a school in the East Nile region of the capital, holds a sign that reads in Arabic, \"We are all El-Fasher\" during a protest against violations committed by the Rapid Support Forces (RSF) against the people of El- Fasher, in Khartoum on November 3, 2025.",
+            "width": 5184,
+            "height": 3456,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4084680",
+            "sourceUrl": "/wp-content/uploads/2025/11/afp_690a7eac7b3a-1762295468.jpg",
+            "credit": "AFP",
+            "caption": "A Sudanese student holds a sign that reads in Arabic, &quot;We are all El-Fasher&quot; during a protest against the atrocities committed by the Rapid Support Forces (RSF) against the people of El- Fasher, in Khartoum on November 3, 2025 [AFP]",
+            "alt": "A Sudanese Student from a school in the East Nile region of the capital, holds a sign that reads in Arabic, \"We are all El-Fasher\" during a protest against violations committed by the Rapid Support Forces (RSF) against the people of El- Fasher, in Khartoum on November 3, 2025.",
+            "width": 5184,
+            "height": 3456,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "c533fe24-4d56-47fe-88d7-b42c011e6c05",
+          "audioDuration": "485.146122",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4491547/aje_4491547_2026-04-14T17-22-40.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4491207",
+          "title": "Iran remains an obstacle to the ‘Greater Israel’ project",
+          "excerpt": "Israel wants to expand in the Middle East. Its failure to defeat Iran is a major setback for its hegemonic plans.",
+          "date": "2026-04-14T12:33:01",
+          "link": "/opinions/2026/4/14/iran-remains-an-obstacle-to-the-greater-israel-project",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/t5pjy1",
+          "proxyShortUrl": "https://aje.news/vpud4s",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "922681",
+              "name": "Samer Jaber",
+              "link": "/author/samer_jaber_201472911611970485",
+              "description": "Samer B Jaber is a PhD researcher specialising in political economy at Royal Holloway, University of London. He is also a fellow with the Council for At-Risk Academics (CARA). He focuses on the Arab world and the Middle East region.",
+              "slug": "samer_jaber_201472911611970485",
+              "twitter": "https://twitter.com/AhlainAhlain",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2020/09/samer-1705750322.jpg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2020/09/samer-1705750322.jpg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2020/09/samer-1705750322.jpg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2020/09/samer-1705750322.jpg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "Samer Jaber is a political activist and researcher.",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 14,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4491223",
+            "sourceUrl": "/wp-content/uploads/2026/04/2025-05-26T165356Z_48166687_RC2SPEAXIBYF_RTRMADP_3_ISRAEL-PALESTINIANS-JERUSALEM-DAY-MARCH-1776166618.jpg",
+            "credit": "Reuters",
+            "caption": "Israelis gather with flags by Damascus Gate in occupied East Jerusalem&#039;s Old City as they mark Jerusalem Day on May 26, 2025 [Ammar Awad/Reuters]",
+            "alt": "Israelis gather with flags by Damascus Gate to Jerusalem's Old City.",
+            "width": 5500,
+            "height": 3667,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4491223",
+            "sourceUrl": "/wp-content/uploads/2026/04/2025-05-26T165356Z_48166687_RC2SPEAXIBYF_RTRMADP_3_ISRAEL-PALESTINIANS-JERUSALEM-DAY-MARCH-1776166618.jpg",
+            "credit": "Reuters",
+            "caption": "Israelis gather with flags by Damascus Gate in occupied East Jerusalem&#039;s Old City as they mark Jerusalem Day on May 26, 2025 [Ammar Awad/Reuters]",
+            "alt": "Israelis gather with flags by Damascus Gate to Jerusalem's Old City.",
+            "width": 5500,
+            "height": 3667,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "cc200f3e-5c0d-43ce-8dad-b42c00cf0182",
+          "audioDuration": "598.491429",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4491207/aje_4491207_2026-04-14T12-33-35.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4489240",
+          "title": "Orban was defeated in Hungary, but Orbanism lives on",
+          "excerpt": "Viktor Orban’s stepping stone – the EU’s own illiberal tendencies and militarism – is still very much present.",
+          "date": "2026-04-13T18:56:31",
+          "link": "/opinions/2026/4/13/orban-was-defeated-in-hungary-but-orbanism-lives-on",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/zwitus",
+          "proxyShortUrl": "https://aje.news/va7r9r",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "922456",
+              "name": "Leonid Ragozin",
+              "link": "/author/leonid_ragozin_2013122273219325632",
+              "description": "Leonid Ragozin is a freelance journalist based in Riga.",
+              "slug": "leonid_ragozin_2013122273219325632",
+              "twitter": "https://twitter.com/leonidragozin",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2019/04/140c6deb8dc6403190c7e274420b533e_6.jpeg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2019/04/140c6deb8dc6403190c7e274420b533e_6.jpeg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2019/04/140c6deb8dc6403190c7e274420b533e_6.jpeg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2019/04/140c6deb8dc6403190c7e274420b533e_6.jpeg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "Leonid Ragozin is a freelance journalist based in Riga.",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 67,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4489264",
+            "sourceUrl": "/wp-content/uploads/2026/04/2026-04-12T194301Z_362423742_RC2VNKA96YAH_RTRMADP_3_HUNGARY-ELECTION-1776100325.jpg",
+            "credit": "Reuters",
+            "caption": "Hungarian Prime Minister Viktor Orban arrives to address supporters after the announcement of the partial results of the parliamentary election in Budapest on April 12, 2026 [Bernadett Szabo/Reuters]",
+            "alt": "Hungarian Prime Minister Viktor Orban arrives to address supporters after the announcement of the partial results of parliamentary election in Budapest, Hungary, April 12, 2026. REUTERS/Bernadett Szabo",
+            "width": 2522,
+            "height": 1681,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4489264",
+            "sourceUrl": "/wp-content/uploads/2026/04/2026-04-12T194301Z_362423742_RC2VNKA96YAH_RTRMADP_3_HUNGARY-ELECTION-1776100325.jpg",
+            "credit": "Reuters",
+            "caption": "Hungarian Prime Minister Viktor Orban arrives to address supporters after the announcement of the partial results of the parliamentary election in Budapest on April 12, 2026 [Bernadett Szabo/Reuters]",
+            "alt": "Hungarian Prime Minister Viktor Orban arrives to address supporters after the announcement of the partial results of parliamentary election in Budapest, Hungary, April 12, 2026. REUTERS/Bernadett Szabo",
+            "width": 2522,
+            "height": 1681,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "b8bd4e52-4d37-4d7f-ab3e-b42b0138522a",
+          "audioDuration": "370.625306",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4489240/aje_4489240_2026-04-13T18-57-03.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4488435",
+          "title": "Israel is trying to change Jerusalem’s religious identity",
+          "excerpt": "Israel is destroying the Status Quo to establish full control over Muslim and Christian religious life at holy sites.",
+          "date": "2026-04-13T12:02:43",
+          "link": "/opinions/2026/4/13/israel-is-trying-to-change-jerusalems-religious-identity",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/0j7aie",
+          "proxyShortUrl": "https://aje.news/7qynxb",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "3505475",
+              "name": "Xavier Abu Eid",
+              "link": "/author/xavier-abu-eid",
+              "description": "Xavier Abu Eid is a political scientist, PhD candidate at Trinity College Dublin and former adviser to the Palestine Liberation Organization.",
+              "slug": "xavier-abu-eid",
+              "twitter": "",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2025/02/IMG-20250212-WA0003-1739366609.jpg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2025/02/IMG-20250212-WA0003-1739366609.jpg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2025/02/IMG-20250212-WA0003-1739366609.jpg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2025/02/IMG-20250212-WA0003-1739366609.jpg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "A political scientist",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 3,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4488464",
+            "sourceUrl": "/wp-content/uploads/2026/04/2026-04-05T062431Z_1667506388_RC2SIKA6NJW0_RTRMADP_3_RELIGION-EASTER-JERUSALEM-MASS-1776075421.jpg",
+            "credit": "Reuters",
+            "caption": "Israeli security officers stand guard outside the Church of the Holy Sepulchre blocking Christians from attending Easter events inside in occupied East Jerusalem&#039;s Old City on April 5, 2026 [Ammar Awad/Reuters]",
+            "alt": "Israeli security officers stand guard outside the Church of the Holy Sepulchre after being blocked from attending Easter events inside, following restrictions on gatherings in large groups, amid the U.S.-Israel conflict with Iran, in Jerusalem's Old City April 5, 2026. REUTERS/Ammar Awad",
+            "width": 5000,
+            "height": 3353,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4488464",
+            "sourceUrl": "/wp-content/uploads/2026/04/2026-04-05T062431Z_1667506388_RC2SIKA6NJW0_RTRMADP_3_RELIGION-EASTER-JERUSALEM-MASS-1776075421.jpg",
+            "credit": "Reuters",
+            "caption": "Israeli security officers stand guard outside the Church of the Holy Sepulchre blocking Christians from attending Easter events inside in occupied East Jerusalem&#039;s Old City on April 5, 2026 [Ammar Awad/Reuters]",
+            "alt": "Israeli security officers stand guard outside the Church of the Holy Sepulchre after being blocked from attending Easter events inside, following restrictions on gatherings in large groups, amid the U.S.-Israel conflict with Iran, in Jerusalem's Old City April 5, 2026. REUTERS/Ammar Awad",
+            "width": 5000,
+            "height": 3353,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "2f28722b-8313-4b35-9825-b42b00c6b650",
+          "audioDuration": "488.881633",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4488435/aje_4488435_2026-04-13T12-03-19.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4474187",
+          "title": "Cuba sent doctors. Washington sent a destroyer.",
+          "excerpt": "The US blockade is killing not just a failing state, but six decades of a small island extending global solidarity.",
+          "date": "2026-04-13T08:38:35",
+          "link": "/opinions/2026/4/13/cuba-sent-doctors-washington-sent-a-destroyer",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/e470nm",
+          "proxyShortUrl": "https://aje.news/83fqbo",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "4474219",
+              "name": "Jafari S Allen",
+              "link": "/author/jafari-s-allen",
+              "description": "Jafari S Allen is Professor of African American and African Diaspora Studies, in the Department of African American and African Diaspora Studies at Columbia University. He is the author of ¡Venceremos? The Erotics of Black Self-making in Cuba,  nd There's a Disco Ball Between Us: A Theory of Black Gay Life—both published by Duke University Press.",
+              "slug": "jafari-s-allen",
+              "twitter": "",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2026/04/IMG_4498-1775661376.jpg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2026/04/IMG_4498-1775661376.jpg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2026/04/IMG_4498-1775661376.jpg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2026/04/IMG_4498-1775661376.jpg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 1,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4488153",
+            "sourceUrl": "/wp-content/uploads/2026/04/2014-10-22T120000Z_693597558_GM1EAAN0D1201_RTRMADP_3_HEALTH-EBOLA-LIBERIA-1776068104.jpg",
+            "credit": "",
+            "caption": "A team of Cuban doctors and nurses arrives in Liberia on October 22, 2014 to help to fight the worst outbreak of the deadly Ebola virus [File: James Giahyue/Reuters]",
+            "alt": "Cuban health workers arrive at Roberts Airport outside Monrovia October 22, 2014. A team of Cuban doctors and nurses arrived in Liberia on Wednesday to help to fight the worst outbreak of the deadly Ebola virus on record alongside a U.S. military mission deploying in the West Africa country. REUTERS/James Giahyue (LIBERIA - Tags: HEALTH DISASTER)",
+            "width": 3500,
+            "height": 2343,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4488153",
+            "sourceUrl": "/wp-content/uploads/2026/04/2014-10-22T120000Z_693597558_GM1EAAN0D1201_RTRMADP_3_HEALTH-EBOLA-LIBERIA-1776068104.jpg",
+            "credit": "",
+            "caption": "A team of Cuban doctors and nurses arrives in Liberia on October 22, 2014 to help to fight the worst outbreak of the deadly Ebola virus [File: James Giahyue/Reuters]",
+            "alt": "Cuban health workers arrive at Roberts Airport outside Monrovia October 22, 2014. A team of Cuban doctors and nurses arrived in Liberia on Wednesday to help to fight the worst outbreak of the deadly Ebola virus on record alongside a U.S. military mission deploying in the West Africa country. REUTERS/James Giahyue (LIBERIA - Tags: HEALTH DISASTER)",
+            "width": 3500,
+            "height": 2343,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "eef62281-40ba-4402-b53b-b42b008ea2a5",
+          "audioDuration": "757.185306",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4474187/aje_4474187_2026-04-13T08-39-12.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        },
+        {
+          "id": "4486308",
+          "title": "Seven ways America can win the ceasefire and end the war",
+          "excerpt": "Trump needs to take decisive action to secure regional peace and a win in the midterm elections.",
+          "date": "2026-04-12T16:30:26",
+          "link": "/opinions/2026/4/12/seven-ways-america-can-win-the-ceasefire-and-end-the-war",
+          "isBreaking": null,
+          "isLive": null,
+          "shortUrl": "https://aje.news/9w1jj5",
+          "proxyShortUrl": "https://aje.news/2qnqbl",
+          "isDeveloping": null,
+          "externalUrl": null,
+          "replacementHeadline": "",
+          "sponsorshipType": null,
+          "postType": "opinion",
+          "author": [
+            {
+              "id": "4430413",
+              "name": "John Feehery",
+              "link": "/author/john-feehery",
+              "description": "John Feehery is a partner at EFB Advocacy, a boutique lobbying and strategic advocacy firm.  When he worked on Capitol Hill, he was consistently ranked as one of the most powerful staffers by Roll Call and as a lobbyist, he is consistently ranked as one of Washington’s top lobbyists by The Hill.",
+              "slug": "john-feehery",
+              "twitter": "",
+              "facebook": "",
+              "avatars": [
+                {
+                  "size": "24",
+                  "url": "/wp-content/uploads/2026/03/John-1774351008.jpg?resize=24%2C24",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "48",
+                  "url": "/wp-content/uploads/2026/03/John-1774351008.jpg?resize=48%2C48",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "96",
+                  "url": "/wp-content/uploads/2026/03/John-1774351008.jpg?resize=96%2C96",
+                  "__typename": "AvatarURLs"
+                },
+                {
+                  "size": "192",
+                  "url": "/wp-content/uploads/2026/03/John-1774351008.jpg?resize=192%2C192",
+                  "__typename": "AvatarURLs"
+                }
+              ],
+              "jobTitle": "",
+              "linked_nicename": "",
+              "allowFollow": true,
+              "displayPostCount": 2,
+              "__typename": "User"
+            }
+          ],
+          "__typename": "Post",
+          "featuredImage": {
+            "id": "4486315",
+            "sourceUrl": "/wp-content/uploads/2026/04/2026-04-11T211057Z_760495259_RC28NKAVUTP5_RTRMADP_3_USA-TRUMP-1776007966.jpg",
+            "credit": "Reuters",
+            "caption": "US President Donald Trump&#039;s conduct of the war on Iran could have repercussions that extend to him and his Republican Party in November&#039;s congressional elections [Annabelle Gordon/Reuters]",
+            "alt": "Trump",
+            "width": 5500,
+            "height": 3667,
+            "__typename": "Media"
+          },
+          "source": [],
+          "postLabel": [],
+          "verticalFeaturedImage": null,
+          "outsideImage": {
+            "id": "4486315",
+            "sourceUrl": "/wp-content/uploads/2026/04/2026-04-11T211057Z_760495259_RC28NKAVUTP5_RTRMADP_3_USA-TRUMP-1776007966.jpg",
+            "credit": "Reuters",
+            "caption": "US President Donald Trump&#039;s conduct of the war on Iran could have repercussions that extend to him and his Republican Party in November&#039;s congressional elections [Annabelle Gordon/Reuters]",
+            "alt": "Trump",
+            "width": 5500,
+            "height": 3667,
+            "__typename": "Media"
+          },
+          "galleryMedia": [],
+          "audioClipId": "2e649f70-e6ae-4e76-9177-b42a01103b08",
+          "audioDuration": "285.962449",
+          "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4486308/aje_4486308_2026-04-12T16-31-02.mp3",
+          "galleryImagesCount": null,
+          "seoTitle": null,
+          "showFAQSchema": false,
+          "showTableOfContent": null,
+          "showEvergreenSchema": false,
+          "writeInAuthor": "",
+          "writeInCoAuthor": {
+            "name": "",
+            "order": "1",
+            "__typename": "WriteInAuthor"
+          },
+          "video": {
+            "id": "",
+            "duration": "",
+            "__typename": "Video"
+          },
+          "programs": [],
+          "featuredYoutube": "",
+          "featuredDataWrapperIframe": "",
+          "childPosts": []
+        }
+      ],
+      "__typename": "FeedPagination"
+    }
+  }
+}

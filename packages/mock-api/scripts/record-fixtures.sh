@@ -82,15 +82,19 @@ record "ArchipelagoSingleArticleQuery--$(slugify "$ARTICLE_SLUG")" \
 # --- Live blog (shell + children + one update) ---
 record "ArchipelagoSingleLiveBlogQuery--$(slugify "$LIVEBLOG_SLUG")" \
   ArchipelagoSingleLiveBlogQuery \
-  "$(jq -nc --arg name "$LIVEBLOG_SLUG" '{name:$name,postType:"post",preview:""}')"
+  "$(jq -nc --arg name "$LIVEBLOG_SLUG" '{name:$name,postType:"liveblog",preview:""}')"
 
 record "SingleLiveBlogChildrensQuery--$(slugify "$LIVEBLOG_SLUG")" \
   SingleLiveBlogChildrensQuery \
   "$(jq -nc --arg postName "$LIVEBLOG_SLUG" '{postName:$postName}')"
 
+# LiveBlogUpdateQuery: production returns "no_posts_found" for child IDs from
+# SingleLiveBlogChildrensQuery — children appear to be embedded entries, not
+# standalone posts. Capturing the actual error response as the fixture is
+# faithful to production behavior; M7 will resolve the real semantics.
 record "LiveBlogUpdateQuery--${LIVEBLOG_UPDATE_POST_ID}" \
   LiveBlogUpdateQuery \
-  "$(jq -nc --argjson postID "$LIVEBLOG_UPDATE_POST_ID" '{postID:$postID,postType:"post"}')"
+  "$(jq -nc --argjson postID "$LIVEBLOG_UPDATE_POST_ID" '{postID:$postID,postType:"liveblog"}')"
 
 # --- Geographic section (initial + 2 pages) ---
 record ArchipelagoSectionQuery--middle-east \

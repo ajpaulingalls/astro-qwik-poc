@@ -1,0 +1,938 @@
+{
+  "data": {
+    "category": {
+      "id": "27867",
+      "name": "Middle East",
+      "slug": "middle-east",
+      "description": "",
+      "headerName": "Middle East News",
+      "link": "/where/middle-east/",
+      "customNavigation": null,
+      "displayCustomNavigationOnArticles": false,
+      "customNavigationBrandingImg": "",
+      "customBrandingImage": null,
+      "customTimerData": null,
+      "displayDate": true,
+      "customSeoMeta": {
+        "customTitle": "",
+        "customHeading": null,
+        "canonicalUrl": "",
+        "socialImg": "",
+        "__typename": "CustomSeoMeta"
+      },
+      "additionalArticleEmbeds": null,
+      "noindexSearchFlag": false,
+      "breadcrumbs": [
+        {
+          "name": "Middle East",
+          "headerName": null,
+          "slug": "middle-east",
+          "link": "/where/middle-east/",
+          "__typename": "Breadcrumb"
+        }
+      ],
+      "showRssFeedLinkOnPageMeta": null,
+      "__typename": "Category"
+    },
+    "articles": [
+      {
+        "id": "4511785",
+        "title": "Iran war live: Trump says ceasefire extended as talks with Tehran in limbo",
+        "excerpt": "Lebanon’s disaster management unit raises death toll from weeks of Israeli attacks to 2,454, with 7,658 people injured.",
+        "date": "2026-04-22T00:00:00",
+        "link": "/news/liveblog/2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo",
+        "isBreaking": false,
+        "isLive": true,
+        "shortUrl": "https://aje.news/70fs10",
+        "proxyShortUrl": "https://aje.news/q72sd5",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "Tehran vows to ‘resist bullying’ as Trump extends Iran truce, blocks ports",
+        "sponsorshipType": null,
+        "postType": "liveblog",
+        "author": [
+          {
+            "id": "918309",
+            "name": "Lyndal Rowlands",
+            "link": "/author/lyndal_rowlands_170519012102404",
+            "description": "Lyndal Rowlands is an Australian journalist and UN correspondent based in New York City.",
+            "slug": "lyndal_rowlands_170519012102404",
+            "twitter": "https://twitter.com/LyndalRowlands",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2017/05/021059e7440d45cba3c79e9ae03f3bbf_6.jpeg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2017/05/021059e7440d45cba3c79e9ae03f3bbf_6.jpeg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2017/05/021059e7440d45cba3c79e9ae03f3bbf_6.jpeg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2017/05/021059e7440d45cba3c79e9ae03f3bbf_6.jpeg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "rowlandsl",
+            "allowFollow": true,
+            "displayPostCount": 308,
+            "__typename": "User"
+          },
+          {
+            "id": "4303155",
+            "name": "Zaid Sabah",
+            "link": "/author/zaid-sabahh",
+            "description": "",
+            "slug": "zaid-sabahh",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2026/02/Zaid-1770736748.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2026/02/Zaid-1770736748.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2026/02/Zaid-1770736748.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2026/02/Zaid-1770736748.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "",
+            "allowFollow": true,
+            "displayPostCount": 47,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4509951",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-20T143625Z_839091749_RC2ZSKA012SO_RTRMADP_3_IRAN-CRISIS-1776765169.jpg",
+          "credit": "Reuters",
+          "caption": "People walk past an anti-US mural on a street in Tehran, Iran, on April 20, 2026 [Majid Asgaripour/WANA (West Asia News Agency) via Reuters]",
+          "alt": "People walk past an anti-U.S. mural on a street, amid a ceasefire between U.S. and Iran, in Tehran, Iran, April 20, 2026. Majid Asgaripour/WANA (West Asia News Agency) via REUTERS ATTENTION EDITORS - THIS PICTURE WAS PROVIDED BY A THIRD PARTY",
+          "width": 6000,
+          "height": 4000,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera and news agencies",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4509951",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-20T143625Z_839091749_RC2ZSKA012SO_RTRMADP_3_IRAN-CRISIS-1776765169.jpg",
+          "credit": "Reuters",
+          "caption": "People walk past an anti-US mural on a street in Tehran, Iran, on April 20, 2026 [Majid Asgaripour/WANA (West Asia News Agency) via Reuters]",
+          "alt": "People walk past an anti-U.S. mural on a street, amid a ceasefire between U.S. and Iran, in Tehran, Iran, April 20, 2026. Majid Asgaripour/WANA (West Asia News Agency) via REUTERS ATTENTION EDITORS - THIS PICTURE WAS PROVIDED BY A THIRD PARTY",
+          "width": 6000,
+          "height": 4000,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "",
+        "audioDuration": "",
+        "audioPlaybackUrl": "",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": null,
+        "showTableOfContent": null,
+        "showEvergreenSchema": null,
+        "programs": [],
+        "video": {
+          "id": "6368602483112",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      },
+      {
+        "id": "4510785",
+        "title": "Pro-Palestine legal aid requests stay high in 2025 amid US campus pressure",
+        "excerpt": "Legal aid group says the rate of requests shows pro-Palestine advocacy persists despite Trump administration’s tactics.",
+        "date": "2026-04-21T20:48:47",
+        "link": "/news/2026/4/21/pro-palestine-legal-aid-requests-stay-high-in-2025-amid-us-campus-pressure",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/88xcv9",
+        "proxyShortUrl": "https://aje.news/2fwfth",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "918343",
+            "name": "Joseph Stepansky",
+            "link": "/author/joseph_stepansky_170108112414933",
+            "description": "Joseph Stepansky is a reporter and producer for Al Jazeera covering US foreign policy, human rights and conflict. He was previously a staff reporter at the New York Daily News, where he covered cops, crime, and the people caught in between.",
+            "slug": "joseph_stepansky_170108112414933",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2020/09/profile-pic-fix.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2020/09/profile-pic-fix.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2020/09/profile-pic-fix.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2020/09/profile-pic-fix.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "Joseph Stepansky is a reporter and producer for Al Jazeera.",
+            "linked_nicename": "stepanskyj",
+            "allowFollow": true,
+            "displayPostCount": 697,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4511066",
+          "sourceUrl": "/wp-content/uploads/2026/04/reuters_69e7c634-1776797236.jpg",
+          "credit": "Reuters",
+          "caption": "Protesters hold up signs in support of Palestinian rights outside of a professional basketball game in Boston, Massachusetts, on June 9, 2024 [File: Peter Casey-USA TODAY Sports via Reuters]",
+          "alt": "Jun 9, 2024; Boston, Massachusetts, USA; Protesters hold up sign in support of Palestine before outside if TD Garden game two of the 2024 NBA Finals between the Boston Celtics and the Dallas Mavericks at TD Garden. Mandatory Credit: Peter Casey-USA TODAY Sports",
+          "width": 6880,
+          "height": 4589,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4511066",
+          "sourceUrl": "/wp-content/uploads/2026/04/reuters_69e7c634-1776797236.jpg",
+          "credit": "Reuters",
+          "caption": "Protesters hold up signs in support of Palestinian rights outside of a professional basketball game in Boston, Massachusetts, on June 9, 2024 [File: Peter Casey-USA TODAY Sports via Reuters]",
+          "alt": "Jun 9, 2024; Boston, Massachusetts, USA; Protesters hold up sign in support of Palestine before outside if TD Garden game two of the 2024 NBA Finals between the Boston Celtics and the Dallas Mavericks at TD Garden. Mandatory Credit: Peter Casey-USA TODAY Sports",
+          "width": 6880,
+          "height": 4589,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "f5028bef-d7b0-4af2-ac86-b43301571ea1",
+        "audioDuration": "359.706122",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510785/aje_4510785_2026-04-21T20-49-11.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      },
+      {
+        "id": "4510917",
+        "title": "US issues more Iran sanctions on eve of possible talks in Pakistan",
+        "excerpt": "The Trump administration targets 14 individuals and entities over alleged links to Iran’s arms industry.",
+        "date": "2026-04-21T20:42:21",
+        "link": "/news/2026/4/21/us-issues-more-iran-sanctions-on-eve-of-possible-talks-in-pakistan",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/93g8wd",
+        "proxyShortUrl": "https://aje.news/0d2b23",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "922888",
+            "name": "Al Jazeera Staff",
+            "link": "/author/al_jazeera_staff_150119130629458",
+            "description": "",
+            "slug": "al_jazeera_staff_150119130629458",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "",
+            "allowFollow": true,
+            "displayPostCount": 5332,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4510930",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-02-11T090421Z_522651403_RC2LJJAY8AY9_RTRMADP_3_IRAN-CRISIS-PROTEST-1776795305.jpg",
+          "credit": "",
+          "caption": "A Shahed drone on display during the 47th anniversary of the Islamic Revolution in Tehran on February 11 [File: Majid Asgaripour/WANA via Reuters]",
+          "alt": "Shahed drone",
+          "width": 5444,
+          "height": 3629,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4510930",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-02-11T090421Z_522651403_RC2LJJAY8AY9_RTRMADP_3_IRAN-CRISIS-PROTEST-1776795305.jpg",
+          "credit": "",
+          "caption": "A Shahed drone on display during the 47th anniversary of the Islamic Revolution in Tehran on February 11 [File: Majid Asgaripour/WANA via Reuters]",
+          "alt": "Shahed drone",
+          "width": 5444,
+          "height": 3629,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "d284c734-499b-4c88-8e42-b4330155615a",
+        "audioDuration": "257.123265",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510917/aje_4510917_2026-04-21T20-42-52.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      },
+      {
+        "id": "4510869",
+        "title": "EU eyes options as Iran conflict threatens jet fuel shortages",
+        "excerpt": "The blockade of the Strait of Hormuz is causing concern in Europe, which relies heavily on imported jet fuel.",
+        "date": "2026-04-21T20:33:13",
+        "link": "/news/2026/4/21/eu-eyes-options-as-iran-conflict-threatens-jet-fuel-shortages",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/14449h",
+        "proxyShortUrl": "https://aje.news/iyso42",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4510983",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-17T152316Z_429483990_RC21RKAXEN6A_RTRMADP_3_IRAN-CRISIS-EU-JETFUEL-1776796138.jpg",
+          "credit": "Reuters",
+          "caption": "The International Energy Agency has warned of jet fuel shortages in Europe (File: Reuters)",
+          "alt": "An airplane and some dark clouds",
+          "width": 6000,
+          "height": 4005,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "AFP",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          },
+          {
+            "name": "Reuters",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4510983",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-17T152316Z_429483990_RC21RKAXEN6A_RTRMADP_3_IRAN-CRISIS-EU-JETFUEL-1776796138.jpg",
+          "credit": "Reuters",
+          "caption": "The International Energy Agency has warned of jet fuel shortages in Europe (File: Reuters)",
+          "alt": "An airplane and some dark clouds",
+          "width": 6000,
+          "height": 4005,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "5cdd82cc-d83b-4e37-851e-b4330152cfc6",
+        "audioDuration": "153.077551",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510869/aje_4510869_2026-04-21T20-33-32.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      },
+      {
+        "id": "4510842",
+        "title": "Sudan refugees returning home face new ‘struggle for survival’: UN",
+        "excerpt": "Returnees find chronic need for investment with homes, water supplies, health provision, electricity ‘heavily damaged’.",
+        "date": "2026-04-21T20:32:32",
+        "link": "/news/2026/4/21/sudan-refugees-returning-home-face-new-struggle-for-survival-un",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/sxi79q",
+        "proxyShortUrl": "https://aje.news/w8cb9u",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "922888",
+            "name": "Al Jazeera Staff",
+            "link": "/author/al_jazeera_staff_150119130629458",
+            "description": "",
+            "slug": "al_jazeera_staff_150119130629458",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "",
+            "allowFollow": true,
+            "displayPostCount": 5332,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4510847",
+          "sourceUrl": "/wp-content/uploads/2026/04/AFP__20260421__A8A99T6__v1__HighRes__SudanConflict-1776792400.jpg",
+          "credit": "AFP",
+          "caption": "Al-Shubbak speaks to an AFP journalist at her home on Khartoum&#039;s Tuti island, on April 17, 2026 [Khaled Desouki/AFP]",
+          "alt": "Local resident Al-Shubbak at her home on Khartoum's Tuti island",
+          "width": 8256,
+          "height": 5504,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4510847",
+          "sourceUrl": "/wp-content/uploads/2026/04/AFP__20260421__A8A99T6__v1__HighRes__SudanConflict-1776792400.jpg",
+          "credit": "AFP",
+          "caption": "Al-Shubbak speaks to an AFP journalist at her home on Khartoum&#039;s Tuti island, on April 17, 2026 [Khaled Desouki/AFP]",
+          "alt": "Local resident Al-Shubbak at her home on Khartoum's Tuti island",
+          "width": 8256,
+          "height": 5504,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "78cc4b6c-a17d-44a6-859d-b4330152ab33",
+        "audioDuration": "136.280816",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510842/aje_4510842_2026-04-21T20-32-56.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      },
+      {
+        "id": "4510583",
+        "title": "US forces detain Iran-linked tanker Tifani with ceasefire talks on edge",
+        "excerpt": "Ship, detained under US policy to stop all Tehran-linked vessels, is under sanctions for smuggling Iranian crude.",
+        "date": "2026-04-21T18:45:32",
+        "link": "/news/2026/4/21/us-forces-detain-iran-linked-tanker-tifani-with-ceasefire-talks-on-edge",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/626x3x",
+        "proxyShortUrl": "https://aje.news/y0m8f7",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4462674",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-03T214404Z_81297207_RC2B2KAHFHCA_RTRMADP_3_IRAN-CRISIS-INTELLIGENCE-HORMUZ-1775349084.jpg",
+          "credit": "Reuters",
+          "caption": "A cargo ship sits in the Gulf near the Strait of Hormuz, as seen from Ras al-Khaimah, UAE [File: Reuters]",
+          "alt": "Strait of Hormuz",
+          "width": 2283,
+          "height": 1518,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera and news agencies",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4462674",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-03T214404Z_81297207_RC2B2KAHFHCA_RTRMADP_3_IRAN-CRISIS-INTELLIGENCE-HORMUZ-1775349084.jpg",
+          "credit": "Reuters",
+          "caption": "A cargo ship sits in the Gulf near the Strait of Hormuz, as seen from Ras al-Khaimah, UAE [File: Reuters]",
+          "alt": "Strait of Hormuz",
+          "width": 2283,
+          "height": 1518,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "aa4610c7-f955-4396-a949-b43301358bfb",
+        "audioDuration": "216.32",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510583/aje_4510583_2026-04-21T18-46-51.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      },
+      {
+        "id": "4510413",
+        "title": "Israeli sexual violence is pushing Palestinians from West Bank: Report",
+        "excerpt": "NGO finds at least 16 cases of conflict-related sexual violence attributed to Israeli settlers and soldiers.",
+        "date": "2026-04-21T16:38:13",
+        "link": "/news/2026/4/21/israeli-sexual-violence-helping-push-palestinians-from-west-bank-report",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/f2yxkm",
+        "proxyShortUrl": "https://aje.news/1zqiql",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "1564051",
+            "name": "Adam Hancock",
+            "link": "/author/adam-hancock",
+            "description": "Adam Hancock is a Singapore-based freelance journalist.",
+            "slug": "adam-hancock",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2021/11/Headshot-1-1706763439.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2021/11/Headshot-1-1706763439.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2021/11/Headshot-1-1706763439.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2021/11/Headshot-1-1706763439.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "hancocka",
+            "allowFollow": true,
+            "displayPostCount": 120,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4510505",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-02-09T122108Z_901108136_RC29IJAFAGWI_RTRMADP_3_ISRAEL-PALESTINIANS-WEST-BANK-1776782182.jpg",
+          "credit": "Reuters",
+          "caption": "Palestinians walk in front of an Israeli settlement in the old city in Hebron in the Israeli-occupied West Bank [Mussa Qawasma/Reuters]",
+          "alt": "Palestinians walk in front of an Israeli settlement in Hebron",
+          "width": 6000,
+          "height": 4000,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4510505",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-02-09T122108Z_901108136_RC29IJAFAGWI_RTRMADP_3_ISRAEL-PALESTINIANS-WEST-BANK-1776782182.jpg",
+          "credit": "Reuters",
+          "caption": "Palestinians walk in front of an Israeli settlement in the old city in Hebron in the Israeli-occupied West Bank [Mussa Qawasma/Reuters]",
+          "alt": "Palestinians walk in front of an Israeli settlement in Hebron",
+          "width": 6000,
+          "height": 4000,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "6f071911-11ae-4d28-8823-b433011256a8",
+        "audioDuration": "173.897143",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510413/aje_4510413_2026-04-21T16-38-39.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      },
+      {
+        "id": "4510238",
+        "title": "Rabbi accused of war crimes selected for Israel’s national celebration",
+        "excerpt": "Rabbi Avraham Zarbiv has filmed himself demolishing Palestinian buildings in Gaza while reciting religious verses.",
+        "date": "2026-04-21T15:35:14",
+        "link": "/news/2026/4/21/rabbi-accused-of-war-crimes-selected-for-israels-national-celebration",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/963ojx",
+        "proxyShortUrl": "https://aje.news/7o1e95",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "2200808",
+            "name": "Simon Speakman Cordall",
+            "link": "/author/simon-speakman-cordall",
+            "description": "",
+            "slug": "simon-speakman-cordall",
+            "twitter": "https://twitter.com/IgnitionUK?ref_src=twsrcgoogletwcampserptwgrauthor",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2024/11/Me-1731669679.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2024/11/Me-1731669679.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2024/11/Me-1731669679.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2024/11/Me-1731669679.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "cordalls",
+            "allowFollow": true,
+            "displayPostCount": 231,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4509983",
+          "sourceUrl": "/wp-content/uploads/2026/04/s1-1776766250.jpg",
+          "credit": "",
+          "caption": "Avraham Zarbiv&#039;s name is now used by some Israelis in place of the verb &#039;to demolish&#039;, in celebration of his actions in Gaza, which have been widely condemned elsewhere as war crimes [Social Media]",
+          "alt": "Avraham Zarbiv",
+          "width": 1841,
+          "height": 1228,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4509983",
+          "sourceUrl": "/wp-content/uploads/2026/04/s1-1776766250.jpg",
+          "credit": "",
+          "caption": "Avraham Zarbiv&#039;s name is now used by some Israelis in place of the verb &#039;to demolish&#039;, in celebration of his actions in Gaza, which have been widely condemned elsewhere as war crimes [Social Media]",
+          "alt": "Avraham Zarbiv",
+          "width": 1841,
+          "height": 1228,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "d867a754-550f-4967-8402-b43301011171",
+        "audioDuration": "338.938776",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510238/aje_4510238_2026-04-21T15-35-45.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      },
+      {
+        "id": "4510367",
+        "title": "Trump says he opposes extending Iran ceasefire amid talks uncertainty",
+        "excerpt": "US president says Iran has ‘no choice’ but to show up to the negotiations in Pakistan and accept a ‘great’ deal.",
+        "date": "2026-04-21T14:56:46",
+        "link": "/news/2026/4/21/trump-says-he-opposes-extending-iran-ceasefire-amid-talks-uncertainty",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/df7lnc",
+        "proxyShortUrl": "https://aje.news/rz9vzj",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "922888",
+            "name": "Al Jazeera Staff",
+            "link": "/author/al_jazeera_staff_150119130629458",
+            "description": "",
+            "slug": "al_jazeera_staff_150119130629458",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "",
+            "allowFollow": true,
+            "displayPostCount": 5332,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4510373",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-20T145734Z_1695700153_RC21TKAUH3R1_RTRMADP_3_IRAN-CRISIS-1776777372.jpg",
+          "credit": "",
+          "caption": "A billboard features an image of new Iranian Supreme Leader Mojtaba Khamenei in Tehran on April 20, 2026 [Majid Asgaripour/WANA via Reuters]",
+          "alt": "Man on motorcycle",
+          "width": 6000,
+          "height": 4000,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4510373",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-20T145734Z_1695700153_RC21TKAUH3R1_RTRMADP_3_IRAN-CRISIS-1776777372.jpg",
+          "credit": "",
+          "caption": "A billboard features an image of new Iranian Supreme Leader Mojtaba Khamenei in Tehran on April 20, 2026 [Majid Asgaripour/WANA via Reuters]",
+          "alt": "Man on motorcycle",
+          "width": 6000,
+          "height": 4000,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "8f1f0868-e869-4135-9a8b-b43300f66dd7",
+        "audioDuration": "187.454694",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510367/aje_4510367_2026-04-21T14-57-10.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": ""
+      }
+    ],
+    "redirect": ""
+  }
+}

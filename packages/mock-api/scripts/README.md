@@ -55,6 +55,10 @@ Three pagination offsets (`0, 9, 18`) match the production "Load More" pattern d
 
 Filenames follow `{operationName}.json` or `{operationName}--{variant1}[--{variant2}].json`, matching the keys produced by `lib/variants.ts:resolveFixtureKey`. Slug values are slugified to `[a-z0-9-]` to keep filenames safe.
 
+## Known fixture gaps (story-003b discoveries)
+
+- **`LiveBlogUpdateQuery--{postID}.json`** captures the live API's `no_posts_found` response. The bare numeric IDs from `SingleLiveBlogChildrensQuery` are NOT addressable via `postByID`; live blog updates appear to be embedded in the parent shell rather than standalone posts. M7 implementation will resolve the actual update-fetch pattern (possibly via `LiveBlogSubscription($postID: Int!)` websocket, or by extracting from the shell content). The error fixture is honest representation of current API behavior.
+
 ## Re-recording
 
 The script is idempotent — re-running with the same slugs overwrites the fixtures deterministically. Diff before committing:

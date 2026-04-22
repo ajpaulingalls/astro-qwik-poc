@@ -1,0 +1,11 @@
+{
+  "errors": [
+    {
+      "message": "no_posts_found",
+      "extensions": {}
+    }
+  ],
+  "data": {
+    "posts": null
+  }
+}

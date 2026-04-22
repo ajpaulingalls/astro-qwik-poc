@@ -1,0 +1,983 @@
+{
+  "data": {
+    "articles": [
+      {
+        "id": "4510221",
+        "title": "Iran’s World Cup participation depends on team’s safety in the US: Minister",
+        "excerpt": "Iran’s team is preparing for the FIFA World Cup but may not travel to the tournament, Sport Minister Donyamali says.",
+        "date": "2026-04-21T14:02:08",
+        "link": "/sports/2026/4/21/irans-world-cup-participation-depends-on-teams-safety-in-the-us-minister",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/ybhut1",
+        "proxyShortUrl": "https://aje.news/ycg2yk",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "921053",
+            "name": "Hafsa Adil",
+            "link": "/author/hafsa_adil_2014815112749476273",
+            "description": "",
+            "slug": "hafsa_adil_2014815112749476273",
+            "twitter": "https://x.com/hafsa_adil",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2025/09/IMG-20250912-WA0000-1757829229.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2025/09/IMG-20250912-WA0000-1757829229.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2025/09/IMG-20250912-WA0000-1757829229.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2025/09/IMG-20250912-WA0000-1757829229.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "",
+            "allowFollow": true,
+            "displayPostCount": 361,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4510380",
+          "sourceUrl": "/wp-content/uploads/2026/04/AFP__20260331__A6C28NV__v1__HighRes__FblIrnCrcFriendly-1776777726.jpg",
+          "credit": "",
+          "caption": "Iran will continue to train for the World Cup despite the doubts surrounding the country&#039;s participation in the tournament [File: Adem Altan/AFP]",
+          "alt": "Iran's forward #18 Amirhossein Hosseinzadeh celebrates with his teammates after scoring a goal during a friendly football match between Iran and Costa Rica, in Antalya, southern Turkey, on March 31, 2026. FIFA's president told AFP that Iran \"will be at the World Cup\" despite the Middle East war. (Photo by Adem ALTAN / AFP)",
+          "width": 2453,
+          "height": 1635,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4510380",
+          "sourceUrl": "/wp-content/uploads/2026/04/AFP__20260331__A6C28NV__v1__HighRes__FblIrnCrcFriendly-1776777726.jpg",
+          "credit": "",
+          "caption": "Iran will continue to train for the World Cup despite the doubts surrounding the country&#039;s participation in the tournament [File: Adem Altan/AFP]",
+          "alt": "Iran's forward #18 Amirhossein Hosseinzadeh celebrates with his teammates after scoring a goal during a friendly football match between Iran and Costa Rica, in Antalya, southern Turkey, on March 31, 2026. FIFA's president told AFP that Iran \"will be at the World Cup\" despite the Middle East war. (Photo by Adem ALTAN / AFP)",
+          "width": 2453,
+          "height": 1635,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "148fa21b-2f1c-4f54-bd92-b43300e76d79",
+        "audioDuration": "208.274286",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510221/aje_4510221_2026-04-21T14-02-33.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      },
+      {
+        "id": "4510136",
+        "title": "Shot by Israeli forces, Hala, 18 and Mohammad, 13 fight for their lives",
+        "excerpt": "A Gaza bride-to-be and a 13-year-old West Bank boy fight for their lives after being shot in the head by Israeli forces.",
+        "date": "2026-04-21T13:26:18",
+        "link": "/features/2026/4/21/shot-by-israeli-forces-hala-18-and-mohammad-13-fight-for-their-lives",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/xq5k2q",
+        "proxyShortUrl": "https://aje.news/7dkqdk",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "607",
+            "name": "Mohammad Mansour",
+            "link": "/author/mansourmo",
+            "description": "",
+            "slug": "mansourmo",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2026/03/image_red-1772538043.png?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2026/03/image_red-1772538043.png?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2026/03/image_red-1772538043.png?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2026/03/image_red-1772538043.png?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": null,
+            "allowFollow": true,
+            "displayPostCount": 69,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4510132",
+          "sourceUrl": "/wp-content/uploads/2026/04/s22-1776770041.jpg",
+          "credit": "",
+          "caption": "Mohammad Saber al-Sheikh, right, and Hala Salem Darwish, left, are currently in intensive care after being targeted by Israeli snipers in the head in the occupied West Bank and Gaza [Courtesy of Family]",
+          "alt": "Mohammad Saber al-Sheikh (right) and Hala Salem Darwish (left) are currently in intensive care after being targeted by Israeli snipers in the head in the Occupied West Bank and Gaza.",
+          "width": 1050,
+          "height": 700,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4510132",
+          "sourceUrl": "/wp-content/uploads/2026/04/s22-1776770041.jpg",
+          "credit": "",
+          "caption": "Mohammad Saber al-Sheikh, right, and Hala Salem Darwish, left, are currently in intensive care after being targeted by Israeli snipers in the head in the occupied West Bank and Gaza [Courtesy of Family]",
+          "alt": "Mohammad Saber al-Sheikh (right) and Hala Salem Darwish (left) are currently in intensive care after being targeted by Israeli snipers in the head in the Occupied West Bank and Gaza.",
+          "width": 1050,
+          "height": 700,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "99c39712-2321-4d29-8dfe-b43300ddac3d",
+        "audioDuration": "261.982041",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510136/aje_4510136_2026-04-21T13-26-55.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      },
+      {
+        "id": "4510038",
+        "title": "Why is the EU under pressure to suspend its trade agreement with Israel?",
+        "excerpt": "Divided EU nations debate suspending Israel deal as pressure mounts over rights violations in Gaza and the West Bank.",
+        "date": "2026-04-21T14:53:20",
+        "link": "/news/2026/4/21/why-is-the-eu-under-pressure-to-suspend-its-trade-agreement-with-israel",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/ft1wc9",
+        "proxyShortUrl": "https://aje.news/ihc2xr",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "922888",
+            "name": "Al Jazeera Staff",
+            "link": "/author/al_jazeera_staff_150119130629458",
+            "description": "",
+            "slug": "al_jazeera_staff_150119130629458",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "",
+            "allowFollow": true,
+            "displayPostCount": 5332,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4508336",
+          "sourceUrl": "/wp-content/uploads/2026/04/2025-10-27T070123Z_977942301_RC23JHADMFYO_RTRMADP_3_ISRAEL-PALESTINIANS-GAZA-1776706787.jpg",
+          "credit": "Reuters",
+          "caption": "Destruction in a residential neighbourhood in Gaza City [Dawoud Abu Alkas/Reuters]",
+          "alt": "Destroyed buildings in Gaza, surrounded by rubble",
+          "width": 2218,
+          "height": 1362,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [
+          {
+            "name": "Explainer",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4508336",
+          "sourceUrl": "/wp-content/uploads/2026/04/2025-10-27T070123Z_977942301_RC23JHADMFYO_RTRMADP_3_ISRAEL-PALESTINIANS-GAZA-1776706787.jpg",
+          "credit": "Reuters",
+          "caption": "Destruction in a residential neighbourhood in Gaza City [Dawoud Abu Alkas/Reuters]",
+          "alt": "Destroyed buildings in Gaza, surrounded by rubble",
+          "width": 2218,
+          "height": 1362,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "88545074-e388-4074-ac10-b43300f59352",
+        "audioDuration": "496.43102",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4510038/aje_4510038_2026-04-21T15-50-45.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      },
+      {
+        "id": "4509931",
+        "title": "Iran-US war: Four scenarios for what’s next as talks stumble",
+        "excerpt": "Between an expiring ceasefire and a possible deal lies a range of ways in which the war could proceed, analysts say.",
+        "date": "2026-04-21T12:22:58",
+        "link": "/news/2026/4/21/iran-us-war-four-scenarios-for-whats-next-as-talks-stumble",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/yy25ti",
+        "proxyShortUrl": "https://aje.news/2xqw4k",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "Iran-US war: Four scenarios for what’s next as talks stumble",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "2670865",
+            "name": "Yashraj Sharma",
+            "link": "/author/yashraj-sharma",
+            "description": "Yashraj Sharma is an independent journalist, covering the intersection of human rights, society, and tech. He reports for Al Jazeera from India.",
+            "slug": "yashraj-sharma",
+            "twitter": "https://twitter.com/yashjournals",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2025/07/WhatsApp-Image-2025-07-14-at-11.25.52-1752485308.jpeg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2025/07/WhatsApp-Image-2025-07-14-at-11.25.52-1752485308.jpeg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2025/07/WhatsApp-Image-2025-07-14-at-11.25.52-1752485308.jpeg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2025/07/WhatsApp-Image-2025-07-14-at-11.25.52-1752485308.jpeg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "sharmay",
+            "allowFollow": true,
+            "displayPostCount": 173,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4509953",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-20T143935Z_338790428_RC20TKAUKWMM_RTRMADP_3_IRAN-CRISIS-1776765174.jpg",
+          "credit": "",
+          "caption": "A woman walks past an anti-Israel mural on a street in Tehran on April 20, 2026, two days before a US-Iran ceasefire is due to expire [Majid Asgaripour/West Asia News Agency via Reuters]",
+          "alt": "Iran",
+          "width": 5637,
+          "height": 3758,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [
+          {
+            "name": "Explainer",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4509953",
+          "sourceUrl": "/wp-content/uploads/2026/04/2026-04-20T143935Z_338790428_RC20TKAUKWMM_RTRMADP_3_IRAN-CRISIS-1776765174.jpg",
+          "credit": "",
+          "caption": "A woman walks past an anti-Israel mural on a street in Tehran on April 20, 2026, two days before a US-Iran ceasefire is due to expire [Majid Asgaripour/West Asia News Agency via Reuters]",
+          "alt": "Iran",
+          "width": 5637,
+          "height": 3758,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "4bdf7a15-5abe-4b99-bf7a-b43300cc41cb",
+        "audioDuration": "476.917551",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4509931/aje_4509931_2026-04-21T12-23-29.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      },
+      {
+        "id": "4509855",
+        "title": "Pakistan races against time to get Iran back to US talks as truce end nears",
+        "excerpt": "But a series of escalations by the US is complicating those efforts, say analysts.",
+        "date": "2026-04-21T13:04:16",
+        "link": "/news/2026/4/21/pakistan-races-against-time-to-get-iran-back-to-us-talks-as-truce-end-nears",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/w0y7ib",
+        "proxyShortUrl": "https://aje.news/0q0p7e",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "1824413",
+            "name": "Abid Hussain",
+            "link": "/author/abid-hussain",
+            "description": "Abid Hussain is Al Jazeera English's digital correspondent in Islamabad, Pakistan.",
+            "slug": "abid-hussain",
+            "twitter": "https://twitter.com/abidhussayn",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2022/08/20211006_194151.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2022/08/20211006_194151.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2022/08/20211006_194151.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2022/08/20211006_194151.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "",
+            "allowFollow": true,
+            "displayPostCount": 524,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4509938",
+          "sourceUrl": "/wp-content/uploads/2026/04/afp_69e747eb8c01-1776764907.jpg",
+          "credit": "AFP",
+          "caption": "Police personnel stand guard near the Serena Hotel in the Red Zone area of Islamabad on April 21, 2026, amid heightened security measures in advance of anticipated US-Iran peace talks [AFP]",
+          "alt": "Police personnel stand guard near the Serena Hotel in the Red Zone area of Islamabad",
+          "width": 7536,
+          "height": 5024,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4509938",
+          "sourceUrl": "/wp-content/uploads/2026/04/afp_69e747eb8c01-1776764907.jpg",
+          "credit": "AFP",
+          "caption": "Police personnel stand guard near the Serena Hotel in the Red Zone area of Islamabad on April 21, 2026, amid heightened security measures in advance of anticipated US-Iran peace talks [AFP]",
+          "alt": "Police personnel stand guard near the Serena Hotel in the Red Zone area of Islamabad",
+          "width": 7536,
+          "height": 5024,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "b9462967-e1ec-4a1f-96b1-b43300d7a1b1",
+        "audioDuration": "580.440816",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4509855/aje_4509855_2026-04-21T13-04-52.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      },
+      {
+        "id": "4509829",
+        "title": "Germany and Italy block bid to suspend EU-Israel trade pact",
+        "excerpt": "Spain, Slovenia, Ireland pushed EU foreign policy chief Kallas to ditch pact over Israeli ‘human rights’ violations.",
+        "date": "2026-04-21T09:32:43",
+        "link": "/news/2026/4/21/spain-slovenia-ireland-push-eu-to-debate-israel-pact-suspension",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/dld410",
+        "proxyShortUrl": "https://aje.news/ro019c",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "3614139",
+            "name": "Caolán Magee",
+            "link": "/author/caolan-magee",
+            "description": "",
+            "slug": "caolan-magee",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2025/03/Caolan-Magee-pic-1-1743426806.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2025/03/Caolan-Magee-pic-1-1743426806.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2025/03/Caolan-Magee-pic-1-1743426806.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2025/03/Caolan-Magee-pic-1-1743426806.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "mageec",
+            "allowFollow": true,
+            "displayPostCount": 214,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4295750",
+          "sourceUrl": "/wp-content/uploads/2026/02/AP26029313270104-1770480891.jpg",
+          "credit": "AP Photo",
+          "caption": "Italian Foreign Minister Antonio Tajani said the effort to suspend the agreement with Israel has been shelved [File: Geert Vanden Wijngaert/AP Photo]",
+          "alt": "Italy's Foreign Minister Antonio Tajani",
+          "width": 1024,
+          "height": 683,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4295750",
+          "sourceUrl": "/wp-content/uploads/2026/02/AP26029313270104-1770480891.jpg",
+          "credit": "AP Photo",
+          "caption": "Italian Foreign Minister Antonio Tajani said the effort to suspend the agreement with Israel has been shelved [File: Geert Vanden Wijngaert/AP Photo]",
+          "alt": "Italy's Foreign Minister Antonio Tajani",
+          "width": 1024,
+          "height": 683,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "33337b31-2b37-46a8-b0b6-b433009d7541",
+        "audioDuration": "258.194286",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4509829/aje_4509829_2026-04-21T09-33-13.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      },
+      {
+        "id": "4509611",
+        "title": "US, Iran exchange threats as fragile ceasefire set to expire",
+        "excerpt": "The US and Iran trade threats as tensions escalate between the countries before their two-week ceasefire ends.",
+        "date": "2026-04-21T07:55:38",
+        "link": "/news/2026/4/21/us-and-iran-exchange-threats-as-fragile-ceasefire-set-to-expire",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/9kovit",
+        "proxyShortUrl": "https://aje.news/f7w691",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "922888",
+            "name": "Al Jazeera Staff",
+            "link": "/author/al_jazeera_staff_150119130629458",
+            "description": "",
+            "slug": "al_jazeera_staff_150119130629458",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2024/05/2017-06-08T131939Z_1189275883_RC11B0FE7F20_RTRMADP_3_GULF-QATAR-JAZEERA-1714943623.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "",
+            "allowFollow": true,
+            "displayPostCount": 5332,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4504371",
+          "sourceUrl": "/wp-content/uploads/2026/04/AFP__20260408__A74693D__v3__HighRes__TopshotIranIsraelUsWar-1776590258.jpg",
+          "credit": "AFP",
+          "caption": "The temporary ceasefire between the US and Iran is set to expire before a resolution as tension grows between the countries [File: Atta Kenara/AFP]",
+          "alt": "A woman walks past an anti-US and anti-Israel mural in Tehran",
+          "width": 5400,
+          "height": 3428,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4504371",
+          "sourceUrl": "/wp-content/uploads/2026/04/AFP__20260408__A74693D__v3__HighRes__TopshotIranIsraelUsWar-1776590258.jpg",
+          "credit": "AFP",
+          "caption": "The temporary ceasefire between the US and Iran is set to expire before a resolution as tension grows between the countries [File: Atta Kenara/AFP]",
+          "alt": "A woman walks past an anti-US and anti-Israel mural in Tehran",
+          "width": 5400,
+          "height": 3428,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "cb1915da-8665-4f65-84a6-b4330082bbd3",
+        "audioDuration": "143.412245",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4509611/aje_4509611_2026-04-21T07-55-56.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      },
+      {
+        "id": "4509448",
+        "title": "Trump’s Board of Peace holds Gaza reconstruction talks with UAE’s DP World",
+        "excerpt": "Israel has killed more than 700 people in Gaza since last year’s US-brokered ‘ceasefire’.",
+        "date": "2026-04-21T07:18:57",
+        "link": "/news/2026/4/21/trumps-board-of-peace-holds-gaza-reconstruction-talks-with-uaes-dp-world",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/uavden",
+        "proxyShortUrl": "https://aje.news/9x4yux",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "3614139",
+            "name": "Caolán Magee",
+            "link": "/author/caolan-magee",
+            "description": "",
+            "slug": "caolan-magee",
+            "twitter": "",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2025/03/Caolan-Magee-pic-1-1743426806.jpg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2025/03/Caolan-Magee-pic-1-1743426806.jpg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2025/03/Caolan-Magee-pic-1-1743426806.jpg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2025/03/Caolan-Magee-pic-1-1743426806.jpg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "mageec",
+            "allowFollow": true,
+            "displayPostCount": 214,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "4509463",
+          "sourceUrl": "/wp-content/uploads/2026/04/getty_69e71538ec-1776751928.jpg",
+          "credit": "Getty",
+          "caption": "US President Donald Trump sits between Prime Minister of Armenia Nikol Pashinyan and Azerbaijan President Ilham Aliyev during a signing ceremony for the Board of Peace at the World Economic Forum on January 22, 2026 in Davos, Switzerland [Chip Somodevilla/Getty Images]",
+          "alt": "US President Donald Trump (C) sits between Prime Minister of Armenia Nikol Pashinyan (L) and Azerbaijan President Ilham Aliyev during a signing ceremony.",
+          "width": 5478,
+          "height": 3598,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          },
+          {
+            "name": "Financial Times",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "4509463",
+          "sourceUrl": "/wp-content/uploads/2026/04/getty_69e71538ec-1776751928.jpg",
+          "credit": "Getty",
+          "caption": "US President Donald Trump sits between Prime Minister of Armenia Nikol Pashinyan and Azerbaijan President Ilham Aliyev during a signing ceremony for the Board of Peace at the World Economic Forum on January 22, 2026 in Davos, Switzerland [Chip Somodevilla/Getty Images]",
+          "alt": "US President Donald Trump (C) sits between Prime Minister of Armenia Nikol Pashinyan (L) and Azerbaijan President Ilham Aliyev during a signing ceremony.",
+          "width": 5478,
+          "height": 3598,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "49644f19-9ee3-4cd1-a0c2-b4330078acbe",
+        "audioDuration": "169.456327",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4509448/aje_4509448_2026-04-21T07-19-19.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      },
+      {
+        "id": "4509390",
+        "title": "What was the Iran nuclear deal Trump dumped in search of ‘better’ terms?",
+        "excerpt": "Trump withdrew the US from the JCPOA in 2018, branding it ‘the worst deal ever’ and seeking stronger terms.",
+        "date": "2026-04-21T11:44:10",
+        "link": "/news/2026/4/21/what-was-the-iran-nuclear-deal-trump-dumped-in-search-of-better-terms",
+        "isBreaking": false,
+        "isLive": false,
+        "shortUrl": "https://aje.news/2da5yt",
+        "proxyShortUrl": "https://aje.news/0a6cdb",
+        "isDeveloping": false,
+        "externalUrl": null,
+        "replacementHeadline": "",
+        "sponsorshipType": null,
+        "postType": "post",
+        "author": [
+          {
+            "id": "918533",
+            "name": "Usaid Siddiqui",
+            "link": "/author/usaid_siddiqui_190806110228727",
+            "description": "Usaid Siddiqui is a journalist at Al Jazeera English Online based in Doha. He tweets @UsaidM16",
+            "slug": "usaid_siddiqui_190806110228727",
+            "twitter": "https://twitter.com/UsaidM16",
+            "facebook": "",
+            "avatars": [
+              {
+                "size": "24",
+                "url": "/wp-content/uploads/2020/08/84210440a1244dd1b8aee716c4b0cdb6_6.jpeg?resize=24%2C24",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "48",
+                "url": "/wp-content/uploads/2020/08/84210440a1244dd1b8aee716c4b0cdb6_6.jpeg?resize=48%2C48",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "96",
+                "url": "/wp-content/uploads/2020/08/84210440a1244dd1b8aee716c4b0cdb6_6.jpeg?resize=96%2C96",
+                "__typename": "AvatarURLs"
+              },
+              {
+                "size": "192",
+                "url": "/wp-content/uploads/2020/08/84210440a1244dd1b8aee716c4b0cdb6_6.jpeg?resize=192%2C192",
+                "__typename": "AvatarURLs"
+              }
+            ],
+            "jobTitle": "",
+            "linked_nicename": "siddiquiu",
+            "allowFollow": true,
+            "displayPostCount": 744,
+            "__typename": "User"
+          }
+        ],
+        "__typename": "Post",
+        "featuredImage": {
+          "id": "766245",
+          "sourceUrl": "/wp-content/uploads/2017/07/a61673c9cae7424fb6ee5e5187e42179_18.jpeg",
+          "credit": "",
+          "caption": "Then-Secretary of State John Kerry (L) speaks with Hossein Fereydoun (C), the brother of Iranian President Hassan Rouhani, and Iranian Foreign Minister Javad Zarif (R), before the secretary and foreign minister addressed an international press corps gathered at the Austria Center in Vienna, Austria, July 14, 2015 after Iran and six major world powers reached a nuclear deal [US State Department/Handout via Reuters]",
+          "alt": "Hossein Fereydoun",
+          "width": 1000,
+          "height": 562,
+          "__typename": "Media"
+        },
+        "source": [
+          {
+            "name": "Al Jazeera",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "featuredSourceLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "postLabel": [
+          {
+            "name": "Explainer",
+            "featuredTaxonomy": false,
+            "featuredTaxonomyImage": null,
+            "featuredActionLink": "",
+            "__typename": "Category"
+          }
+        ],
+        "verticalFeaturedImage": null,
+        "outsideImage": {
+          "id": "766245",
+          "sourceUrl": "/wp-content/uploads/2017/07/a61673c9cae7424fb6ee5e5187e42179_18.jpeg",
+          "credit": "",
+          "caption": "Then-Secretary of State John Kerry (L) speaks with Hossein Fereydoun (C), the brother of Iranian President Hassan Rouhani, and Iranian Foreign Minister Javad Zarif (R), before the secretary and foreign minister addressed an international press corps gathered at the Austria Center in Vienna, Austria, July 14, 2015 after Iran and six major world powers reached a nuclear deal [US State Department/Handout via Reuters]",
+          "alt": "Hossein Fereydoun",
+          "width": 1000,
+          "height": 562,
+          "__typename": "Media"
+        },
+        "galleryMedia": [],
+        "audioClipId": "f6d58540-3e1f-47cd-bef8-b43300c19282",
+        "audioDuration": "668.760816",
+        "audioPlaybackUrl": "https://tts.aljazeera.net/aje/2026/04/4509390/aje_4509390_2026-04-21T11-44-39.mp3",
+        "galleryImagesCount": null,
+        "seoTitle": null,
+        "showFAQSchema": false,
+        "showTableOfContent": null,
+        "showEvergreenSchema": false,
+        "programs": [],
+        "video": {
+          "id": "",
+          "duration": "",
+          "__typename": "Video"
+        },
+        "featuredYoutube": "",
+        "featuredDataWrapperIframe": "",
+        "childPosts": []
+      }
+    ]
+  }
+}

@@ -48,9 +48,9 @@ The Arabic site (`aljazeera.net`) uses the **same GraphQL endpoint and queries**
 
 | Query | Variables | Purpose |
 |-------|-----------|---------|
-| `ArchipelagoSingleLiveBlogQuery` | `{ name: "{slug}", postType: "post", preview: "" }` | Blog shell — metadata, header, initial content |
+| `ArchipelagoSingleLiveBlogQuery` | `{ name: "{slug}", postType: "liveblog", preview: "" }` | Blog shell — metadata, header, initial content. **postType MUST be "liveblog" not "post"** — the latter returns `no_posts_found`. |
 | `SingleLiveBlogChildrensQuery` | `{ postName: "{slug}" }` | Child entries / updates list |
-| `LiveBlogUpdateQuery` | `{ postID: <int>, postType: "post" }` | Individual update content (called N times). `SingleLiveBlogChildrensQuery` returns bare numeric post IDs. |
+| `LiveBlogUpdateQuery` | `{ postID: <int>, postType: "liveblog" }` | Intended for individual update content. **Open question:** the bare numeric IDs returned by `SingleLiveBlogChildrensQuery` (e.g. `4512107`, `4512131`) all return `no_posts_found` from `postByID`, regardless of postType. Live blog updates appear to be embedded entries within the parent post rather than standalone posts. M7 implementation must verify how production actually fetches individual updates (the live blog frontend may extract them from the shell content directly, or use the websocket subscription `LiveBlogSubscription($postID: Int!)`). |
 | `ArchipelagoBreakingTickerQuery` (ID 18) | `{}` | Breaking news ticker |
 
 ### Section Front — Geographic (e.g., `/middle-east`)
