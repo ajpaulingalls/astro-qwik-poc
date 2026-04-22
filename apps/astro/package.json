@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && sed -i.bak '/@deno\\/astro-adapter\\/__deno_imports/d' dist/server/entry.mjs && rm dist/server/entry.mjs.bak",
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run"
