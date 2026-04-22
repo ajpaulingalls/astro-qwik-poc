@@ -4,7 +4,7 @@
 
 ## Why a monorepo
 
-The two PoCs exist to be compared, not to live in isolation. A monorepo lets us share the things that *must* be identical across both implementations:
+The two PoCs exist to be compared, not to live in isolation. A monorepo lets us share the things that _must_ be identical across both implementations:
 
 - **Mock GraphQL API** — same fixture-based server serving identical data to both apps
 - **Production research** — `docs/RESEARCH.md` describes aljazeera.com itself, framework-agnostic
@@ -56,12 +56,12 @@ bun run perf:qwik
 
 ## Pages in scope
 
-| Page | Route | Key Characteristics |
-|------|-------|---------------------|
-| **Homepage** | `/` | 3-column layout, 17 featured posts, livestream, vertical videos, most popular, curated collections |
-| **Article** | `/news/[...slug]` | Long-form rich content, embeds, related stories |
-| **Live Blog** | `/news/liveblog/[...slug]` | 3-query architecture, polling for updates |
-| **Section Front** | `/[section]` | Two architectures (geographic vs topic), offset-based "Load More" |
+| Page              | Route                      | Key Characteristics                                                                                |
+| ----------------- | -------------------------- | -------------------------------------------------------------------------------------------------- |
+| **Homepage**      | `/`                        | 3-column layout, 17 featured posts, livestream, vertical videos, most popular, curated collections |
+| **Article**       | `/news/[...slug]`          | Long-form rich content, embeds, related stories                                                    |
+| **Live Blog**     | `/news/liveblog/[...slug]` | 3-query architecture, polling for updates                                                          |
+| **Section Front** | `/[section]`               | Two architectures (geographic vs topic), offset-based "Load More"                                  |
 
 Each page includes the **breaking news ticker** (polled globally) and **hardcoded navigation**.
 
@@ -69,12 +69,12 @@ Each page includes the **breaking news ticker** (polled globally) and **hardcode
 
 Both apps aim to **exceed** the Core Web Vitals "Good" thresholds, not just pass them. Acceptance criteria use the stretch column; a value worse than the floor fails the milestone.
 
-| Metric | "Good" floor | **Stretch (target)** |
-|--------|--------------|----------------------|
-| LCP | < 2.5s | **≤ 1.5s** |
-| CLS | < 0.1 | **≤ 0.05** |
-| INP | < 200ms | **≤ 100ms** |
-| Lighthouse Performance | ≥ 95 | **≥ 98** |
+| Metric                 | "Good" floor | **Stretch (target)** |
+| ---------------------- | ------------ | -------------------- |
+| LCP                    | < 2.5s       | **≤ 1.5s**           |
+| CLS                    | < 0.1        | **≤ 0.05**           |
+| INP                    | < 200ms      | **≤ 100ms**          |
+| Lighthouse Performance | ≥ 95         | **≥ 98**             |
 
 JavaScript budgets are framework-specific — see each app's `docs/ARCHITECTURE.md`.
 
@@ -87,10 +87,10 @@ JavaScript budgets are framework-specific — see each app's `docs/ARCHITECTURE.
 
 ## Key documents
 
-| Document | Scope |
-|----------|-------|
-| [docs/RESEARCH.md](./docs/RESEARCH.md) | Production GraphQL queries, response shapes, navigation/pagination patterns — applies to both apps |
-| [apps/astro/docs/ARCHITECTURE.md](./apps/astro/docs/ARCHITECTURE.md) | Astro 6 design — islands, runtime split (bun + Deno), CSP, Fonts API |
-| [apps/astro/docs/MILESTONES.md](./apps/astro/docs/MILESTONES.md) | Astro implementation plan |
-| [apps/qwik/docs/ARCHITECTURE.md](./apps/qwik/docs/ARCHITECTURE.md) | Qwik 2 design — resumability, lazy handlers |
-| [apps/qwik/docs/MILESTONES.md](./apps/qwik/docs/MILESTONES.md) | Qwik implementation plan |
+| Document                                                             | Scope                                                                                              |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [docs/RESEARCH.md](./docs/RESEARCH.md)                               | Production GraphQL queries, response shapes, navigation/pagination patterns — applies to both apps |
+| [apps/astro/docs/ARCHITECTURE.md](./apps/astro/docs/ARCHITECTURE.md) | Astro 6 design — islands, runtime split (bun + Deno), CSP, Fonts API                               |
+| [apps/astro/docs/MILESTONES.md](./apps/astro/docs/MILESTONES.md)     | Astro implementation plan                                                                          |
+| [apps/qwik/docs/ARCHITECTURE.md](./apps/qwik/docs/ARCHITECTURE.md)   | Qwik 2 design — resumability, lazy handlers                                                        |
+| [apps/qwik/docs/MILESTONES.md](./apps/qwik/docs/MILESTONES.md)       | Qwik implementation plan                                                                           |

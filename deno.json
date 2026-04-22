@@ -1,7 +1,5 @@
 {
-  "workspace": [
-    "./packages/mock-api"
-  ],
+  "workspace": ["./packages/mock-api"],
   "tasks": {
     "mock-api": "cd packages/mock-api && deno task dev"
   }

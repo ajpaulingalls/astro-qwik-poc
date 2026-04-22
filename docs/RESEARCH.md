@@ -13,6 +13,7 @@ GET /graphql?wp-site=aje&operationName={name}&variables={json}&extensions={}
 ```
 
 Key details:
+
 - **Method:** GET only (not POST)
 - **`wp-site` header:** Required on every request — `aje` for English, `aja` for Arabic
 - **Operation IDs:** Each query has a numeric ID (1–101) in the internal query map; the API resolves by `operationName`
@@ -28,47 +29,47 @@ The Arabic site (`aljazeera.net`) uses the **same GraphQL endpoint and queries**
 
 ### Homepage
 
-| Query | Variables | Purpose |
-|-------|-----------|---------|
-| `HomePageQuery` | `{ isAtf: true, atfLength: 2, slug: "", preview: "" }` | Main homepage content — layout, featured posts, collections, livestream |
-| `HomePageCuratedFeedQuery` | `{ preview: "", slug: "" }` | Curated feed content |
-| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}` | Breaking news ticker — **polled on every page** |
+| Query                                    | Variables                                              | Purpose                                                                 |
+| ---------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `HomePageQuery`                          | `{ isAtf: true, atfLength: 2, slug: "", preview: "" }` | Main homepage content — layout, featured posts, collections, livestream |
+| `HomePageCuratedFeedQuery`               | `{ preview: "", slug: "" }`                            | Curated feed content                                                    |
+| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                   | Breaking news ticker — **polled on every page**                         |
 
 **No infinite scroll.** All homepage content comes from the initial queries.
 
 ### Article Page
 
-| Query | Variables | Purpose |
-|-------|-----------|---------|
-| `ArchipelagoSingleArticleQuery` (ID 68) | `{ name: "{slug}", postType: "post", preview: "" }` | Full article content with rich fields |
-| `HomePageCuratedFeedQuery` | `{ preview: "", slug: "" }` | Related / more stories |
-| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}` | Breaking news ticker |
+| Query                                    | Variables                                           | Purpose                               |
+| ---------------------------------------- | --------------------------------------------------- | ------------------------------------- |
+| `ArchipelagoSingleArticleQuery` (ID 68)  | `{ name: "{slug}", postType: "post", preview: "" }` | Full article content with rich fields |
+| `HomePageCuratedFeedQuery`               | `{ preview: "", slug: "" }`                         | Related / more stories                |
+| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                | Breaking news ticker                  |
 
 ### Live Blog
 
-| Query | Variables | Purpose |
-|-------|-----------|---------|
-| `ArchipelagoSingleLiveBlogQuery` | `{ name: "{slug}", postType: "liveblog", preview: "" }` | Blog shell — metadata, header, initial content. **postType MUST be "liveblog" not "post"** — the latter returns `no_posts_found`. |
-| `SingleLiveBlogChildrensQuery` | `{ postName: "{slug}" }` | Child entries / updates list |
-| `LiveBlogUpdateQuery` | `{ postID: <int>, postType: "liveblog" }` | Intended for individual update content. **Open question:** the bare numeric IDs returned by `SingleLiveBlogChildrensQuery` (e.g. `4512107`, `4512131`) all return `no_posts_found` from `postByID`, regardless of postType. Live blog updates appear to be embedded entries within the parent post rather than standalone posts. M7 implementation must verify how production actually fetches individual updates (the live blog frontend may extract them from the shell content directly, or use the websocket subscription `LiveBlogSubscription($postID: Int!)`). |
-| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}` | Breaking news ticker |
+| Query                                    | Variables                                               | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ---------------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ArchipelagoSingleLiveBlogQuery`         | `{ name: "{slug}", postType: "liveblog", preview: "" }` | Blog shell — metadata, header, initial content. **postType MUST be "liveblog" not "post"** — the latter returns `no_posts_found`.                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `SingleLiveBlogChildrensQuery`           | `{ postName: "{slug}" }`                                | Child entries / updates list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `LiveBlogUpdateQuery`                    | `{ postID: <int>, postType: "liveblog" }`               | Intended for individual update content. **Open question:** the bare numeric IDs returned by `SingleLiveBlogChildrensQuery` (e.g. `4512107`, `4512131`) all return `no_posts_found` from `postByID`, regardless of postType. Live blog updates appear to be embedded entries within the parent post rather than standalone posts. M7 implementation must verify how production actually fetches individual updates (the live blog frontend may extract them from the shell content directly, or use the websocket subscription `LiveBlogSubscription($postID: Int!)`). |
+| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                    | Breaking news ticker                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ### Section Front — Geographic (e.g., `/middle-east`)
 
-| Query | Variables | Purpose |
-|-------|-----------|---------|
-| `ArchipelagoSectionQuery` (ID 64) | `{ name: "{section}", categoryType: "where", postTypes: [...], quantity: 9 }` | Initial section content |
-| `ArchipelagoAjeSectionPostsQuery` (ID 7) | `{ category: "{section}", categoryType: "where", quantity: 9, offset: N }` | Pagination — offset-based "Load More" |
-| `HomePageCuratedFeedQuery` | `{ preview: "", slug: "" }` | Curated feed |
-| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}` | Breaking news ticker |
+| Query                                    | Variables                                                                     | Purpose                               |
+| ---------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
+| `ArchipelagoSectionQuery` (ID 64)        | `{ name: "{section}", categoryType: "where", postTypes: [...], quantity: 9 }` | Initial section content               |
+| `ArchipelagoAjeSectionPostsQuery` (ID 7) | `{ category: "{section}", categoryType: "where", quantity: 9, offset: N }`    | Pagination — offset-based "Load More" |
+| `HomePageCuratedFeedQuery`               | `{ preview: "", slug: "" }`                                                   | Curated feed                          |
+| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                                          | Breaking news ticker                  |
 
 ### Section Front — Topic (e.g., `/opinion`)
 
-| Query | Variables | Purpose |
-|-------|-----------|---------|
-| `ArchipelagoTopicsPageQuery` (ID 92) | `{ slug: "opinion", postTypes: [...], preview: "" }` | Initial topic page content |
-| `ArchipelagoPaginatedTopicsFeedQuery` | `{ slug: "opinion", quantity: 9, offset: N }` | Pagination — offset-based "Load More" |
-| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}` | Breaking news ticker |
+| Query                                    | Variables                                            | Purpose                               |
+| ---------------------------------------- | ---------------------------------------------------- | ------------------------------------- |
+| `ArchipelagoTopicsPageQuery` (ID 92)     | `{ slug: "opinion", postTypes: [...], preview: "" }` | Initial topic page content            |
+| `ArchipelagoPaginatedTopicsFeedQuery`    | `{ slug: "opinion", quantity: 9, offset: N }`        | Pagination — offset-based "Load More" |
+| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                 | Breaking news ticker                  |
 
 ---
 
@@ -76,29 +77,29 @@ The Arabic site (`aljazeera.net`) uses the **same GraphQL endpoint and queries**
 
 The response lives under `data.homepage` and contains **21 fields** — all content, **zero navigation**:
 
-| Field | Type | Detail |
-|-------|------|--------|
-| `layout` | `string` | `"three-column"` |
-| `livestream` | `object` | Keys: `accountId`, `title`, `playerID`, `videoID`, `bcPlaybackUrl`, `source`, `youtubeVideoID`, `youtubeChannelID`, `featuredImage` |
-| `livestreamPosition` | `string` | `"1"` |
-| `featuredMedia` | `null` | Not used currently |
-| `__typename` | `string` | `"HomepageAj"` |
-| `featuredPosts` | `list[17]` | Main hero/top stories |
-| `feedOrder` | `list[2]` | Controls module ordering |
-| `feedPost` | `list[1]` | Feed content |
-| `curatedCollection` | `list[1]` | Editorially curated block |
-| `automatedCollection` | `list[0]` | Empty (automated content) |
-| `automatedMultiCollection` | `list[0]` | Empty |
-| `brandedEventCollection` | `null` | Not used currently |
-| `opinion` | `null` | Not used on homepage currently |
-| `mostPopular` | `list[10]` | Most popular articles |
-| `trendingVideos` | `list[0]` | Empty currently |
-| `videoBlockPlaylist` | `object` | Keys: `posts` |
-| `layoutMetaData` | `object` | Keys: `topStories`, `secondStories`, `categoryColumn`, `liveblogConfig`, `topStoryTheme`, `displaySecondColFirstStoryLiveblogUpdates`, `firstStoryRelatedStories` |
-| `seoDescription` | `string` | Empty |
-| `customSeoMeta` | `object` | Keys: `customTitle`, `customHeading`, `canonicalUrl`, `socialImg` |
-| `verticalVideos` | `list[10]` | Short-form vertical video carousel |
-| `additionalPageEmbeds` | `object` | Keys: `allowEmbeds`, `aboveFeaturedArea`, `belowFeaturedArea`, `aboveFeaturedAreaForMobile`, `belowFeaturedAreaForMobile`, `inSidebar` |
+| Field                      | Type       | Detail                                                                                                                                                            |
+| -------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `layout`                   | `string`   | `"three-column"`                                                                                                                                                  |
+| `livestream`               | `object`   | Keys: `accountId`, `title`, `playerID`, `videoID`, `bcPlaybackUrl`, `source`, `youtubeVideoID`, `youtubeChannelID`, `featuredImage`                               |
+| `livestreamPosition`       | `string`   | `"1"`                                                                                                                                                             |
+| `featuredMedia`            | `null`     | Not used currently                                                                                                                                                |
+| `__typename`               | `string`   | `"HomepageAj"`                                                                                                                                                    |
+| `featuredPosts`            | `list[17]` | Main hero/top stories                                                                                                                                             |
+| `feedOrder`                | `list[2]`  | Controls module ordering                                                                                                                                          |
+| `feedPost`                 | `list[1]`  | Feed content                                                                                                                                                      |
+| `curatedCollection`        | `list[1]`  | Editorially curated block                                                                                                                                         |
+| `automatedCollection`      | `list[0]`  | Empty (automated content)                                                                                                                                         |
+| `automatedMultiCollection` | `list[0]`  | Empty                                                                                                                                                             |
+| `brandedEventCollection`   | `null`     | Not used currently                                                                                                                                                |
+| `opinion`                  | `null`     | Not used on homepage currently                                                                                                                                    |
+| `mostPopular`              | `list[10]` | Most popular articles                                                                                                                                             |
+| `trendingVideos`           | `list[0]`  | Empty currently                                                                                                                                                   |
+| `videoBlockPlaylist`       | `object`   | Keys: `posts`                                                                                                                                                     |
+| `layoutMetaData`           | `object`   | Keys: `topStories`, `secondStories`, `categoryColumn`, `liveblogConfig`, `topStoryTheme`, `displaySecondColFirstStoryLiveblogUpdates`, `firstStoryRelatedStories` |
+| `seoDescription`           | `string`   | Empty                                                                                                                                                             |
+| `customSeoMeta`            | `object`   | Keys: `customTitle`, `customHeading`, `canonicalUrl`, `socialImg`                                                                                                 |
+| `verticalVideos`           | `list[10]` | Short-form vertical video carousel                                                                                                                                |
+| `additionalPageEmbeds`     | `object`   | Keys: `allowEmbeds`, `aboveFeaturedArea`, `belowFeaturedArea`, `aboveFeaturedAreaForMobile`, `belowFeaturedAreaForMobile`, `inSidebar`                            |
 
 ---
 
@@ -107,6 +108,7 @@ The response lives under `data.homepage` and contains **21 fields** — all cont
 **Finding: Navigation is hardcoded in the frontend bundle.**
 
 Evidence:
+
 - The `data.homepage` response contains **zero navigation fields** — all 21 keys are content-related
 - The `cmsArcSettings` query (ID 21) is **never called** on any production page — not on homepage, article, section, or live blog pages
 - No other GraphQL query returns navigation or menu data
@@ -130,13 +132,13 @@ Evidence:
 
 ## Key Operation IDs (from Production Query Map)
 
-| ID | Operation Name | Notes |
-|----|---------------|-------|
-| 7 | `ArchipelagoAjeSectionPostsQuery` | Geographic section pagination |
-| 18 | `ArchipelagoBreakingTickerQuery` | Breaking ticker — polled globally |
-| 21 | `cmsArcSettings` | **Not called in production** |
-| 64 | `ArchipelagoSectionQuery` | Geographic section initial load |
-| 68 | `ArchipelagoSingleArticleQuery` | Full article content |
-| 92 | `ArchipelagoTopicsPageQuery` | Topic section initial load |
+| ID  | Operation Name                    | Notes                             |
+| --- | --------------------------------- | --------------------------------- |
+| 7   | `ArchipelagoAjeSectionPostsQuery` | Geographic section pagination     |
+| 18  | `ArchipelagoBreakingTickerQuery`  | Breaking ticker — polled globally |
+| 21  | `cmsArcSettings`                  | **Not called in production**      |
+| 64  | `ArchipelagoSectionQuery`         | Geographic section initial load   |
+| 68  | `ArchipelagoSingleArticleQuery`   | Full article content              |
+| 92  | `ArchipelagoTopicsPageQuery`      | Topic section initial load        |
 
 The full query map (101 operations) is available in `aje_query_map.json`.

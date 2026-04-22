@@ -10,13 +10,13 @@ This is a **monorepo containing two parallel PoCs** for the same product: Astro 
 
 The whole point of the monorepo is comparing the two frameworks fairly. Things that must be identical across both apps live at the top level; things that are framework-specific live under `apps/<framework>/`.
 
-| Concern | Lives in | Reason |
-|---------|----------|--------|
-| Production API research | `docs/RESEARCH.md` | aljazeera.com behavior is framework-agnostic |
-| Mock GraphQL server + fixtures | `packages/mock-api/` | Both apps must hit the exact same data |
-| Performance harness (Playwright + Lighthouse + reporter) | `packages/perf-harness/` | Apples-to-apples CWV comparison requires identical methodology |
-| Final comparison report | `docs/COMPARISON.md` | M9 output — synthesizes data from both apps |
-| Per-app architecture, milestones, CLAUDE.md | `apps/<framework>/docs/` and `apps/<framework>/CLAUDE.md` | Framework-specific |
+| Concern                                                  | Lives in                                                  | Reason                                                         |
+| -------------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------- |
+| Production API research                                  | `docs/RESEARCH.md`                                        | aljazeera.com behavior is framework-agnostic                   |
+| Mock GraphQL server + fixtures                           | `packages/mock-api/`                                      | Both apps must hit the exact same data                         |
+| Performance harness (Playwright + Lighthouse + reporter) | `packages/perf-harness/`                                  | Apples-to-apples CWV comparison requires identical methodology |
+| Final comparison report                                  | `docs/COMPARISON.md`                                      | M9 output — synthesizes data from both apps                    |
+| Per-app architecture, milestones, CLAUDE.md              | `apps/<framework>/docs/` and `apps/<framework>/CLAUDE.md` | Framework-specific                                             |
 
 When you're working on something, the right doc to read first depends on the question:
 
@@ -28,21 +28,21 @@ When you're working on something, the right doc to read first depends on the que
 ## Locked-in structural decisions
 
 - **Workspace tooling:** bun workspaces (`package.json` `workspaces: ["apps/*", "packages/*"]`) for the Node-side packages; Deno workspace (`deno.json`) covers `packages/mock-api/`.
-- **Mock API runtime:** Deno 2 with native `Deno.serve()` — *not* the deprecated `import { serve } from "deno.land/std/http"`. Port `4455`.
+- **Mock API runtime:** Deno 2 with native `Deno.serve()` — _not_ the deprecated `import { serve } from "deno.land/std/http"`. Port `4455`.
 - **Performance harness:** Playwright drives interactions (so INP is captured), Lighthouse runs against the resulting state, results aggregated per page type. `chrome-devtools-mcp` available as a dev-time probe but not part of the CI loop.
 - **Astro app:** Astro 6 + Preact + bun for deps and dev + Deno for production SSR via `@deno/astro-adapter` 0.4.0. Details in `apps/astro/CLAUDE.md`.
-- **Qwik app:** Qwik 2 beta (`@qwik.dev/core` 2.0.0-beta.x) — *not* the legacy `@builder.io/qwik` 1.x stable. Details in `apps/qwik/CLAUDE.md`.
+- **Qwik app:** Qwik 2 beta (`@qwik.dev/core` 2.0.0-beta.x) — _not_ the legacy `@builder.io/qwik` 1.x stable. Details in `apps/qwik/CLAUDE.md`.
 
 ## Performance targets — stretch goals
 
 Both apps target the same **stretch CWV thresholds**. Use these as the primary acceptance criteria; the "Good" thresholds are a hard floor below which a milestone fails outright.
 
-| Metric | "Good" floor | **Stretch target** |
-|--------|--------------|--------------------|
-| LCP | < 2.5s | **≤ 1.5s** |
-| CLS | < 0.1 | **≤ 0.05** |
-| INP | < 200ms | **≤ 100ms** |
-| Lighthouse Performance | ≥ 95 | **≥ 98** |
+| Metric                 | "Good" floor | **Stretch target** |
+| ---------------------- | ------------ | ------------------ |
+| LCP                    | < 2.5s       | **≤ 1.5s**         |
+| CLS                    | < 0.1        | **≤ 0.05**         |
+| INP                    | < 200ms      | **≤ 100ms**        |
+| Lighthouse Performance | ≥ 95         | **≥ 98**           |
 
 JS bundle budgets differ by framework — see each app's `docs/ARCHITECTURE.md`.
 
@@ -61,24 +61,24 @@ The mock GraphQL API mirrors production exactly. Critical behaviors to preserve 
 
 Pick the tool that matches the question. Different question types have different best sources — the npm packages ship runtime code and types but **not** guide docs.
 
-| Question type | Best source | Why |
-|---------------|-------------|-----|
-| "What's the signature of X?" / "What options does Y accept?" | **Read `node_modules/<pkg>/**/*.d.ts`** (after `bun install`) | Exact types for the installed version, JSDoc inline, no network, no drift |
-| "What's the type of this expression?" / "Where is X defined?" | **LSP tool** (`hover` / `goToDefinition`) | Faster than reading files; works once an app is scaffolded |
-| "How do I migrate v1→v2?" / "What's the recommended pattern?" / "Why does X work this way?" | **`gh api` the docs source repo** | Guides are NOT in the npm packages |
-| "What does production aljazeera.com do?" | `docs/RESEARCH.md` | Already verified, in-repo |
+| Question type                                                                               | Best source                                                    | Why                                                                       |
+| ------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| "What's the signature of X?" / "What options does Y accept?"                                | **Read `node_modules/<pkg>/**/\*.d.ts`** (after `bun install`) | Exact types for the installed version, JSDoc inline, no network, no drift |
+| "What's the type of this expression?" / "Where is X defined?"                               | **LSP tool** (`hover` / `goToDefinition`)                      | Faster than reading files; works once an app is scaffolded                |
+| "How do I migrate v1→v2?" / "What's the recommended pattern?" / "Why does X work this way?" | **`gh api` the docs source repo**                              | Guides are NOT in the npm packages                                        |
+| "What does production aljazeera.com do?"                                                    | `docs/RESEARCH.md`                                             | Already verified, in-repo                                                 |
 
 **Preflight:** the `node_modules/` and LSP options only work after M1 has scaffolded an app and `bun install` has run. Before then, use `gh api` for everything.
 
 ### Where types live in node_modules (after install)
 
-| Package | Type entry points |
-|---------|-------------------|
-| `astro` | `node_modules/astro/dist/index.d.ts` (root) + `dist/types/**/*.d.ts` (deep) |
-| `@astrojs/preact` | `node_modules/@astrojs/preact/dist/index.d.ts` |
-| `@deno/astro-adapter` | `node_modules/@deno/astro-adapter/src/index.ts` (TS source — package exports `.ts` directly) |
-| `@qwik.dev/core` | `node_modules/@qwik.dev/core/public.d.ts` (root) + `dist/**/*.d.ts` (deep) + `server.d.ts`, `testing.d.ts`, `optimizer.d.ts` (entry-point shims) |
-| `@qwik.dev/router` | `node_modules/@qwik.dev/router/**/*.d.ts` |
+| Package               | Type entry points                                                                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `astro`               | `node_modules/astro/dist/index.d.ts` (root) + `dist/types/**/*.d.ts` (deep)                                                                      |
+| `@astrojs/preact`     | `node_modules/@astrojs/preact/dist/index.d.ts`                                                                                                   |
+| `@deno/astro-adapter` | `node_modules/@deno/astro-adapter/src/index.ts` (TS source — package exports `.ts` directly)                                                     |
+| `@qwik.dev/core`      | `node_modules/@qwik.dev/core/public.d.ts` (root) + `dist/**/*.d.ts` (deep) + `server.d.ts`, `testing.d.ts`, `optimizer.d.ts` (entry-point shims) |
+| `@qwik.dev/router`    | `node_modules/@qwik.dev/router/**/*.d.ts`                                                                                                        |
 
 JSDoc in these files is the API source of truth — release-notes summaries and blog posts can lag.
 
@@ -93,6 +93,7 @@ gh api repos/withastro/docs/contents/src/content/docs/en/<path>.mdx --jq '.conte
 ```
 
 Pages organized under `src/content/docs/en/`. Useful entry points:
+
 - `guides/upgrade-to/v6.mdx` — v5→v6 migration
 - `reference/configuration-reference.mdx` — config schema
 
@@ -110,6 +111,7 @@ gh api 'repos/QwikDev/qwik/contents/packages/docs/src/routes/docs/(qwikrouter)/r
 ```
 
 Path quirks for Qwik 2:
+
 - Route groups: **`(qwik)`** for core APIs (`@qwik.dev/core`), **`(qwikrouter)`** for routing (`@qwik.dev/router`). On v1's `main` branch this is `(qwikcity)` instead — easy to grab the wrong one.
 - `menu.md` is a hand-maintained hierarchical index — start there to find the right page path
 - v1→v2 migration guide: `packages/docs/src/routes/docs/upgrade/` on `build/v2`
