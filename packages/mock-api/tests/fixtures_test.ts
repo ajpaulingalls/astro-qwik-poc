@@ -1,14 +1,6 @@
 import { assert, assertEquals, assertRejects, assertStringIncludes } from "jsr:@std/assert@^1";
 import { loadFixtures } from "../lib/fixtures.ts";
-
-async function withTempDir<T>(fn: (dir: string) => Promise<T>): Promise<T> {
-  const dir = await Deno.makeTempDir({ prefix: "mock-api-fixtures-test-" });
-  try {
-    return await fn(dir);
-  } finally {
-    await Deno.remove(dir, { recursive: true });
-  }
-}
+import { withTempDir } from "./_helpers.ts";
 
 Deno.test("loadFixtures: loads all .json files, key = basename without extension", async () => {
   await withTempDir(async (dir) => {
