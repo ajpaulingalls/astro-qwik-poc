@@ -3,7 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "description": "Shared Playwright + Lighthouse performance harness for the AJE Astro and Qwik PoCs",
+  "type": "module",
   "scripts": {
-    "run": "echo 'Not implemented yet — see docs/MILESTONES.md M2 in either app' && exit 1"
+    "run": "echo 'Not implemented yet — runner.ts arrives in story-001 cycle' && exit 1",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^2.1.0"
   }
 }
