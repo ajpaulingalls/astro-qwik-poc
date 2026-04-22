@@ -16,6 +16,12 @@
     "build:qwik": "bun --filter aje-poc-qwik build",
     "perf": "bun --filter @aje-poc/perf-harness run",
     "perf:astro": "bun --filter @aje-poc/perf-harness run -- --target=astro",
-    "perf:qwik": "bun --filter @aje-poc/perf-harness run -- --target=qwik"
+    "perf:qwik": "bun --filter @aje-poc/perf-harness run -- --target=qwik",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "prettier-plugin-astro": "^0.14.1"
   }
 }
