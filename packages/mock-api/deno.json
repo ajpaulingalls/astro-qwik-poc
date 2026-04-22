@@ -1,6 +1,12 @@
 {
   "tasks": {
     "dev": "deno run --allow-net=0.0.0.0:4455 --allow-read=./fixtures --allow-env=PORT,FIXTURE_DIR server.ts",
-    "test": "deno test --allow-net --allow-read --allow-write --allow-env --allow-run=bash"
+    "test": "deno test --allow-net --allow-read --allow-write --allow-env --allow-run=bash",
+    "fmt": "deno fmt",
+    "fmt:check": "deno fmt --check",
+    "lint": "deno lint"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1"
   }
 }
