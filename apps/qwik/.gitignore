@@ -1,0 +1,5 @@
+# Vite SSR build output (separate from dist/, which is client-only)
+server/
+
+# Vitest sentinel directory created during test runs
+dummy-non-existing-folder/
