@@ -13,7 +13,6 @@ export const useHomepageData = routeLoader$(async () => {
     operationName: "HomePageQuery",
     variables: { isAtf: true, atfLength: 2, slug: "", preview: "" },
   });
-  console.log("HomePageQuery", data);
   return data;
 });
 
