@@ -15,7 +15,9 @@ export async function loadFixtures(dir: string): Promise<FixtureMap> {
       JSON.parse(text);
     } catch (err) {
       throw new Error(
-        `Invalid JSON in fixture ${entry.name}: ${err instanceof Error ? err.message : String(err)}`,
+        `Invalid JSON in fixture ${entry.name}: ${
+          err instanceof Error ? err.message : String(err)
+        }`,
       );
     }
 

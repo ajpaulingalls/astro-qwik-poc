@@ -35,12 +35,17 @@ const VARIANT_RULES: Record<string, SuffixBuilder> = {
 
 export class MissingVariableError extends Error {
   constructor(operationName: string) {
-    super(`Operation '${operationName}' requires variant variables that are missing or wrongly typed`);
+    super(
+      `Operation '${operationName}' requires variant variables that are missing or wrongly typed`,
+    );
     this.name = "MissingVariableError";
   }
 }
 
-export function resolveFixtureKey(operationName: string, variables: Variables): string {
+export function resolveFixtureKey(
+  operationName: string,
+  variables: Variables,
+): string {
   const builder = VARIANT_RULES[operationName];
   if (!builder) return operationName;
   const suffix = builder(variables);

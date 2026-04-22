@@ -14,9 +14,12 @@ export interface RunningServer {
 const DEFAULT_PORT = 4455;
 const DEFAULT_FIXTURE_DIR = "./fixtures";
 
-export async function startServer(opts: ServerOptions = {}): Promise<RunningServer> {
+export async function startServer(
+  opts: ServerOptions = {},
+): Promise<RunningServer> {
   const port = resolvePort(opts.port);
-  const fixtureDir = opts.fixtureDir ?? Deno.env.get("FIXTURE_DIR") ?? DEFAULT_FIXTURE_DIR;
+  const fixtureDir = opts.fixtureDir ?? Deno.env.get("FIXTURE_DIR") ??
+    DEFAULT_FIXTURE_DIR;
   const fixtures = await loadFixtures(fixtureDir);
   const server = Deno.serve({ port }, (req) => handle(req, { fixtures }));
   return {

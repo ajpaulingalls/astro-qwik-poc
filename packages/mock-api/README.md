@@ -1,9 +1,11 @@
 # mock-api
 
-Shared Deno 2 mock GraphQL server for the AJE PoCs. Mirrors the production `aljazeera.com` GraphQL interface (GET-only, `wp-site` header required, resolution by `operationName`) and serves recorded fixture JSON.
+Shared Deno 2 mock GraphQL server for the AJE PoCs. Mirrors the production
+`aljazeera.com` GraphQL interface (GET-only, `wp-site` header required,
+resolution by `operationName`) and serves recorded fixture JSON.
 
-**Runtime:** Deno 2 (not part of the bun workspace).
-**Port:** `4455` (override with `PORT` env).
+**Runtime:** Deno 2 (not part of the bun workspace). **Port:** `4455` (override
+with `PORT` env).
 
 ## Quick start
 
@@ -36,57 +38,88 @@ The dev task uses the narrowest viable permission set:
 
 ## Environment variables
 
-| Variable | Default | Purpose | Read by |
-|----------|---------|---------|---------|
-| `PORT` | `4455` | Server port. Fails loud on non-integer or out-of-range values. | server |
-| `FIXTURE_DIR` | `./fixtures` | Directory the loader scans for `*.json` at startup. | server |
-| `WP_SITE` | `aje` | `wp-site` header value used when recording new fixtures from production (`aje` English, `aja` Arabic). | `scripts/record-fixtures.sh` only |
+| Variable      | Default      | Purpose                                                                                                | Read by                           |
+| ------------- | ------------ | ------------------------------------------------------------------------------------------------------ | --------------------------------- |
+| `PORT`        | `4455`       | Server port. Fails loud on non-integer or out-of-range values.                                         | server                            |
+| `FIXTURE_DIR` | `./fixtures` | Directory the loader scans for `*.json` at startup.                                                    | server                            |
+| `WP_SITE`     | `aje`        | `wp-site` header value used when recording new fixtures from production (`aje` English, `aja` Arabic). | `scripts/record-fixtures.sh` only |
 
-The server itself reads only `PORT` and `FIXTURE_DIR`. The per-request `wp-site` header is required on every request (missing → 400) and validated by the handler.
+The server itself reads only `PORT` and `FIXTURE_DIR`. The per-request `wp-site`
+header is required on every request (missing → 400) and validated by the
+handler.
 
 ## Fixture layout
 
-Every `*.json` file under `FIXTURE_DIR` is loaded at startup, keyed by basename (without extension). Filenames must match the keys produced by `lib/variants.ts:resolveFixtureKey`:
+Every `*.json` file under `FIXTURE_DIR` is loaded at startup, keyed by basename
+(without extension). Filenames must match the keys produced by
+`lib/variants.ts:resolveFixtureKey`:
 
-- `{operationName}.json` — operations without variants (e.g. `HomePageQuery.json`)
-- `{operationName}--{variant}.json` — single-variant operations (e.g. `ArchipelagoSectionQuery--middle-east.json`)
-- `{operationName}--{variant1}--{variant2}.json` — paginated operations (e.g. `ArchipelagoAjeSectionPostsQuery--middle-east--offset-9.json`)
+- `{operationName}.json` — operations without variants (e.g.
+  `HomePageQuery.json`)
+- `{operationName}--{variant}.json` — single-variant operations (e.g.
+  `ArchipelagoSectionQuery--middle-east.json`)
+- `{operationName}--{variant1}--{variant2}.json` — paginated operations (e.g.
+  `ArchipelagoAjeSectionPostsQuery--middle-east--offset-9.json`)
 
-Variant values are slugified (`[a-z0-9-]+`, lowercase, runs collapsed, edges trimmed) so production article slugs containing slashes can't escape the filename.
+Variant values are slugified (`[a-z0-9-]+`, lowercase, runs collapsed, edges
+trimmed) so production article slugs containing slashes can't escape the
+filename.
 
-A malformed fixture aborts startup with the offending filename — no silent 500s at request time.
+A malformed fixture aborts startup with the offending filename — no silent 500s
+at request time.
 
 ## Architecture
 
-| File | Role |
-|------|------|
-| `server.ts` | Bootstrap: env validation, fixture preload, `Deno.serve`. Exports `startServer({port, fixtureDir})` for tests. |
-| `lib/handler.ts` | Pure `handle(req, {fixtures}) → Response`. Enforces GET-only, `wp-site` header, `/graphql` path, OPTIONS preflight. |
-| `lib/variants.ts` | `resolveFixtureKey(operationName, variables) → string`. Throws `MissingVariableError` (handler converts to 400) when a known operation is called without required variables. |
-| `lib/fixtures.ts` | `loadFixtures(dir) → Map<string, string>`. Validates each fixture via `JSON.parse` at startup; stores raw text for fast response. |
-| `tests/_helpers.ts` | `withTempDir`, `withRunningServer`. |
-| `scripts/record-fixtures.sh` | Re-runnable production capture (curl + jq). See [scripts/README.md](./scripts/README.md). |
+| File                         | Role                                                                                                                                                                         |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `server.ts`                  | Bootstrap: env validation, fixture preload, `Deno.serve`. Exports `startServer({port, fixtureDir})` for tests.                                                               |
+| `lib/handler.ts`             | Pure `handle(req, {fixtures}) → Response`. Enforces GET-only, `wp-site` header, `/graphql` path, OPTIONS preflight.                                                          |
+| `lib/variants.ts`            | `resolveFixtureKey(operationName, variables) → string`. Throws `MissingVariableError` (handler converts to 400) when a known operation is called without required variables. |
+| `lib/fixtures.ts`            | `loadFixtures(dir) → Map<string, string>`. Validates each fixture via `JSON.parse` at startup; stores raw text for fast response.                                            |
+| `tests/_helpers.ts`          | `withTempDir`, `withRunningServer`.                                                                                                                                          |
+| `scripts/record-fixtures.sh` | Re-runnable production capture (curl + jq). See [scripts/README.md](./scripts/README.md).                                                                                    |
 
 ## Adding a new operation
 
-1. **Add a variant rule** in `lib/variants.ts` if the operation has variables that select a fixture (slug, section, offset). Add tests in `tests/variants_test.ts` first (red), then implement (green). Ensure new fixture filenames will match `resolveFixtureKey` output.
-2. **Add a `record` line** in `scripts/record-fixtures.sh` with the correct `operationName` and `variables` JSON (built via `jq -nc --arg/--argjson` for safety).
-3. **Re-record** with `bash scripts/record-fixtures.sh` — the new fixture lands in `fixtures/`.
-4. **Verify** via integration test in `tests/server_test.ts` (or rely on the existing variant-routing test if the new operation follows an existing pattern).
+1. **Add a variant rule** in `lib/variants.ts` if the operation has variables
+   that select a fixture (slug, section, offset). Add tests in
+   `tests/variants_test.ts` first (red), then implement (green). Ensure new
+   fixture filenames will match `resolveFixtureKey` output.
+2. **Add a `record` line** in `scripts/record-fixtures.sh` with the correct
+   `operationName` and `variables` JSON (built via `jq -nc --arg/--argjson` for
+   safety).
+3. **Re-record** with `bash scripts/record-fixtures.sh` — the new fixture lands
+   in `fixtures/`.
+4. **Verify** via integration test in `tests/server_test.ts` (or rely on the
+   existing variant-routing test if the new operation follows an existing
+   pattern).
 
-If the new operation reveals that production's actual schema differs from what `docs/RESEARCH.md` documents, fix RESEARCH.md too. Honesty over surprise.
+If the new operation reveals that production's actual schema differs from what
+`docs/RESEARCH.md` documents, fix RESEARCH.md too. Honesty over surprise.
 
 ## Production behavior reference
 
-`docs/RESEARCH.md` (repo root) is the source of truth for verified production query patterns: operation names, variable shapes, pagination semantics, hardcoded navigation, etc. The mock server mirrors this — when the two diverge, RESEARCH.md is the spec we're matching against.
+`docs/RESEARCH.md` (repo root) is the source of truth for verified production
+query patterns: operation names, variable shapes, pagination semantics,
+hardcoded navigation, etc. The mock server mirrors this — when the two diverge,
+RESEARCH.md is the spec we're matching against.
 
 Critical invariants reproduced here (preserved by the mock):
+
 - **GET only** (POST → 405)
 - **`wp-site` header required** on every request (missing → 400)
 - **Resolution by `operationName`**, not by query body
 - **Pagination is client-side offset-based** (`offset: 0, 9, 18, …`)
-- **Navigation is hardcoded in the frontend** — no GraphQL query returns nav data
+- **Navigation is hardcoded in the frontend** — no GraphQL query returns nav
+  data
 
 ## Production endpoint integration (planned for M11)
 
-Per the execution plan, M11 adds env-driven endpoint switching to the frontend GraphQL clients (`apps/astro/src/lib/graphql.ts` and `apps/qwik/src/lib/graphql.ts`, both planned for M2/M3 scaffolds): default = mock on `:4455`; override = production `aljazeera.com`. Switching will be config-only — no app-route code changes. The mock will remain the source for CI/dev/perf reproducibility; live demos use the production endpoint per `docs/DEMO.md` (planned for M11). None of these files exist yet — they're forward references to anchor the design intent.
+Per the execution plan, M11 adds env-driven endpoint switching to the frontend
+GraphQL clients (`apps/astro/src/lib/graphql.ts` and
+`apps/qwik/src/lib/graphql.ts`, both planned for M2/M3 scaffolds): default =
+mock on `:4455`; override = production `aljazeera.com`. Switching will be
+config-only — no app-route code changes. The mock will remain the source for
+CI/dev/perf reproducibility; live demos use the production endpoint per
+`docs/DEMO.md` (planned for M11). None of these files exist yet — they're
+forward references to anchor the design intent.

@@ -1,5 +1,9 @@
 import { type FixtureMap } from "./fixtures.ts";
-import { MissingVariableError, resolveFixtureKey, type Variables } from "./variants.ts";
+import {
+  MissingVariableError,
+  resolveFixtureKey,
+  type Variables,
+} from "./variants.ts";
 
 export interface HandlerDeps {
   fixtures: FixtureMap;
@@ -56,7 +60,10 @@ export function handle(req: Request, deps: HandlerDeps): Response {
 
   const fixture = deps.fixtures.get(key);
   if (fixture === undefined) {
-    return text(404, `Unknown operation: ${operationName} (no fixture for key '${key}')`);
+    return text(
+      404,
+      `Unknown operation: ${operationName} (no fixture for key '${key}')`,
+    );
   }
 
   return new Response(fixture, {
