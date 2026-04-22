@@ -9,3 +9,4 @@ packages/mock-api
 # Per-app gitignored build/test output
 apps/qwik/server
 apps/qwik/dummy-non-existing-folder
+packages/perf-harness/reports

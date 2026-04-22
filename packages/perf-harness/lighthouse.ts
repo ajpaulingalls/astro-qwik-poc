@@ -1,5 +1,5 @@
 import lighthouse from 'lighthouse';
-import * as chromeLauncher from 'chrome-launcher';
+import { withChrome } from './chrome.ts';
 
 export interface RawMetrics {
   lcp: number;
@@ -9,12 +9,9 @@ export interface RawMetrics {
 }
 
 export async function runLighthouseAudit(url: string): Promise<RawMetrics> {
-  const chrome = await chromeLauncher.launch({
-    chromeFlags: ['--headless=new', '--no-sandbox'],
-  });
-  try {
+  return withChrome(async (port) => {
     const result = await lighthouse(url, {
-      port: chrome.port,
+      port,
       output: 'json',
       logLevel: 'error',
       onlyCategories: ['performance'],
@@ -23,9 +20,7 @@ export async function runLighthouseAudit(url: string): Promise<RawMetrics> {
       throw new Error(`runLighthouseAudit: no result for ${url}`);
     }
     return extractMetrics(result.lhr);
-  } finally {
-    await chrome.kill();
-  }
+  });
 }
 
 interface LhAudit {

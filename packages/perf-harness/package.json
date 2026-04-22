@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "chrome-launcher": "^1.1.2",
-    "lighthouse": "^12.2.0"
+    "lighthouse": "^12.2.0",
+    "puppeteer-core": "^23.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

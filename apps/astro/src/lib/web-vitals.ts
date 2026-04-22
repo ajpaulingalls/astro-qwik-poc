@@ -11,6 +11,7 @@ const push = (m: Metric): void => {
   globalThis.__webVitals.push(m);
 };
 
-onLCP(push);
-onCLS(push);
-onINP(push);
+const opts = { reportAllChanges: true };
+onLCP(push, opts);
+onCLS(push, opts);
+onINP(push, opts);

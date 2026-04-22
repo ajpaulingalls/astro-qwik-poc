@@ -3,9 +3,16 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { median } from './aggregator.ts';
+import { withChrome } from './chrome.ts';
 import { runLighthouseAudit, type RawMetrics } from './lighthouse.ts';
 import { formatReport, type AggregatedReport } from './reporter.ts';
-import { buildPageList, parseArgs, waitForPort, type Target } from './runner_helpers.ts';
+import {
+  buildPageList,
+  collectWebVitals,
+  parseArgs,
+  waitForPort,
+  type Target,
+} from './runner_helpers.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../..');
@@ -29,13 +36,15 @@ function spawnMockApi(): ChildProcess {
 }
 
 function spawnAstro(): ChildProcess {
+  // --allow-env unscoped: Astro adapter reads CI plus various Vite/Node env vars
+  // at startup. M9 audit will narrow this once the full env-var surface is known.
   return spawn(
     'deno',
     [
       'run',
       '--allow-net=0.0.0.0:8080,localhost:4455',
       '--allow-read=apps/astro/dist',
-      '--allow-env=HOST,PORT',
+      '--allow-env',
       'apps/astro/dist/server/entry.mjs',
     ],
     { cwd: REPO_ROOT, stdio: 'ignore' },
@@ -43,7 +52,7 @@ function spawnAstro(): ChildProcess {
 }
 
 function spawnQwik(): ChildProcess {
-  return spawn('bun', ['run', 'preview'], {
+  return spawn('bun', ['run', 'preview', '--', '--host', '127.0.0.1'], {
     cwd: resolve(REPO_ROOT, 'apps/qwik'),
     stdio: 'ignore',
   });
@@ -108,15 +117,17 @@ async function main(): Promise<void> {
     for (const page of pages) {
       const url = `http://localhost:${APP_PORT[args.target]}${page.path}`;
       const samples: RawMetrics[] = [];
+      const wvSamples: unknown[] = [];
       for (let i = 0; i < args.runs; i++) {
         process.stderr.write(`[${args.target}/${page.name}] run ${i + 1}/${args.runs}\n`);
         samples.push(await runLighthouseAudit(url));
+        wvSamples.push(...(await withChrome((port) => collectWebVitals(url, port))));
       }
       const report: AggregatedReport = {
         page: page.name,
         target: args.target,
         metrics: aggregateRuns(samples, args.runs),
-        webVitals: { samples: [] },
+        webVitals: { samples: wvSamples },
       };
       const formatted = formatReport(report);
       writeReports(args.target, page.name, formatted);
