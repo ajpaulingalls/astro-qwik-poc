@@ -5,3 +5,7 @@ dist
 bun.lock
 packages/mock-api
 .claude
+
+# Per-app gitignored build/test output
+apps/qwik/server
+apps/qwik/dummy-non-existing-folder
