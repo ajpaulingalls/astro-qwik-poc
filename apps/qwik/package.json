@@ -2,5 +2,22 @@
   "name": "aje-poc-qwik",
   "private": true,
   "version": "0.0.0",
-  "description": "Al Jazeera English PoC — Qwik 2 (beta) implementation"
+  "description": "Al Jazeera English PoC — Qwik 2 (beta) implementation",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode ssr",
+    "build": "vite build && vite build --ssr ./src/entry.ssr.tsx",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@qwik.dev/core": "~2.0.0-beta.32",
+    "@qwik.dev/router": "latest",
+    "@tailwindcss/vite": "latest",
+    "@types/node": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vite": "^7.3.2",
+    "vitest": "latest"
+  }
 }
