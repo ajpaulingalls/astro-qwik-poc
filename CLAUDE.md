@@ -57,21 +57,46 @@ The mock GraphQL API mirrors production exactly. Critical behaviors to preserve 
 - **Navigation is hardcoded** in each app's frontend — no GraphQL query returns nav data; the `cmsArcSettings` query is never called in production. Do not add a CMS-driven nav abstraction in either app.
 - Pagination is **client-side offset-based** (`offset: 0, 9, 18, …`) via "Load More" — no `?page=N` URLs, no infinite scroll
 
-## Looking up framework docs
+## Looking up framework details
 
-Neither Astro nor Qwik hosts an `llms.txt`, `llms-full.txt`, or per-page `.md` versions on their official docs sites (verified 2026-04 — all 404). For authoritative source markdown, fetch from the docs source repos:
+Pick the tool that matches the question. Different question types have different best sources — the npm packages ship runtime code and types but **not** guide docs.
 
-### Astro 6
+| Question type | Best source | Why |
+|---------------|-------------|-----|
+| "What's the signature of X?" / "What options does Y accept?" | **Read `node_modules/<pkg>/**/*.d.ts`** (after `bun install`) | Exact types for the installed version, JSDoc inline, no network, no drift |
+| "What's the type of this expression?" / "Where is X defined?" | **LSP tool** (`hover` / `goToDefinition`) | Faster than reading files; works once an app is scaffolded |
+| "How do I migrate v1→v2?" / "What's the recommended pattern?" / "Why does X work this way?" | **`gh api` the docs source repo** | Guides are NOT in the npm packages |
+| "What does production aljazeera.com do?" | `docs/RESEARCH.md` | Already verified, in-repo |
+
+**Preflight:** the `node_modules/` and LSP options only work after M1 has scaffolded an app and `bun install` has run. Before then, use `gh api` for everything.
+
+### Where types live in node_modules (after install)
+
+| Package | Type entry points |
+|---------|-------------------|
+| `astro` | `node_modules/astro/dist/index.d.ts` (root) + `dist/types/**/*.d.ts` (deep) |
+| `@astrojs/preact` | `node_modules/@astrojs/preact/dist/index.d.ts` |
+| `@deno/astro-adapter` | `node_modules/@deno/astro-adapter/src/index.ts` (TS source — package exports `.ts` directly) |
+| `@qwik.dev/core` | `node_modules/@qwik.dev/core/public.d.ts` (root) + `dist/**/*.d.ts` (deep) + `server.d.ts`, `testing.d.ts`, `optimizer.d.ts` (entry-point shims) |
+| `@qwik.dev/router` | `node_modules/@qwik.dev/router/**/*.d.ts` |
+
+JSDoc in these files is the API source of truth — release-notes summaries and blog posts can lag.
+
+### Guide docs (no llms.txt anywhere — verified 2026-04)
+
+Neither `docs.astro.build` nor `qwik.dev` hosts `llms.txt`, `llms-full.txt`, or per-page `.md` URLs (all 404). Fetch from the docs source repos instead:
+
+#### Astro 6
 
 ```bash
 gh api repos/withastro/docs/contents/src/content/docs/en/<path>.mdx --jq '.content' | base64 -d
 ```
 
-Pages are organized intuitively under `src/content/docs/en/`. Useful entry points:
+Pages organized under `src/content/docs/en/`. Useful entry points:
 - `guides/upgrade-to/v6.mdx` — v5→v6 migration
 - `reference/configuration-reference.mdx` — config schema
 
-### Qwik 2 (beta)
+#### Qwik 2 (beta)
 
 **Critical:** Qwik 2 docs live on the **`build/v2` branch**, not `main`. The `main` branch still hosts Qwik 1.x docs and uses `@builder.io/qwik`.
 
@@ -88,8 +113,6 @@ Path quirks for Qwik 2:
 - Route groups: **`(qwik)`** for core APIs (`@qwik.dev/core`), **`(qwikrouter)`** for routing (`@qwik.dev/router`). On v1's `main` branch this is `(qwikcity)` instead — easy to grab the wrong one.
 - `menu.md` is a hand-maintained hierarchical index — start there to find the right page path
 - v1→v2 migration guide: `packages/docs/src/routes/docs/upgrade/` on `build/v2`
-
-Use these when verifying API shapes — particularly anything written from release-notes summaries that wasn't cross-checked against the live source.
 
 ## Known doc lint warnings (ignore)
 
