@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertRejects, assertStringIncludes } from "jsr:@std/assert@^1";
+import { assert, assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { loadFixtures } from "../lib/fixtures.ts";
 import { withTempDir } from "./_helpers.ts";
 

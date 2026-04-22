@@ -1,4 +1,4 @@
-import { assertEquals, assertStringIncludes } from "jsr:@std/assert@^1";
+import { assertEquals, assertStringIncludes } from "@std/assert";
 import { withRunningServer } from "./_helpers.ts";
 
 Deno.test("server: boots and serves a fixture via real HTTP", async () => {

@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "jsr:@std/assert@^1";
+import { assertEquals, assertThrows } from "@std/assert";
 import { MissingVariableError, resolveFixtureKey } from "../lib/variants.ts";
 
 // E2E coverage (variants exercised through the server's handler chain) lives

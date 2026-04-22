@@ -14,5 +14,54 @@
     "@std/internal@1.0.13": {
       "integrity": "2f9546691d4ac2d32859c82dff284aaeac980ddeca38430d07941e7e288725c0"
     }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@eslint/js@^9.39.4",
+        "npm:eslint-plugin-astro@^1.7.0",
+        "npm:eslint-plugin-qwik@2.0.0-beta.32",
+        "npm:eslint@^9.39.4",
+        "npm:globals@15",
+        "npm:prettier-plugin-astro@~0.14.1",
+        "npm:prettier@^3.4.2",
+        "npm:typescript-eslint@^8.59.0"
+      ]
+    },
+    "members": {
+      "apps/astro": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@astrojs/preact@5",
+            "npm:@deno/astro-adapter@0.4",
+            "npm:@tailwindcss/vite@4",
+            "npm:astro@^6.1.8",
+            "npm:preact@^10.24.0",
+            "npm:tailwindcss@4",
+            "npm:typescript@^5.9.0",
+            "npm:vitest@^2.1.0"
+          ]
+        }
+      },
+      "apps/qwik": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@qwik.dev/core@~2.0.0-beta.32",
+            "npm:@qwik.dev/router@latest",
+            "npm:@tailwindcss/vite@latest",
+            "npm:@types/node@latest",
+            "npm:tailwindcss@latest",
+            "npm:typescript@latest",
+            "npm:vite@^7.3.2",
+            "npm:vitest@latest"
+          ]
+        }
+      },
+      "packages/mock-api": {
+        "dependencies": [
+          "jsr:@std/assert@1"
+        ]
+      }
+    }
   }
 }

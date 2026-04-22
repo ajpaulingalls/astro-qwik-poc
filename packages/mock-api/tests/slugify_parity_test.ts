@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@^1";
+import { assertEquals } from "@std/assert";
 import { slugify as tsSlugify } from "../lib/variants.ts";
 
 const SCRIPT_PATH = new URL("../scripts/record-fixtures.sh", import.meta.url).pathname;
