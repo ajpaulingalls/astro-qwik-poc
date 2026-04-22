@@ -14,7 +14,7 @@ For a given target (`astro` or `qwik`), the harness:
 
 The mock-api and the app are torn down on exit (SIGTERM, SIGKILL after 2s).
 
-INP is intentionally absent from the M4 schema — without a Playwright session driving real interactions, Lighthouse-only INP is misleading on a no-interaction placeholder page. INP returns in the M4 stories that wire up the `web-vitals` JS lib (`apps/{astro,qwik}/src/lib/web-vitals.ts`).
+INP is intentionally absent from the lab-metric schema — without a browser-driven session driving real interactions, Lighthouse-only INP is misleading on a no-interaction placeholder page. INP arrives via the `web-vitals` JS lib field-side (`apps/{astro,qwik}/src/lib/web-vitals.ts`), surfaced under `webVitals.samples` in the report. Browser-driving uses puppeteer-core attached to chrome-launcher's Chrome via CDP — see `chrome.ts` and `runner_helpers.ts:collectWebVitals`.
 
 ## Usage
 

@@ -10,13 +10,13 @@ This is a **monorepo containing two parallel PoCs** for the same product: Astro 
 
 The whole point of the monorepo is comparing the two frameworks fairly. Things that must be identical across both apps live at the top level; things that are framework-specific live under `apps/<framework>/`.
 
-| Concern                                                  | Lives in                                                  | Reason                                                         |
-| -------------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------- |
-| Production API research                                  | `docs/RESEARCH.md`                                        | aljazeera.com behavior is framework-agnostic                   |
-| Mock GraphQL server + fixtures                           | `packages/mock-api/`                                      | Both apps must hit the exact same data                         |
-| Performance harness (Playwright + Lighthouse + reporter) | `packages/perf-harness/`                                  | Apples-to-apples CWV comparison requires identical methodology |
-| Final comparison report                                  | `docs/COMPARISON.md`                                      | M9 output — synthesizes data from both apps                    |
-| Per-app architecture, milestones, CLAUDE.md              | `apps/<framework>/docs/` and `apps/<framework>/CLAUDE.md` | Framework-specific                                             |
+| Concern                                                      | Lives in                                                  | Reason                                                         |
+| ------------------------------------------------------------ | --------------------------------------------------------- | -------------------------------------------------------------- |
+| Production API research                                      | `docs/RESEARCH.md`                                        | aljazeera.com behavior is framework-agnostic                   |
+| Mock GraphQL server + fixtures                               | `packages/mock-api/`                                      | Both apps must hit the exact same data                         |
+| Performance harness (puppeteer-core + Lighthouse + reporter) | `packages/perf-harness/`                                  | Apples-to-apples CWV comparison requires identical methodology |
+| Final comparison report                                      | `docs/COMPARISON.md`                                      | M9 output — synthesizes data from both apps                    |
+| Per-app architecture, milestones, CLAUDE.md                  | `apps/<framework>/docs/` and `apps/<framework>/CLAUDE.md` | Framework-specific                                             |
 
 When you're working on something, the right doc to read first depends on the question:
 
@@ -29,7 +29,7 @@ When you're working on something, the right doc to read first depends on the que
 
 - **Workspace tooling:** bun workspaces (`package.json` `workspaces: ["apps/*", "packages/*"]`) for the Node-side packages; Deno workspace (`deno.json`) covers `packages/mock-api/`.
 - **Mock API runtime:** Deno 2 with native `Deno.serve()` — _not_ the deprecated `import { serve } from "deno.land/std/http"`. Port `4455`.
-- **Performance harness:** Playwright drives interactions (so INP is captured), Lighthouse runs against the resulting state, results aggregated per page type. `chrome-devtools-mcp` available as a dev-time probe but not part of the CI loop.
+- **Performance harness:** puppeteer-core drives interactions (so INP is captured) by attaching to chrome-launcher's headless Chrome via CDP, Lighthouse runs against the resulting state, results aggregated per page type. (Original spec said Playwright; swapped to puppeteer-core in sprint-003 to avoid the ~300MB bundled-Chromium install — puppeteer-core attaches to the chrome-launcher Chrome we already use for Lighthouse.) `chrome-devtools-mcp` available as a dev-time probe but not part of the CI loop.
 - **Astro app:** Astro 6 + Preact + bun for deps and dev + Deno for production SSR via `@deno/astro-adapter` 0.4.0. Details in `apps/astro/CLAUDE.md`.
 - **Qwik app:** Qwik 2 beta (`@qwik.dev/core` 2.0.0-beta.x) — _not_ the legacy `@builder.io/qwik` 1.x stable. Details in `apps/qwik/CLAUDE.md`.
 

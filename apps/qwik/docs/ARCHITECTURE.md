@@ -400,11 +400,11 @@ function getSectionType(section: string): 'geographic' | 'topic' {
 
 The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page acceptance criteria use the stretch column. A measured value worse than the floor fails the milestone outright.
 
-| Metric  | "Good" floor | **Stretch (target)** | Measured On                                                                            |
-| ------- | ------------ | -------------------- | -------------------------------------------------------------------------------------- |
-| **LCP** | < 2.5s       | **≤ 1.5s**           | All page types, 4G throttled                                                           |
-| **CLS** | < 0.1        | **≤ 0.05**           | All page types                                                                         |
-| **INP** | < 200ms      | **≤ 100ms**          | Interactive components (measured via Playwright-driven interactions in the M2 harness) |
+| Metric  | "Good" floor | **Stretch (target)** | Measured On                                                                                |
+| ------- | ------------ | -------------------- | ------------------------------------------------------------------------------------------ |
+| **LCP** | < 2.5s       | **≤ 1.5s**           | All page types, 4G throttled                                                               |
+| **CLS** | < 0.1        | **≤ 0.05**           | All page types                                                                             |
+| **INP** | < 200ms      | **≤ 100ms**          | Interactive components (measured via puppeteer-core-driven interactions in the M2 harness) |
 
 > Same stretch targets apply to the Astro PoC — see top-level [README.md](../../../README.md#performance-targets--stretch-goals).
 
@@ -458,7 +458,7 @@ Web fonts loaded via standard Vite asset pipeline (Qwik 2 doesn't have a built-i
 - Section type resolution
 - Component rendering (where applicable)
 
-### Integration Tests — Playwright
+### Integration Tests — puppeteer-core
 
 - Page loads and renders content for all four page types
 - Interactive components work (Load More, nav toggle, ticker)
@@ -468,7 +468,7 @@ Web fonts loaded via standard Vite asset pipeline (Qwik 2 doesn't have a built-i
 
 Run via the shared **`packages/perf-harness/`** (built in M2). Same harness drives both the Astro and Qwik apps for apples-to-apples data:
 
-- Drives interactions via Playwright (so INP is captured)
+- Drives interactions via puppeteer-core (so INP is captured)
 - Runs Lighthouse against the resulting state
 - Aggregates n ≥ 5 runs per page (CWV are noisy)
 - Outputs a structured report consumable by the comparison report (M10)

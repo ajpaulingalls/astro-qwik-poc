@@ -8,7 +8,7 @@ The two PoCs exist to be compared, not to live in isolation. A monorepo lets us 
 
 - **Mock GraphQL API** — same fixture-based server serving identical data to both apps
 - **Production research** — `docs/RESEARCH.md` describes aljazeera.com itself, framework-agnostic
-- **Performance harness** — Lighthouse + Playwright runner that measures both apps the same way; the comparison report depends on identical methodology
+- **Performance harness** — Lighthouse + puppeteer-core runner that measures both apps the same way; the comparison report depends on identical methodology
 
 Each app keeps its framework-specific architecture, milestones, and CLAUDE.md inside its own subtree.
 
@@ -27,7 +27,7 @@ aje-poc/
 │       └── docs/{ARCHITECTURE,MILESTONES}.md
 ├── packages/
 │   ├── mock-api/                    ← Deno 2 mock GraphQL server + recorded fixtures
-│   └── perf-harness/                ← Playwright + Lighthouse runner + comparison reporter
+│   └── perf-harness/                ← puppeteer-core + Lighthouse runner + comparison reporter
 ├── docs/
 │   ├── RESEARCH.md                  ← Framework-agnostic production findings
 │   └── COMPARISON.md                ← Final comparison report (M9 output)

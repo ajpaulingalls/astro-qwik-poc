@@ -63,7 +63,7 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 
 ### Deliverables
 
-- [ ] **Playwright runner** in `packages/perf-harness/` that drives interaction flows (Load More click, hamburger toggle, ticker dismiss) — required for INP measurement, since plain Lighthouse doesn't interact with the page
+- [ ] **puppeteer-core runner** in `packages/perf-harness/` that drives interaction flows (Load More click, hamburger toggle, ticker dismiss) — required for INP measurement, since plain Lighthouse doesn't interact with the page
 - [ ] **Lighthouse integration** that runs against the resulting interactive state, not a cold load
 - [ ] **Multi-run aggregation** (n ≥ 5 per page) — CWV are noisy; report median + p95 per metric per page
 - [ ] **`web-vitals` JS library** instrumented in the Qwik app (and mirrored in the Astro app) for a single source of truth on metric definitions
@@ -266,7 +266,7 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 | Live Blog JS     | —                 | < 20 KB              | n/a                 |
 | Section Front JS | —                 | < 15 KB              | n/a                 |
 
-- All Playwright interaction tests pass
+- All puppeteer-core interaction tests pass
 - SSR throughput > 50 req/s per page type
 - All metrics on stretch column (not floor) for the milestone to be "complete"; floor-but-not-stretch values are recorded as a known limitation in M10
 
