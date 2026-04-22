@@ -47,7 +47,8 @@ export function resolveFixtureKey(operationName: string, variables: Variables): 
   return `${operationName}${suffix}`;
 }
 
-function slugify(value: string): string {
+// Exported so scripts/record-fixtures.sh can be parity-tested against the same algorithm.
+export function slugify(value: string): string {
   return value
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
