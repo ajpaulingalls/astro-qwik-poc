@@ -169,9 +169,14 @@ Qwik's GraphQL client is **isomorphic** — the same module runs on both server 
 
 ```typescript
 // src/lib/graphql.ts
-const API_BASE = import.meta.env.PUBLIC_API_BASE || "http://localhost:4455";
+const DEFAULT_API_BASE = "http://localhost:4455";
 
-interface GraphQLOptions {
+function resolveApiBase(): string {
+  const fromEnv = import.meta.env?.PUBLIC_API_BASE;
+  return fromEnv && fromEnv.length > 0 ? fromEnv : DEFAULT_API_BASE;
+}
+
+interface GraphqlFetchOptions {
   operationName: string;
   variables?: Record<string, unknown>;
   wpSite?: "aje" | "aja";
@@ -181,7 +186,7 @@ export async function graphqlFetch<T>({
   operationName,
   variables = {},
   wpSite = "aje",
-}: GraphQLOptions): Promise<T> {
+}: GraphqlFetchOptions): Promise<T> {
   const params = new URLSearchParams({
     "wp-site": wpSite,
     operationName,
@@ -189,7 +194,7 @@ export async function graphqlFetch<T>({
     extensions: "{}",
   });
 
-  const response = await fetch(`${API_BASE}/graphql?${params}`, {
+  const response = await fetch(`${resolveApiBase()}/graphql?${params.toString()}`, {
     method: "GET",
     headers: {
       accept: "application/json",
