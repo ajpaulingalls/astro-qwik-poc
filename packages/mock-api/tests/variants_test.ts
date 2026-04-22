@@ -1,6 +1,9 @@
 import { assertEquals, assertThrows } from "jsr:@std/assert@^1";
 import { MissingVariableError, resolveFixtureKey } from "../lib/variants.ts";
 
+// E2E coverage (variants exercised through the server's handler chain) lives
+// in tests/server_test.ts: "variant routing serves different fixtures...".
+
 Deno.test("resolveFixtureKey: operations without variant rules return plain operationName", () => {
   assertEquals(resolveFixtureKey("HomePageQuery", {}), "HomePageQuery");
   assertEquals(resolveFixtureKey("HomePageCuratedFeedQuery", {}), "HomePageCuratedFeedQuery");
