@@ -28,20 +28,20 @@ bun run build:qwik
 
 Qwik's resumability model means initial JS is near-zero regardless of page complexity:
 
-| Page | JS Target |
-|------|-----------|
-| Homepage | < 15 KB compressed |
-| Article | < 10 KB compressed |
-| Live Blog | < 20 KB compressed |
+| Page          | JS Target          |
+| ------------- | ------------------ |
+| Homepage      | < 15 KB compressed |
+| Article       | < 10 KB compressed |
+| Live Blog     | < 20 KB compressed |
 | Section Front | < 15 KB compressed |
 
 CWV stretch targets (LCP ≤ 1.5s, CLS ≤ 0.05, INP ≤ 100ms, Lighthouse ≥ 98) are shared across both PoCs — see [top-level README](../../README.md#performance-targets--stretch-goals).
 
 ## Key Documents
 
-| Document | Purpose |
-|----------|---------|
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Qwik-specific architecture — resumability, lazy handlers, Qwik 2 platform features |
-| [docs/MILESTONES.md](./docs/MILESTONES.md) | 10 milestones with stretch-CWV acceptance criteria |
-| [CLAUDE.md](./CLAUDE.md) | Notes for Claude Code working in this app subtree |
-| [../../docs/RESEARCH.md](../../docs/RESEARCH.md) | Production GraphQL findings (shared, framework-agnostic) |
+| Document                                         | Purpose                                                                            |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)   | Qwik-specific architecture — resumability, lazy handlers, Qwik 2 platform features |
+| [docs/MILESTONES.md](./docs/MILESTONES.md)       | 10 milestones with stretch-CWV acceptance criteria                                 |
+| [CLAUDE.md](./CLAUDE.md)                         | Notes for Claude Code working in this app subtree                                  |
+| [../../docs/RESEARCH.md](../../docs/RESEARCH.md) | Production GraphQL findings (shared, framework-agnostic)                           |

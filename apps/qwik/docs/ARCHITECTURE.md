@@ -13,14 +13,14 @@
 
 For a news site, this is compelling: regardless of how many components are on the page, the initial JS payload is near-zero. A homepage with 17 story cards, a video carousel, and a livestream player ships the same amount of JavaScript as a simple article page — effectively none until interaction.
 
-| Component | Loading Strategy | Why |
-|-----------|-----------------|-----|
-| `BreakingTicker` | `useVisibleTask$()` | Starts polling on mount |
-| `LiveBlogUpdater` | `useVisibleTask$()` | Starts polling on mount |
-| `LoadMoreButton` | `$()` click handler | Lazy-loaded on first click |
-| `VerticalVideoCarousel` | `$()` handlers | Lazy-loaded on interaction |
-| `VideoPlayer` | `$()` handlers | Lazy-loaded on play |
-| `Navigation` (hamburger) | `$()` click handler | Lazy-loaded on tap |
+| Component                | Loading Strategy    | Why                        |
+| ------------------------ | ------------------- | -------------------------- |
+| `BreakingTicker`         | `useVisibleTask$()` | Starts polling on mount    |
+| `LiveBlogUpdater`        | `useVisibleTask$()` | Starts polling on mount    |
+| `LoadMoreButton`         | `$()` click handler | Lazy-loaded on first click |
+| `VerticalVideoCarousel`  | `$()` handlers      | Lazy-loaded on interaction |
+| `VideoPlayer`            | `$()` handlers      | Lazy-loaded on play        |
+| `Navigation` (hamburger) | `$()` click handler | Lazy-loaded on tap         |
 
 No island boundaries are needed — Qwik's compiler automatically determines what can be lazy-loaded.
 
@@ -55,16 +55,16 @@ No island boundaries are needed — Qwik's compiler automatically determines wha
 
 ## Qwik 2 platform features in use
 
-| Feature | Notes |
-|---------|-------|
-| **`@qwik.dev/core`** (was `@builder.io/qwik`) | All component / signal / task imports use the new scope |
-| **`@qwik.dev/router`** (was `@builder.io/qwik-city`) | `routeLoader$`, file-based routing, `Form` |
-| **Leaner HTML output** | No comment nodes — smaller payload, helps LCP |
-| **`useAsyncComputed$`** | New reactive async signal — useful for derived data from `routeLoader$` results |
-| **`useSerializer$`** | Loaders are no longer serialized to the client by default in v2; opt in with this for client-resumable data |
-| **`allowStale`** option on `routeLoader$` / `AsyncSignal` | Returns stale data immediately while revalidating — relevant for the breaking ticker and live blog polling |
-| **`passive:` / `capture:` event markers** | JSX event handlers can opt into passive listeners (e.g. `onTouchstart$={passive: ...}`) — relevant for the vertical video carousel scroll handling |
-| **HTML validation** | Enforced at build time (e.g. `<p>` can't contain `<div>`) — catches structural bugs in `ArticleBody.tsx` rich-text rendering |
+| Feature                                                   | Notes                                                                                                                                              |
+| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`@qwik.dev/core`** (was `@builder.io/qwik`)             | All component / signal / task imports use the new scope                                                                                            |
+| **`@qwik.dev/router`** (was `@builder.io/qwik-city`)      | `routeLoader$`, file-based routing, `Form`                                                                                                         |
+| **Leaner HTML output**                                    | No comment nodes — smaller payload, helps LCP                                                                                                      |
+| **`useAsyncComputed$`**                                   | New reactive async signal — useful for derived data from `routeLoader$` results                                                                    |
+| **`useSerializer$`**                                      | Loaders are no longer serialized to the client by default in v2; opt in with this for client-resumable data                                        |
+| **`allowStale`** option on `routeLoader$` / `AsyncSignal` | Returns stale data immediately while revalidating — relevant for the breaking ticker and live blog polling                                         |
+| **`passive:` / `capture:` event markers**                 | JSX event handlers can opt into passive listeners (e.g. `onTouchstart$={passive: ...}`) — relevant for the vertical video carousel scroll handling |
+| **HTML validation**                                       | Enforced at build time (e.g. `<p>` can't contain `<div>`) — catches structural bugs in `ArticleBody.tsx` rich-text rendering                       |
 
 Stable Qwik 2 release is not yet announced; we're following the `@qwik.dev/core` `latest` tag (currently `2.0.0-beta.32`).
 
@@ -94,23 +94,23 @@ const fixtures = new Map<string, unknown>();
 
 Deno.serve({ port: 4455 }, (req: Request) => {
   const url = new URL(req.url);
-  const operationName = url.searchParams.get("operationName");
-  const wpSite = req.headers.get("wp-site");
+  const operationName = url.searchParams.get('operationName');
+  const wpSite = req.headers.get('wp-site');
 
   if (!wpSite) {
-    return new Response("Missing wp-site header", { status: 400 });
+    return new Response('Missing wp-site header', { status: 400 });
   }
 
-  const fixture = fixtures.get(operationName ?? "");
+  const fixture = fixtures.get(operationName ?? '');
   if (!fixture) {
     return new Response(`Unknown operation: ${operationName}`, { status: 404 });
   }
 
   return new Response(JSON.stringify(fixture), {
     headers: {
-      "content-type": "application/json",
-      "access-control-allow-origin": "*",
-      "access-control-allow-headers": "wp-site",
+      'content-type': 'application/json',
+      'access-control-allow-origin': '*',
+      'access-control-allow-headers': 'wp-site',
     },
   });
 });
@@ -145,11 +145,11 @@ curl -s 'https://www.aljazeera.com/graphql?wp-site=aje&operationName=HomePageQue
 
 ### Environment Variables
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `PORT` | `4455` | Server port |
-| `WP_SITE` | `aje` | Default wp-site if header missing (dev convenience) |
-| `FIXTURE_DIR` | `./fixtures` | Path to fixture JSON files |
+| Variable      | Default      | Purpose                                             |
+| ------------- | ------------ | --------------------------------------------------- |
+| `PORT`        | `4455`       | Server port                                         |
+| `WP_SITE`     | `aje`        | Default wp-site if header missing (dev convenience) |
+| `FIXTURE_DIR` | `./fixtures` | Path to fixture JSON files                          |
 
 ### Deno Permissions
 
@@ -169,7 +169,7 @@ Qwik's GraphQL client is **isomorphic** — the same module runs on both server 
 
 ```typescript
 // src/lib/graphql.ts
-const DEFAULT_API_BASE = "http://localhost:4455";
+const DEFAULT_API_BASE = 'http://localhost:4455';
 
 function resolveApiBase(): string {
   const fromEnv = import.meta.env?.PUBLIC_API_BASE;
@@ -179,26 +179,26 @@ function resolveApiBase(): string {
 interface GraphqlFetchOptions {
   operationName: string;
   variables?: Record<string, unknown>;
-  wpSite?: "aje" | "aja";
+  wpSite?: 'aje' | 'aja';
 }
 
 export async function graphqlFetch<T>({
   operationName,
   variables = {},
-  wpSite = "aje",
+  wpSite = 'aje',
 }: GraphqlFetchOptions): Promise<T> {
   const params = new URLSearchParams({
-    "wp-site": wpSite,
+    'wp-site': wpSite,
     operationName,
     variables: JSON.stringify(variables),
-    extensions: "{}",
+    extensions: '{}',
   });
 
   const response = await fetch(`${resolveApiBase()}/graphql?${params.toString()}`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      accept: "application/json",
-      "wp-site": wpSite,
+      accept: 'application/json',
+      'wp-site': wpSite,
     },
   });
 
@@ -211,19 +211,19 @@ export async function graphqlFetch<T>({
 
 ```tsx
 // src/routes/index.tsx
-import { component$ } from "@qwik.dev/core";
-import { routeLoader$ } from "@qwik.dev/router";
-import { graphqlFetch } from "../lib/graphql";
+import { component$ } from '@qwik.dev/core';
+import { routeLoader$ } from '@qwik.dev/router';
+import { graphqlFetch } from '../lib/graphql';
 
 export const useHomepageData = routeLoader$(async () => {
   const [homepage, curatedFeed] = await Promise.all([
     graphqlFetch({
-      operationName: "HomePageQuery",
-      variables: { isAtf: true, atfLength: 2, slug: "", preview: "" },
+      operationName: 'HomePageQuery',
+      variables: { isAtf: true, atfLength: 2, slug: '', preview: '' },
     }),
     graphqlFetch({
-      operationName: "HomePageCuratedFeedQuery",
-      variables: { preview: "", slug: "" },
+      operationName: 'HomePageCuratedFeedQuery',
+      variables: { preview: '', slug: '' },
     }),
   ]);
   return { homepage, curatedFeed };
@@ -295,8 +295,8 @@ export const LoadMoreButton = component$<Props>(
 
 ```tsx
 // src/components/BreakingTicker.tsx
-import { component$, useSignal, useVisibleTask$ } from "@qwik.dev/core";
-import { graphqlFetch } from "../lib/graphql";
+import { component$, useSignal, useVisibleTask$ } from '@qwik.dev/core';
+import { graphqlFetch } from '../lib/graphql';
 
 export const BreakingTicker = component$(() => {
   const tickerData = useSignal(null);
@@ -304,7 +304,7 @@ export const BreakingTicker = component$(() => {
   useVisibleTask$(({ cleanup }) => {
     const poll = async () => {
       const data = await graphqlFetch({
-        operationName: "ArchipelagoBreakingTickerQuery",
+        operationName: 'ArchipelagoBreakingTickerQuery',
       });
       tickerData.value = data;
     };
@@ -329,35 +329,35 @@ In Qwik, there's **no distinction between static and interactive components** at
 
 ### Purely Static (zero JS shipped)
 
-| Component | Description |
-|-----------|-------------|
-| `HeroCard.tsx` | Large featured story card (top story) |
-| `StoryCard.tsx` | Standard article card with image, headline, excerpt |
-| `StoryCardCompact.tsx` | Smaller card variant (sidebar, related) |
-| `ArticleBody.tsx` | Rich text renderer — handles embeds, images, pull quotes |
-| `MostPopular.tsx` | Most popular sidebar/module (10 items) |
-| `CuratedCollection.tsx` | Editorially curated content block |
-| `Footer.tsx` | Site footer with link columns |
+| Component               | Description                                              |
+| ----------------------- | -------------------------------------------------------- |
+| `HeroCard.tsx`          | Large featured story card (top story)                    |
+| `StoryCard.tsx`         | Standard article card with image, headline, excerpt      |
+| `StoryCardCompact.tsx`  | Smaller card variant (sidebar, related)                  |
+| `ArticleBody.tsx`       | Rich text renderer — handles embeds, images, pull quotes |
+| `MostPopular.tsx`       | Most popular sidebar/module (10 items)                   |
+| `CuratedCollection.tsx` | Editorially curated content block                        |
+| `Footer.tsx`            | Site footer with link columns                            |
 
 ### Interactive (JS lazy-loaded on interaction or mount)
 
-| Component | Trigger | Description |
-|-----------|---------|-------------|
-| `BreakingTicker.tsx` | `useVisibleTask$` (mount) | Polls `ArchipelagoBreakingTickerQuery` every 30s |
-| `LoadMoreButton.tsx` | `$()` (click) | Triggers offset-based pagination, appends results |
-| `LiveBlogUpdater.tsx` | `useVisibleTask$` (mount) | Polls for new live blog entries |
-| `VerticalVideoCarousel.tsx` | `$()` (swipe/scroll) | Swipeable vertical video shorts carousel — use `passive:` event marker for scroll |
-| `VideoPlayer.tsx` | `$()` (play) | Brightcove / YouTube embed |
-| `LivestreamPlayer.tsx` | `$()` (play) | Livestream video with config from `livestream` field |
-| `Navigation.tsx` | `$()` (click) | Nav with hamburger menu toggle for mobile |
+| Component                   | Trigger                   | Description                                                                       |
+| --------------------------- | ------------------------- | --------------------------------------------------------------------------------- |
+| `BreakingTicker.tsx`        | `useVisibleTask$` (mount) | Polls `ArchipelagoBreakingTickerQuery` every 30s                                  |
+| `LoadMoreButton.tsx`        | `$()` (click)             | Triggers offset-based pagination, appends results                                 |
+| `LiveBlogUpdater.tsx`       | `useVisibleTask$` (mount) | Polls for new live blog entries                                                   |
+| `VerticalVideoCarousel.tsx` | `$()` (swipe/scroll)      | Swipeable vertical video shorts carousel — use `passive:` event marker for scroll |
+| `VideoPlayer.tsx`           | `$()` (play)              | Brightcove / YouTube embed                                                        |
+| `LivestreamPlayer.tsx`      | `$()` (play)              | Livestream video with config from `livestream` field                              |
+| `Navigation.tsx`            | `$()` (click)             | Nav with hamburger menu toggle for mobile                                         |
 
 ### Layouts
 
-| Component | Description |
-|-----------|-------------|
-| `layout.tsx` (root) | Global wrapper — nav, footer, ticker slot |
-| `ThreeColumnLayout.tsx` | Homepage grid layout |
-| `SectionLayout.tsx` | Section front layout |
+| Component               | Description                               |
+| ----------------------- | ----------------------------------------- |
+| `layout.tsx` (root)     | Global wrapper — nav, footer, ticker slot |
+| `ThreeColumnLayout.tsx` | Homepage grid layout                      |
+| `SectionLayout.tsx`     | Section front layout                      |
 
 ---
 
@@ -365,23 +365,27 @@ In Qwik, there's **no distinction between static and interactive components** at
 
 Qwik Router (`@qwik.dev/router`) uses **directory-based routing**:
 
-| Pattern | Route File | Page Type |
-|---------|-----------|-----------|
-| `/` | `src/routes/index.tsx` | Homepage |
-| `/news/{year}/{month}/{day}/{slug}` | `src/routes/news/[...slug]/index.tsx` | Article |
-| `/news/liveblog/{year}/{month}/{day}/{slug}` | `src/routes/news/liveblog/[...slug]/index.tsx` | Live Blog |
-| `/{section}` | `src/routes/[section]/index.tsx` | Section Front |
+| Pattern                                      | Route File                                     | Page Type     |
+| -------------------------------------------- | ---------------------------------------------- | ------------- |
+| `/`                                          | `src/routes/index.tsx`                         | Homepage      |
+| `/news/{year}/{month}/{day}/{slug}`          | `src/routes/news/[...slug]/index.tsx`          | Article       |
+| `/news/liveblog/{year}/{month}/{day}/{slug}` | `src/routes/news/liveblog/[...slug]/index.tsx` | Live Blog     |
+| `/{section}`                                 | `src/routes/[section]/index.tsx`               | Section Front |
 
 ### Section Type Resolution
 
 ```typescript
 const GEOGRAPHIC_SECTIONS = [
-  "middle-east", "asia-pacific", "us-canada",
-  "europe", "africa", "latin-america"
+  'middle-east',
+  'asia-pacific',
+  'us-canada',
+  'europe',
+  'africa',
+  'latin-america',
 ];
 
-function getSectionType(section: string): "geographic" | "topic" {
-  return GEOGRAPHIC_SECTIONS.includes(section) ? "geographic" : "topic";
+function getSectionType(section: string): 'geographic' | 'topic' {
+  return GEOGRAPHIC_SECTIONS.includes(section) ? 'geographic' : 'topic';
 }
 ```
 
@@ -396,11 +400,11 @@ function getSectionType(section: string): "geographic" | "topic" {
 
 The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page acceptance criteria use the stretch column. A measured value worse than the floor fails the milestone outright.
 
-| Metric | "Good" floor | **Stretch (target)** | Measured On |
-|--------|--------------|----------------------|-------------|
-| **LCP** | < 2.5s | **≤ 1.5s** | All page types, 4G throttled |
-| **CLS** | < 0.1 | **≤ 0.05** | All page types |
-| **INP** | < 200ms | **≤ 100ms** | Interactive components (measured via Playwright-driven interactions in the M2 harness) |
+| Metric  | "Good" floor | **Stretch (target)** | Measured On                                                                            |
+| ------- | ------------ | -------------------- | -------------------------------------------------------------------------------------- |
+| **LCP** | < 2.5s       | **≤ 1.5s**           | All page types, 4G throttled                                                           |
+| **CLS** | < 0.1        | **≤ 0.05**           | All page types                                                                         |
+| **INP** | < 200ms      | **≤ 100ms**          | Interactive components (measured via Playwright-driven interactions in the M2 harness) |
 
 > Same stretch targets apply to the Astro PoC — see top-level [README.md](../../../README.md#performance-targets--stretch-goals).
 
@@ -408,29 +412,29 @@ The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page 
 
 Qwik's resumability model means initial JS is near-zero regardless of page complexity — handlers load only when triggered:
 
-| Page | JS Target | Notes |
-|------|-----------|-------|
-| **Homepage** | < 15 KB | Near-zero initial — handlers loaded on interaction |
-| **Article** | < 10 KB | Minimal interactivity — video player if present |
-| **Live Blog** | < 20 KB | Polling handler + update rendering |
-| **Section Front** | < 15 KB | Load More handler + ticker |
+| Page              | JS Target | Notes                                              |
+| ----------------- | --------- | -------------------------------------------------- |
+| **Homepage**      | < 15 KB   | Near-zero initial — handlers loaded on interaction |
+| **Article**       | < 10 KB   | Minimal interactivity — video player if present    |
+| **Live Blog**     | < 20 KB   | Polling handler + update rendering                 |
+| **Section Front** | < 15 KB   | Load More handler + ticker                         |
 
 ### SSR Performance
 
-| Metric | Target |
-|--------|--------|
-| **Homepage TTFB** | < 200ms (from mock API) |
-| **Article TTFB** | < 150ms |
+| Metric             | Target                                 |
+| ------------------ | -------------------------------------- |
+| **Homepage TTFB**  | < 200ms (from mock API)                |
+| **Article TTFB**   | < 150ms                                |
 | **SSR throughput** | > 50 req/s per page type (single core) |
 
 ### Lighthouse Scores
 
-| Category | "Good" floor | **Stretch (target)** |
-|----------|--------------|----------------------|
-| Performance | ≥ 95 | **≥ 98** |
-| Accessibility | ≥ 90 | ≥ 95 |
-| Best Practices | ≥ 95 | ≥ 98 |
-| SEO | ≥ 95 | ≥ 98 |
+| Category       | "Good" floor | **Stretch (target)** |
+| -------------- | ------------ | -------------------- |
+| Performance    | ≥ 95         | **≥ 98**             |
+| Accessibility  | ≥ 90         | ≥ 95                 |
+| Best Practices | ≥ 95         | ≥ 98                 |
+| SEO            | ≥ 95         | ≥ 98                 |
 
 ---
 

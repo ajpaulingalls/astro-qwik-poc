@@ -17,13 +17,13 @@ Codified in `docs/ARCHITECTURE.md` — don't relitigate without explicit user in
 
 ## Qwik 2 platform features in use
 
-| Feature | Where used |
-|---------|-----------|
-| `@qwik.dev/core` / `@qwik.dev/router` (renamed scope) | All imports |
-| `useSerializer$` | Loaders no longer serialize to client by default in v2; opt in here |
-| `allowStale` on `routeLoader$` / `AsyncSignal` | Breaking ticker, live blog polling — alternative to manual `setInterval` |
-| `passive:` event markers | Vertical video carousel scroll/touch |
-| Build-time HTML validation | `ArticleBody.tsx` rich-text rendering |
+| Feature                                               | Where used                                                               |
+| ----------------------------------------------------- | ------------------------------------------------------------------------ |
+| `@qwik.dev/core` / `@qwik.dev/router` (renamed scope) | All imports                                                              |
+| `useSerializer$`                                      | Loaders no longer serialize to client by default in v2; opt in here      |
+| `allowStale` on `routeLoader$` / `AsyncSignal`        | Breaking ticker, live blog polling — alternative to manual `setInterval` |
+| `passive:` event markers                              | Vertical video carousel scroll/touch                                     |
+| Build-time HTML validation                            | `ArticleBody.tsx` rich-text rendering                                    |
 
 ## Beta caveats
 
@@ -71,6 +71,7 @@ gh api 'repos/QwikDev/qwik/contents/packages/docs/src/routes/docs/(qwikrouter)/r
 ```
 
 Useful entry points on `build/v2`:
+
 - `menu.md` — full doc index
 - `upgrade/` — v1→v2 migration guide (read this when porting v1 patterns)
 - `(qwik)/core/<topic>/index.mdx` — core APIs (component$, useSignal, useTask$, etc.)

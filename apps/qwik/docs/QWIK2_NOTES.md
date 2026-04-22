@@ -10,7 +10,7 @@ Installed pins: `@qwik.dev/core ~2.0.0-beta.32`, `@qwik.dev/router 2.0.0-beta.32
 
 1. **`QwikCityProvider` is deprecated.** `@qwik.dev/router/lib/index.d.ts` marks it `@deprecated Use useQwikRouter() instead. Will be removed in v3.` The architecture doc's `<QwikCityProvider>` wrapper pattern is replaced by calling `useQwikRouter()` inside `component$` — no provider component needed. `src/root.tsx` follows the new pattern.
 2. **`qwikCity` vite plugin renamed to `qwikRouter`.** Imported from `@qwik.dev/router/vite`. `qwikCity` remains as a deprecated alias scheduled for v3 removal.
-3. **`allowStale` does not exist on `routeLoader$` / `AsyncSignal` in `beta.32`.** The architecture doc references it for breaking-ticker and live-blog polling (M7, M8). Installed types expose `serializationStrategy: 'never' | 'always' | 'auto'` instead — controls *whether* loader data is sent to the client, not *staleness*. Polling in M7/M8 will need manual `setInterval` inside `useVisibleTask$` until `allowStale` lands. Will recheck on subsequent beta bumps.
+3. **`allowStale` does not exist on `routeLoader$` / `AsyncSignal` in `beta.32`.** The architecture doc references it for breaking-ticker and live-blog polling (M7, M8). Installed types expose `serializationStrategy: 'never' | 'always' | 'auto'` instead — controls _whether_ loader data is sent to the client, not _staleness_. Polling in M7/M8 will need manual `setInterval` inside `useVisibleTask$` until `allowStale` lands. Will recheck on subsequent beta bumps.
 4. **`passive:` event marker syntax not yet verified.** Not needed for M3; will confirm against installed `.d.ts` when the vertical-video carousel lands in M4.
 
 ### APIs confirmed present in `beta.32`

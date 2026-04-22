@@ -3,6 +3,7 @@
 > 10 milestones from scaffolding to final comparison report.
 >
 > Cross-references:
+>
 > - [ARCHITECTURE.md](./ARCHITECTURE.md) — Qwik-specific technical design
 > - [../../../docs/RESEARCH.md](../../../docs/RESEARCH.md) — verified production query patterns (shared with Astro PoC)
 > - [../../../packages/perf-harness/](../../../packages/perf-harness/) — shared performance harness (built in M2)
@@ -11,23 +12,23 @@
 
 Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear them. Every per-page acceptance criterion uses the stretch column. A value worse than the floor fails the milestone outright.
 
-| Metric | "Good" floor | **Stretch (target)** |
-|--------|--------------|----------------------|
-| LCP | < 2.5s | **≤ 1.5s** |
-| CLS | < 0.1 | **≤ 0.05** |
-| INP | < 200ms | **≤ 100ms** |
-| Lighthouse Performance | ≥ 95 | **≥ 98** |
+| Metric                 | "Good" floor | **Stretch (target)** |
+| ---------------------- | ------------ | -------------------- |
+| LCP                    | < 2.5s       | **≤ 1.5s**           |
+| CLS                    | < 0.1        | **≤ 0.05**           |
+| INP                    | < 200ms      | **≤ 100ms**          |
+| Lighthouse Performance | ≥ 95         | **≥ 98**             |
 
 ### Qwik 2 platform features in scope
 
-| Feature | Where it shows up |
-|---------|-------------------|
-| **`@qwik.dev/core` / `@qwik.dev/router`** (renamed from `@builder.io/qwik` + `qwik-city`) | All imports, throughout |
-| **`useSerializer$`** — opt-in client serialization (loaders no longer serialize by default) | Wherever `routeLoader$` data needs client access |
-| **`allowStale` on `routeLoader$` / `AsyncSignal`** | Breaking ticker, live blog polling — alternative to manual `setInterval` |
-| **`passive:` event markers** | Vertical video carousel scroll/touch |
-| **HTML validation at build time** | `ArticleBody.tsx` rich-text rendering (catches invalid nesting) |
-| **Leaner HTML output** (no comment nodes) | Smaller payload across all page types — helps LCP |
+| Feature                                                                                     | Where it shows up                                                        |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **`@qwik.dev/core` / `@qwik.dev/router`** (renamed from `@builder.io/qwik` + `qwik-city`)   | All imports, throughout                                                  |
+| **`useSerializer$`** — opt-in client serialization (loaders no longer serialize by default) | Wherever `routeLoader$` data needs client access                         |
+| **`allowStale` on `routeLoader$` / `AsyncSignal`**                                          | Breaking ticker, live blog polling — alternative to manual `setInterval` |
+| **`passive:` event markers**                                                                | Vertical video carousel scroll/touch                                     |
+| **HTML validation at build time**                                                           | `ArticleBody.tsx` rich-text rendering (catches invalid nesting)          |
+| **Leaner HTML output** (no comment nodes)                                                   | Smaller payload across all page types — helps LCP                        |
 
 > **Beta status:** Qwik 2 is at `2.0.0-beta.32` as of April 2026. Stable release date unannounced. Plugin compatibility may have gaps; document any blocker as it appears.
 
@@ -254,16 +255,16 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 
 ### Acceptance Criteria
 
-| Metric | Floor (must pass) | **Stretch (target)** | All four page types |
-|--------|-------------------|----------------------|---------------------|
-| LCP | < 2.5s | **≤ 1.5s** | ✓ |
-| CLS | < 0.1 | **≤ 0.05** | ✓ |
-| INP | < 200ms | **≤ 100ms** | ✓ |
-| Lighthouse Perf | ≥ 95 | **≥ 98** | ✓ |
-| Homepage JS | — | < 15 KB | n/a |
-| Article JS | — | < 10 KB | n/a |
-| Live Blog JS | — | < 20 KB | n/a |
-| Section Front JS | — | < 15 KB | n/a |
+| Metric           | Floor (must pass) | **Stretch (target)** | All four page types |
+| ---------------- | ----------------- | -------------------- | ------------------- |
+| LCP              | < 2.5s            | **≤ 1.5s**           | ✓                   |
+| CLS              | < 0.1             | **≤ 0.05**           | ✓                   |
+| INP              | < 200ms           | **≤ 100ms**          | ✓                   |
+| Lighthouse Perf  | ≥ 95              | **≥ 98**             | ✓                   |
+| Homepage JS      | —                 | < 15 KB              | n/a                 |
+| Article JS       | —                 | < 10 KB              | n/a                 |
+| Live Blog JS     | —                 | < 20 KB              | n/a                 |
+| Section Front JS | —                 | < 15 KB              | n/a                 |
 
 - All Playwright interaction tests pass
 - SSR throughput > 50 req/s per page type
@@ -296,18 +297,18 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 
 ## Timeline Overview
 
-| Milestone | Estimated Effort | Dependencies |
-|-----------|-----------------|--------------|
-| 1. Scaffolding & Mock API | 2–3 days (add 1 day for beta debugging) | None |
-| 2. Performance Test Harness | 2–3 days | M1 (shared with Astro PoC) |
-| 3. Layout & Navigation | 2 days | M1 (M2 strongly recommended for measurement) |
-| 4. Homepage | 3–4 days | M3 |
-| 5. Article Page | 2–3 days | M3 |
-| 6. Section Front | 3–4 days | M3 |
-| 7. Live Blog | 3–4 days | M3 |
-| 8. Breaking Ticker | 1 day | M3 |
-| 9. Final Performance Validation | 2–3 days | M4–M8 |
-| 10. Comparison Report | 2–3 days | M9 + Astro M9 |
+| Milestone                       | Estimated Effort                        | Dependencies                                 |
+| ------------------------------- | --------------------------------------- | -------------------------------------------- |
+| 1. Scaffolding & Mock API       | 2–3 days (add 1 day for beta debugging) | None                                         |
+| 2. Performance Test Harness     | 2–3 days                                | M1 (shared with Astro PoC)                   |
+| 3. Layout & Navigation          | 2 days                                  | M1 (M2 strongly recommended for measurement) |
+| 4. Homepage                     | 3–4 days                                | M3                                           |
+| 5. Article Page                 | 2–3 days                                | M3                                           |
+| 6. Section Front                | 3–4 days                                | M3                                           |
+| 7. Live Blog                    | 3–4 days                                | M3                                           |
+| 8. Breaking Ticker              | 1 day                                   | M3                                           |
+| 9. Final Performance Validation | 2–3 days                                | M4–M8                                        |
+| 10. Comparison Report           | 2–3 days                                | M9 + Astro M9                                |
 
 **Total estimated effort:** ~5 weeks (with beta-friction buffer).
 
