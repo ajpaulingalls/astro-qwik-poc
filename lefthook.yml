@@ -1,0 +1,34 @@
+pre-commit:
+  parallel: true
+  commands:
+    prettier-check:
+      glob: '*.{ts,tsx,astro,mjs,cjs,js,json,md,css,yml,yaml}'
+      run: bun x prettier --check {staged_files}
+
+    eslint:
+      glob: '*.{ts,tsx,astro,mjs,cjs,js}'
+      run: bun x eslint {staged_files}
+
+    deno-fmt-check:
+      glob: 'packages/mock-api/**/*.{ts,md,json}'
+      run: deno fmt --check {staged_files}
+
+    deno-lint:
+      glob: 'packages/mock-api/**/*.ts'
+      run: deno lint {staged_files}
+
+    test-astro:
+      glob: 'apps/astro/**/*'
+      run: bun --filter aje-poc-astro test
+      stage_fixed: false
+
+    test-qwik:
+      glob: 'apps/qwik/**/*'
+      run: bun --filter aje-poc-qwik test
+      stage_fixed: false
+
+    test-mock-api:
+      glob: 'packages/mock-api/**/*.ts'
+      root: 'packages/mock-api/'
+      run: deno task test
+      stage_fixed: false
