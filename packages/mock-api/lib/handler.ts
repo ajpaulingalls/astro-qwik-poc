@@ -1,8 +1,5 @@
+import { type FixtureMap } from "./fixtures.ts";
 import { MissingVariableError, resolveFixtureKey, type Variables } from "./variants.ts";
-
-// Fixtures are pre-stringified at load (see lib/fixtures.ts) so the hot path
-// can return them directly without per-request JSON.stringify.
-export type FixtureMap = Map<string, string>;
 
 export interface HandlerDeps {
   fixtures: FixtureMap;
