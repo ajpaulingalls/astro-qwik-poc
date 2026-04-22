@@ -10,6 +10,9 @@
     "preview": "vite preview",
     "test": "vitest run"
   },
+  "dependencies": {
+    "web-vitals": "^4.2.4"
+  },
   "devDependencies": {
     "@qwik.dev/core": "~2.0.0-beta.32",
     "@qwik.dev/router": "latest",
