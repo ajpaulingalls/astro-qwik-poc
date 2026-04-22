@@ -1,0 +1,33 @@
+---
+import '../styles/global.css';
+import { graphqlFetch } from '../lib/graphql';
+
+interface HomePageData {
+  homepage: {
+    layout: string;
+    featuredPosts: Array<{ id: string; title: string }>;
+  };
+}
+
+const data = await graphqlFetch<HomePageData>({
+  operationName: 'HomePageQuery',
+  variables: { isAtf: true, atfLength: 2, slug: '', preview: '' },
+});
+
+console.log('HomePageQuery', data);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>aje-poc-astro</title>
+  </head>
+  <body class="font-sans">
+    <main class="mx-auto max-w-2xl p-8">
+      <h1 class="text-2xl font-bold">aje-poc-astro</h1>
+      <p>HomePageQuery layout: <code>{data.homepage.layout}</code></p>
+      <p>Featured posts loaded: {data.homepage.featuredPosts.length}</p>
+    </main>
+  </body>
+</html>
