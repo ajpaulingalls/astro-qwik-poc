@@ -1,5 +1,5 @@
-import { createRenderer } from "@qwik.dev/router";
-import Root from "./root";
+import { createRenderer } from '@qwik.dev/router';
+import Root from './root';
 
 export default createRenderer((opts) => {
   return {
@@ -7,7 +7,7 @@ export default createRenderer((opts) => {
     options: {
       ...opts,
       containerAttributes: {
-        lang: "en",
+        lang: 'en',
         ...opts.containerAttributes,
       },
     },

@@ -1,4 +1,4 @@
-export type WpSite = "aje" | "aja";
+export type WpSite = 'aje' | 'aja';
 
 export interface GraphqlFetchOptions {
   operationName: string;
@@ -6,7 +6,7 @@ export interface GraphqlFetchOptions {
   wpSite?: WpSite;
 }
 
-const DEFAULT_API_BASE = "http://localhost:4455";
+const DEFAULT_API_BASE = 'http://localhost:4455';
 
 function resolveApiBase(): string {
   const fromEnv = import.meta.env?.PUBLIC_API_BASE;
@@ -16,20 +16,20 @@ function resolveApiBase(): string {
 export async function graphqlFetch<T>({
   operationName,
   variables = {},
-  wpSite = "aje",
+  wpSite = 'aje',
 }: GraphqlFetchOptions): Promise<T> {
   const params = new URLSearchParams({
-    "wp-site": wpSite,
+    'wp-site': wpSite,
     operationName,
     variables: JSON.stringify(variables),
-    extensions: "{}",
+    extensions: '{}',
   });
 
   const response = await fetch(`${resolveApiBase()}/graphql?${params.toString()}`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      accept: "application/json",
-      "wp-site": wpSite,
+      accept: 'application/json',
+      'wp-site': wpSite,
     },
   });
 

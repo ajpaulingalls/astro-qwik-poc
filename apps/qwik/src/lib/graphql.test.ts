@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { graphqlFetch } from "./graphql";
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { graphqlFetch } from './graphql';
 
 interface CapturedFetchCall {
   url: string;
@@ -15,7 +15,7 @@ function mockFetch(payload: unknown): {
     calls.push({ url: String(input), init });
     return new Response(JSON.stringify(payload), {
       status: 200,
-      headers: { "content-type": "application/json" },
+      headers: { 'content-type': 'application/json' },
     });
   });
   return { fetch: fetchMock, calls };
@@ -23,11 +23,11 @@ function mockFetch(payload: unknown): {
 
 const ORIGINAL_FETCH = globalThis.fetch;
 
-describe("graphqlFetch", () => {
+describe('graphqlFetch', () => {
   let calls: CapturedFetchCall[];
 
   beforeEach(() => {
-    const m = mockFetch({ data: { homepage: { layout: "three-column" } } });
+    const m = mockFetch({ data: { homepage: { layout: 'three-column' } } });
     calls = m.calls;
     globalThis.fetch = m.fetch as unknown as typeof fetch;
   });
@@ -37,65 +37,66 @@ describe("graphqlFetch", () => {
     vi.unstubAllEnvs();
   });
 
-  it("builds a GET URL with operationName, URL-encoded variables, and extensions={}", async () => {
+  it('builds a GET URL with operationName, URL-encoded variables, and extensions={}', async () => {
     await graphqlFetch({
-      operationName: "HomePageQuery",
-      variables: { isAtf: true, atfLength: 2, slug: "", preview: "" },
+      operationName: 'HomePageQuery',
+      variables: { isAtf: true, atfLength: 2, slug: '', preview: '' },
     });
 
     expect(calls).toHaveLength(1);
     const url = new URL(calls[0].url);
-    expect(url.pathname).toBe("/graphql");
-    expect(url.searchParams.get("operationName")).toBe("HomePageQuery");
-    expect(url.searchParams.get("wp-site")).toBe("aje");
-    expect(JSON.parse(url.searchParams.get("variables") ?? "{}")).toEqual({
+    expect(url.pathname).toBe('/graphql');
+    expect(url.searchParams.get('operationName')).toBe('HomePageQuery');
+    expect(url.searchParams.get('wp-site')).toBe('aje');
+    expect(JSON.parse(url.searchParams.get('variables') ?? '{}')).toEqual({
       isAtf: true,
       atfLength: 2,
-      slug: "",
-      preview: "",
+      slug: '',
+      preview: '',
     });
-    expect(url.searchParams.get("extensions")).toBe("{}");
-    expect(calls[0].init.method ?? "GET").toBe("GET");
+    expect(url.searchParams.get('extensions')).toBe('{}');
+    expect(calls[0].init.method ?? 'GET').toBe('GET');
   });
 
-  it("injects the wp-site header (default aje)", async () => {
-    await graphqlFetch({ operationName: "HomePageQuery" });
+  it('injects the wp-site header (default aje)', async () => {
+    await graphqlFetch({ operationName: 'HomePageQuery' });
     const headers = new Headers(calls[0].init.headers);
-    expect(headers.get("wp-site")).toBe("aje");
+    expect(headers.get('wp-site')).toBe('aje');
   });
 
-  it("honours an explicit wpSite override (aja)", async () => {
-    await graphqlFetch({ operationName: "HomePageQuery", wpSite: "aja" });
+  it('honours an explicit wpSite override (aja)', async () => {
+    await graphqlFetch({ operationName: 'HomePageQuery', wpSite: 'aja' });
     const url = new URL(calls[0].url);
     const headers = new Headers(calls[0].init.headers);
-    expect(url.searchParams.get("wp-site")).toBe("aja");
-    expect(headers.get("wp-site")).toBe("aja");
+    expect(url.searchParams.get('wp-site')).toBe('aja');
+    expect(headers.get('wp-site')).toBe('aja');
   });
 
-  it("returns json.data typed as T", async () => {
+  it('returns json.data typed as T', async () => {
     const result = await graphqlFetch<{ homepage: { layout: string } }>({
-      operationName: "HomePageQuery",
+      operationName: 'HomePageQuery',
     });
-    expect(result.homepage.layout).toBe("three-column");
+    expect(result.homepage.layout).toBe('three-column');
   });
 
-  it("falls back to http://localhost:4455 when PUBLIC_API_BASE is unset", async () => {
-    vi.stubEnv("PUBLIC_API_BASE", "");
-    await graphqlFetch({ operationName: "HomePageQuery" });
-    expect(calls[0].url.startsWith("http://localhost:4455/graphql?")).toBe(true);
+  it('falls back to http://localhost:4455 when PUBLIC_API_BASE is unset', async () => {
+    vi.stubEnv('PUBLIC_API_BASE', '');
+    await graphqlFetch({ operationName: 'HomePageQuery' });
+    expect(calls[0].url.startsWith('http://localhost:4455/graphql?')).toBe(true);
   });
 
-  it("uses PUBLIC_API_BASE from import.meta.env when set", async () => {
-    vi.stubEnv("PUBLIC_API_BASE", "https://api.example.test");
-    await graphqlFetch({ operationName: "HomePageQuery" });
-    expect(calls[0].url.startsWith("https://api.example.test/graphql?")).toBe(true);
+  it('uses PUBLIC_API_BASE from import.meta.env when set', async () => {
+    vi.stubEnv('PUBLIC_API_BASE', 'https://api.example.test');
+    await graphqlFetch({ operationName: 'HomePageQuery' });
+    expect(calls[0].url.startsWith('https://api.example.test/graphql?')).toBe(true);
   });
 
-  it("throws when the response status is not ok", async () => {
+  it('throws when the response status is not ok', async () => {
     globalThis.fetch = vi.fn(
-      async () => new Response("Missing wp-site header", { status: 400, statusText: "Bad Request" }),
+      async () =>
+        new Response('Missing wp-site header', { status: 400, statusText: 'Bad Request' }),
     ) as unknown as typeof fetch;
-    await expect(graphqlFetch({ operationName: "HomePageQuery" })).rejects.toThrow(
+    await expect(graphqlFetch({ operationName: 'HomePageQuery' })).rejects.toThrow(
       /graphqlFetch HomePageQuery failed: 400 Bad Request/,
     );
   });
