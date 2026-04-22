@@ -31,10 +31,10 @@ Deno.test("resolveFixtureKey: SingleLiveBlogChildrensQuery uses variables.postNa
   );
 });
 
-Deno.test("resolveFixtureKey: LiveBlogUpdateQuery uses variables.uri", () => {
+Deno.test("resolveFixtureKey: LiveBlogUpdateQuery uses variables.postID (int)", () => {
   assertEquals(
-    resolveFixtureKey("LiveBlogUpdateQuery", { uri: "/news/2026/4/21/some-update" }),
-    "LiveBlogUpdateQuery--news-2026-4-21-some-update",
+    resolveFixtureKey("LiveBlogUpdateQuery", { postID: 4512107, postType: "post" }),
+    "LiveBlogUpdateQuery--4512107",
   );
 });
 
@@ -113,7 +113,7 @@ Deno.test("resolveFixtureKey: slugifies values with spaces and uppercase", () =>
 
 Deno.test("resolveFixtureKey: strips leading/trailing dashes after slugify", () => {
   assertEquals(
-    resolveFixtureKey("LiveBlogUpdateQuery", { uri: "/foo/bar/" }),
-    "LiveBlogUpdateQuery--foo-bar",
+    resolveFixtureKey("ArchipelagoSingleArticleQuery", { name: "/foo/bar/" }),
+    "ArchipelagoSingleArticleQuery--foo-bar",
   );
 });

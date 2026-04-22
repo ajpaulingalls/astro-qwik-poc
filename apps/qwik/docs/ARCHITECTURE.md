@@ -128,7 +128,7 @@ packages/mock-api/fixtures/
 ├── ArchipelagoSingleArticleQuery--sample-slug.json   ← variant
 ├── ArchipelagoSingleLiveBlogQuery.json
 ├── SingleLiveBlogChildrensQuery.json
-├── LiveBlogUpdateQuery.json
+├── LiveBlogUpdateQuery--{postID}.json   ← variant (numeric WP post ID)
 ├── ArchipelagoSectionQuery--middle-east.json
 ├── ArchipelagoAjeSectionPostsQuery--middle-east--offset-0.json
 ├── ArchipelagoTopicsPageQuery--opinion.json

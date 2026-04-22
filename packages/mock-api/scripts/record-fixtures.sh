@@ -55,11 +55,11 @@ record() {
 
 ARTICLE_SLUG="${ARTICLE_SLUG:-}"
 LIVEBLOG_SLUG="${LIVEBLOG_SLUG:-}"
-LIVEBLOG_UPDATE_URI="${LIVEBLOG_UPDATE_URI:-}"
+LIVEBLOG_UPDATE_POST_ID="${LIVEBLOG_UPDATE_POST_ID:-}"
 
 require ARTICLE_SLUG "$ARTICLE_SLUG"
 require LIVEBLOG_SLUG "$LIVEBLOG_SLUG"
-require LIVEBLOG_UPDATE_URI "$LIVEBLOG_UPDATE_URI"
+require LIVEBLOG_UPDATE_POST_ID "$LIVEBLOG_UPDATE_POST_ID"
 
 mkdir -p "$OUT_DIR"
 
@@ -88,9 +88,9 @@ record "SingleLiveBlogChildrensQuery--$(slugify "$LIVEBLOG_SLUG")" \
   SingleLiveBlogChildrensQuery \
   "$(jq -nc --arg postName "$LIVEBLOG_SLUG" '{postName:$postName}')"
 
-record "LiveBlogUpdateQuery--$(slugify "$LIVEBLOG_UPDATE_URI")" \
+record "LiveBlogUpdateQuery--${LIVEBLOG_UPDATE_POST_ID}" \
   LiveBlogUpdateQuery \
-  "$(jq -nc --arg uri "$LIVEBLOG_UPDATE_URI" '{uri:$uri}')"
+  "$(jq -nc --argjson postID "$LIVEBLOG_UPDATE_POST_ID" '{postID:$postID,postType:"post"}')"
 
 # --- Geographic section (initial + 2 pages) ---
 record ArchipelagoSectionQuery--middle-east \

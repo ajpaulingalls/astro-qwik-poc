@@ -25,13 +25,15 @@ ARTICLE_SLUG="some-current-article-slug"
 # slugs are the WP post name (typically the URL's last segment).
 LIVEBLOG_SLUG="some-current-liveblog-slug"
 
-# Pick one update URI from inside the live blog (the children query returns
-# the uri field for each entry). Format is the full WP URI path.
-LIVEBLOG_UPDATE_URI="/news/2026/4/21/some-update-uri"
+# Pick one update post ID from the live blog's children list. SingleLiveBlogChildrensQuery
+# returns bare numeric IDs:
+#   curl -sH 'wp-site: aje' "https://www.aljazeera.com/graphql?operationName=SingleLiveBlogChildrensQuery&variables=$(jq -rn --arg v "$(jq -nc --arg postName "$LIVEBLOG_SLUG" '{postName:$postName}')" '$v|@uri')&extensions=%7B%7D" \
+#     | jq '.data.article.children[0]'
+LIVEBLOG_UPDATE_POST_ID="4512107"
 
 ARTICLE_SLUG="$ARTICLE_SLUG" \
 LIVEBLOG_SLUG="$LIVEBLOG_SLUG" \
-LIVEBLOG_UPDATE_URI="$LIVEBLOG_UPDATE_URI" \
+LIVEBLOG_UPDATE_POST_ID="$LIVEBLOG_UPDATE_POST_ID" \
   bash packages/mock-api/scripts/record-fixtures.sh
 ```
 
@@ -91,4 +93,4 @@ scrub() {
 | `OUT_DIR` | `packages/mock-api/fixtures` | Output directory |
 | `ARTICLE_SLUG` | (required) | Slug for the article fixture |
 | `LIVEBLOG_SLUG` | (required) | Slug for the live blog fixture |
-| `LIVEBLOG_UPDATE_URI` | (required) | URI for one live blog update |
+| `LIVEBLOG_UPDATE_POST_ID` | (required) | Numeric WP post ID for one live blog update |

@@ -50,7 +50,7 @@ The Arabic site (`aljazeera.net`) uses the **same GraphQL endpoint and queries**
 |-------|-----------|---------|
 | `ArchipelagoSingleLiveBlogQuery` | `{ name: "{slug}", postType: "post", preview: "" }` | Blog shell — metadata, header, initial content |
 | `SingleLiveBlogChildrensQuery` | `{ postName: "{slug}" }` | Child entries / updates list |
-| `LiveBlogUpdateQuery` | `{ uri: "{update-uri}" }` | Individual update content (called N times) |
+| `LiveBlogUpdateQuery` | `{ postID: <int>, postType: "post" }` | Individual update content (called N times). `SingleLiveBlogChildrensQuery` returns bare numeric post IDs. |
 | `ArchipelagoBreakingTickerQuery` (ID 18) | `{}` | Breaking news ticker |
 
 ### Section Front — Geographic (e.g., `/middle-east`)

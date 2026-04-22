@@ -12,8 +12,9 @@ const VARIANT_RULES: Record<string, SuffixBuilder> = {
   SingleLiveBlogChildrensQuery: (v) =>
     typeof v.postName === "string" ? `--${slugify(v.postName)}` : null,
 
+  // Production signature verified by live probe 2026-04: (postID: Int!, postType: String!).
   LiveBlogUpdateQuery: (v) =>
-    typeof v.uri === "string" ? `--${slugify(v.uri)}` : null,
+    typeof v.postID === "number" ? `--${v.postID}` : null,
 
   ArchipelagoSectionQuery: (v) =>
     typeof v.name === "string" ? `--${slugify(v.name)}` : null,
