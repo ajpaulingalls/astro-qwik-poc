@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --mode ssr",
-    "build": "vite build && vite build --ssr ./src/entry.ssr.tsx",
+    "build": "vite build && vite build --ssr ./src/entry.ssr.tsx && vite build --ssr ./src/entry.preview.tsx",
     "preview": "vite preview",
     "test": "vitest run"
   },
