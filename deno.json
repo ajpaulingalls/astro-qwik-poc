@@ -3,6 +3,6 @@
     "./packages/mock-api"
   ],
   "tasks": {
-    "mock-api": "cd packages/mock-api && deno run --allow-net --allow-read --allow-env server.ts"
+    "mock-api": "cd packages/mock-api && deno task dev"
   }
 }
