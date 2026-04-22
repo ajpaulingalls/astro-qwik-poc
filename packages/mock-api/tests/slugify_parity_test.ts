@@ -1,7 +1,8 @@
 import { assertEquals } from "@std/assert";
 import { slugify as tsSlugify } from "../lib/variants.ts";
 
-const SCRIPT_PATH = new URL("../scripts/record-fixtures.sh", import.meta.url).pathname;
+const SCRIPT_PATH =
+  new URL("../scripts/record-fixtures.sh", import.meta.url).pathname;
 
 async function bashSlugify(input: string): Promise<string> {
   // Source the script (the BASH_SOURCE guard short-circuits the recording
@@ -32,6 +33,10 @@ for (const input of PARITY_INPUTS) {
   Deno.test(`slugify parity: bash and TS produce identical output for ${JSON.stringify(input)}`, async () => {
     const ts = tsSlugify(input);
     const bash = await bashSlugify(input);
-    assertEquals(bash, ts, `bash and TS disagree on slugify(${JSON.stringify(input)})`);
+    assertEquals(
+      bash,
+      ts,
+      `bash and TS disagree on slugify(${JSON.stringify(input)})`,
+    );
   });
 }

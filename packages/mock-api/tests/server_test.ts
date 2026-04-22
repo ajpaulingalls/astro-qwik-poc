@@ -31,12 +31,20 @@ Deno.test("server: missing wp-site header returns 400 over real HTTP (negative-p
 Deno.test("server: variant routing serves different fixtures for same op + different vars", async () => {
   await withRunningServer(
     {
-      "ArchipelagoAjeSectionPostsQuery--middle-east--offset-0": { data: { posts: ["a"] } },
-      "ArchipelagoAjeSectionPostsQuery--middle-east--offset-9": { data: { posts: ["b"] } },
+      "ArchipelagoAjeSectionPostsQuery--middle-east--offset-0": {
+        data: { posts: ["a"] },
+      },
+      "ArchipelagoAjeSectionPostsQuery--middle-east--offset-9": {
+        data: { posts: ["b"] },
+      },
     },
     async (port) => {
-      const v0 = encodeURIComponent(JSON.stringify({ category: "middle-east", offset: 0 }));
-      const v9 = encodeURIComponent(JSON.stringify({ category: "middle-east", offset: 9 }));
+      const v0 = encodeURIComponent(
+        JSON.stringify({ category: "middle-east", offset: 0 }),
+      );
+      const v9 = encodeURIComponent(
+        JSON.stringify({ category: "middle-east", offset: 9 }),
+      );
       const res0 = await fetch(
         `http://localhost:${port}/graphql?operationName=ArchipelagoAjeSectionPostsQuery&variables=${v0}`,
         { headers: { "wp-site": "aje" } },

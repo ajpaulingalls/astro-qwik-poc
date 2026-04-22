@@ -2,10 +2,22 @@ import { assertEquals, assertStringIncludes } from "@std/assert";
 import { handle } from "../lib/handler.ts";
 
 const fixtures = new Map<string, string>([
-  ["HomePageQuery", JSON.stringify({ data: { homepage: { layout: "three-column" } } })],
-  ["ArchipelagoSectionQuery--middle-east", JSON.stringify({ data: { section: { name: "middle-east" } } })],
-  ["ArchipelagoAjeSectionPostsQuery--middle-east--offset-0", JSON.stringify({ data: { posts: ["a", "b"] } })],
-  ["ArchipelagoAjeSectionPostsQuery--middle-east--offset-9", JSON.stringify({ data: { posts: ["c", "d"] } })],
+  [
+    "HomePageQuery",
+    JSON.stringify({ data: { homepage: { layout: "three-column" } } }),
+  ],
+  [
+    "ArchipelagoSectionQuery--middle-east",
+    JSON.stringify({ data: { section: { name: "middle-east" } } }),
+  ],
+  [
+    "ArchipelagoAjeSectionPostsQuery--middle-east--offset-0",
+    JSON.stringify({ data: { posts: ["a", "b"] } }),
+  ],
+  [
+    "ArchipelagoAjeSectionPostsQuery--middle-east--offset-9",
+    JSON.stringify({ data: { posts: ["c", "d"] } }),
+  ],
 ]);
 
 function buildRequest(opts: {
@@ -17,19 +29,28 @@ function buildRequest(opts: {
 }): Request {
   const path = opts.path ?? "/graphql";
   const params = new URLSearchParams();
-  if (opts.operationName !== undefined) params.set("operationName", opts.operationName);
+  if (opts.operationName !== undefined) {
+    params.set("operationName", opts.operationName);
+  }
   if (opts.variables !== undefined) {
-    const v = typeof opts.variables === "string" ? opts.variables : JSON.stringify(opts.variables);
+    const v = typeof opts.variables === "string"
+      ? opts.variables
+      : JSON.stringify(opts.variables);
     params.set("variables", v);
   }
-  const url = `http://localhost:4455${path}${params.toString() ? "?" + params.toString() : ""}`;
+  const url = `http://localhost:4455${path}${
+    params.toString() ? "?" + params.toString() : ""
+  }`;
   const headers = new Headers();
   if (opts.wpSite !== null) headers.set("wp-site", opts.wpSite ?? "aje");
   return new Request(url, { method: opts.method ?? "GET", headers });
 }
 
 Deno.test("handler: GET with valid wp-site + known operationName returns fixture JSON 200", async () => {
-  const res = handle(buildRequest({ operationName: "HomePageQuery", variables: {} }), { fixtures });
+  const res = handle(
+    buildRequest({ operationName: "HomePageQuery", variables: {} }),
+    { fixtures },
+  );
   assertEquals(res.status, 200);
   assertEquals(res.headers.get("content-type"), "application/json");
   const body = await res.json();
@@ -37,14 +58,24 @@ Deno.test("handler: GET with valid wp-site + known operationName returns fixture
 });
 
 Deno.test("handler: every response includes CORS headers", () => {
-  const res = handle(buildRequest({ operationName: "HomePageQuery", variables: {} }), { fixtures });
+  const res = handle(
+    buildRequest({ operationName: "HomePageQuery", variables: {} }),
+    { fixtures },
+  );
   assertEquals(res.headers.get("access-control-allow-origin"), "*");
-  assertStringIncludes(res.headers.get("access-control-allow-headers") ?? "", "wp-site");
+  assertStringIncludes(
+    res.headers.get("access-control-allow-headers") ?? "",
+    "wp-site",
+  );
 });
 
 Deno.test("handler: missing wp-site header returns 400", async () => {
   const res = handle(
-    buildRequest({ operationName: "HomePageQuery", variables: {}, wpSite: null }),
+    buildRequest({
+      operationName: "HomePageQuery",
+      variables: {},
+      wpSite: null,
+    }),
     { fixtures },
   );
   assertEquals(res.status, 400);
@@ -57,7 +88,11 @@ Deno.test("handler: non-GET methods (POST/PUT/DELETE/PATCH) return 405", () => {
       buildRequest({ method, operationName: "HomePageQuery", variables: {} }),
       { fixtures },
     );
-    assertEquals(res.status, 405, `expected 405 for ${method}, got ${res.status}`);
+    assertEquals(
+      res.status,
+      405,
+      `expected 405 for ${method}, got ${res.status}`,
+    );
   }
 });
 
@@ -65,12 +100,19 @@ Deno.test("handler: OPTIONS returns 204 with CORS headers (preflight support)", 
   const res = handle(buildRequest({ method: "OPTIONS" }), { fixtures });
   assertEquals(res.status, 204);
   assertEquals(res.headers.get("access-control-allow-origin"), "*");
-  assertStringIncludes(res.headers.get("access-control-allow-headers") ?? "", "wp-site");
+  assertStringIncludes(
+    res.headers.get("access-control-allow-headers") ?? "",
+    "wp-site",
+  );
 });
 
 Deno.test("handler: non-/graphql path returns 404", () => {
   const res = handle(
-    buildRequest({ path: "/something-else", operationName: "HomePageQuery", variables: {} }),
+    buildRequest({
+      path: "/something-else",
+      operationName: "HomePageQuery",
+      variables: {},
+    }),
     { fixtures },
   );
   assertEquals(res.status, 404);
@@ -125,7 +167,10 @@ Deno.test("handler: variant routing — same op, different vars, different fixtu
 
 Deno.test("handler: variant rule with missing required vars returns 400 (MissingVariableError → 400)", async () => {
   const res = handle(
-    buildRequest({ operationName: "ArchipelagoAjeSectionPostsQuery", variables: {} }),
+    buildRequest({
+      operationName: "ArchipelagoAjeSectionPostsQuery",
+      variables: {},
+    }),
     { fixtures },
   );
   assertEquals(res.status, 400);
@@ -134,6 +179,8 @@ Deno.test("handler: variant rule with missing required vars returns 400 (Missing
 
 Deno.test("handler: variants param is optional (defaults to {})", () => {
   // HomePageQuery has no variant rule, so empty/missing variables is valid
-  const res = handle(buildRequest({ operationName: "HomePageQuery" }), { fixtures });
+  const res = handle(buildRequest({ operationName: "HomePageQuery" }), {
+    fixtures,
+  });
   assertEquals(res.status, 200);
 });

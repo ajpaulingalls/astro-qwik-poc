@@ -1,11 +1,22 @@
-import { assert, assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
+import {
+  assert,
+  assertEquals,
+  assertRejects,
+  assertStringIncludes,
+} from "@std/assert";
 import { loadFixtures } from "../lib/fixtures.ts";
 import { withTempDir } from "./_helpers.ts";
 
 Deno.test("loadFixtures: loads all .json files, key = basename without extension", async () => {
   await withTempDir(async (dir) => {
-    await Deno.writeTextFile(`${dir}/HomePageQuery.json`, JSON.stringify({ data: { homepage: 1 } }));
-    await Deno.writeTextFile(`${dir}/ArchipelagoBreakingTickerQuery.json`, JSON.stringify({ data: { ticker: [] } }));
+    await Deno.writeTextFile(
+      `${dir}/HomePageQuery.json`,
+      JSON.stringify({ data: { homepage: 1 } }),
+    );
+    await Deno.writeTextFile(
+      `${dir}/ArchipelagoBreakingTickerQuery.json`,
+      JSON.stringify({ data: { ticker: [] } }),
+    );
 
     const map = await loadFixtures(dir);
 
@@ -17,7 +28,9 @@ Deno.test("loadFixtures: loads all .json files, key = basename without extension
 
 Deno.test("loadFixtures: stores raw file text (pre-stringified), not parsed object", async () => {
   await withTempDir(async (dir) => {
-    const body = JSON.stringify({ data: { homepage: { layout: "three-column" } } });
+    const body = JSON.stringify({
+      data: { homepage: { layout: "three-column" } },
+    });
     await Deno.writeTextFile(`${dir}/HomePageQuery.json`, body);
 
     const map = await loadFixtures(dir);
@@ -43,7 +56,10 @@ Deno.test("loadFixtures: preserves variant filenames (e.g. Op--variant--offset-N
 
 Deno.test("loadFixtures: ignores non-.json files in the directory", async () => {
   await withTempDir(async (dir) => {
-    await Deno.writeTextFile(`${dir}/HomePageQuery.json`, JSON.stringify({ data: 1 }));
+    await Deno.writeTextFile(
+      `${dir}/HomePageQuery.json`,
+      JSON.stringify({ data: 1 }),
+    );
     await Deno.writeTextFile(`${dir}/README.md`, "# notes");
     await Deno.writeTextFile(`${dir}/notes.txt`, "ignored");
 
@@ -63,8 +79,14 @@ Deno.test("loadFixtures: empty directory returns empty Map", async () => {
 
 Deno.test("loadFixtures: invalid JSON in any fixture throws (fail-loud at startup)", async () => {
   await withTempDir(async (dir) => {
-    await Deno.writeTextFile(`${dir}/HomePageQuery.json`, JSON.stringify({ data: 1 }));
-    await Deno.writeTextFile(`${dir}/Broken.json`, "{ this is: not, valid json");
+    await Deno.writeTextFile(
+      `${dir}/HomePageQuery.json`,
+      JSON.stringify({ data: 1 }),
+    );
+    await Deno.writeTextFile(
+      `${dir}/Broken.json`,
+      "{ this is: not, valid json",
+    );
 
     const err = await assertRejects(() => loadFixtures(dir));
     assertStringIncludes(String(err), "Broken.json");
