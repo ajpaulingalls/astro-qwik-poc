@@ -7,7 +7,6 @@ const fixture: AggregatedReport = {
   metrics: {
     lcp: { median: 800, n: 5 },
     cls: { median: 0.001, n: 5 },
-    inp: { median: 32, n: 5 },
     lhPerf: { median: 99, n: 5 },
     jsBytes: { median: 12345, n: 5 },
   },
@@ -23,10 +22,6 @@ describe('formatReport', () => {
         '  "metrics": {',
         '    "cls": {',
         '      "median": 0.001,',
-        '      "n": 5',
-        '    },',
-        '    "inp": {',
-        '      "median": 32,',
         '      "n": 5',
         '    },',
         '    "jsBytes": {',
@@ -61,7 +56,6 @@ describe('formatReport', () => {
         '| metric  | median |',
         '| ------- | ------ |',
         '| cls     |  0.001 |',
-        '| inp     |     32 |',
         '| jsBytes |  12345 |',
         '| lcp     |    800 |',
         '| lhPerf  |     99 |',
@@ -82,7 +76,7 @@ describe('formatReport', () => {
   it('does not introduce keys not present in the input (no sortKeys data loss)', () => {
     const { json } = formatReport(fixture);
     const parsed = JSON.parse(json);
-    expect(Object.keys(parsed.metrics).sort()).toEqual(['cls', 'inp', 'jsBytes', 'lcp', 'lhPerf']);
+    expect(Object.keys(parsed.metrics).sort()).toEqual(['cls', 'jsBytes', 'lcp', 'lhPerf']);
     expect(parsed.metrics.lcp).toEqual({ median: 800, n: 5 });
   });
 });
