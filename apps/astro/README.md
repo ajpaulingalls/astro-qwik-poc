@@ -26,20 +26,20 @@ bun run build:astro
 
 ## App-specific JS bundle budgets
 
-| Page | JS Target |
-|------|-----------|
-| Homepage | < 50 KB compressed |
-| Article | < 30 KB compressed |
-| Live Blog | < 60 KB compressed |
+| Page          | JS Target          |
+| ------------- | ------------------ |
+| Homepage      | < 50 KB compressed |
+| Article       | < 30 KB compressed |
+| Live Blog     | < 60 KB compressed |
 | Section Front | < 45 KB compressed |
 
 CWV stretch targets (LCP ≤ 1.5s, CLS ≤ 0.05, INP ≤ 100ms, Lighthouse ≥ 98) are shared across both PoCs — see [top-level README](../../README.md#performance-targets--stretch-goals).
 
 ## Key Documents
 
-| Document | Purpose |
-|----------|---------|
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Astro-specific architecture — islands, runtime split, CSP, Fonts API, performance budgets |
-| [docs/MILESTONES.md](./docs/MILESTONES.md) | 10 milestones with stretch-CWV acceptance criteria |
-| [CLAUDE.md](./CLAUDE.md) | Notes for Claude Code working in this app subtree |
-| [../../docs/RESEARCH.md](../../docs/RESEARCH.md) | Production GraphQL findings (shared, framework-agnostic) |
+| Document                                         | Purpose                                                                                   |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)   | Astro-specific architecture — islands, runtime split, CSP, Fonts API, performance budgets |
+| [docs/MILESTONES.md](./docs/MILESTONES.md)       | 10 milestones with stretch-CWV acceptance criteria                                        |
+| [CLAUDE.md](./CLAUDE.md)                         | Notes for Claude Code working in this app subtree                                         |
+| [../../docs/RESEARCH.md](../../docs/RESEARCH.md) | Production GraphQL findings (shared, framework-agnostic)                                  |

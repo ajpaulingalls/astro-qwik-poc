@@ -11,14 +11,14 @@
 
 For a news site, this is ideal: the vast majority of content (articles, story cards, layouts, footers) is static HTML. Only a handful of components need interactivity:
 
-| Component | Directive | Why |
-|-----------|-----------|-----|
-| `BreakingTicker` | `client:idle` | Needs to poll immediately after page load |
-| `LiveBlogUpdater` | `client:idle` | Needs to poll for new entries |
-| `LoadMoreButton` | `client:visible` | Only hydrate when scrolled into view |
-| `VerticalVideoCarousel` | `client:visible` | Only hydrate when scrolled into view |
-| `VideoPlayer` | `client:visible` | Only hydrate when scrolled into view |
-| `Navigation` (hamburger) | `client:idle` | Menu toggle needed on mobile |
+| Component                | Directive        | Why                                       |
+| ------------------------ | ---------------- | ----------------------------------------- |
+| `BreakingTicker`         | `client:idle`    | Needs to poll immediately after page load |
+| `LiveBlogUpdater`        | `client:idle`    | Needs to poll for new entries             |
+| `LoadMoreButton`         | `client:visible` | Only hydrate when scrolled into view      |
+| `VerticalVideoCarousel`  | `client:visible` | Only hydrate when scrolled into view      |
+| `VideoPlayer`            | `client:visible` | Only hydrate when scrolled into view      |
+| `Navigation` (hamburger) | `client:idle`    | Menu toggle needed on mobile              |
 
 Each island hydrates independently — a failing video player doesn't block the ticker.
 
@@ -64,23 +64,23 @@ Server islands would still hit the GraphQL API on each render, would need server
 
 The PoC intentionally splits package management, dev runtime, and production runtime:
 
-| Concern | Tool | Why |
-|---------|------|-----|
-| Package manager | **bun** | Fast install, drop-in `package.json` compatibility |
-| Dev server | **bun** running `astro dev` | Vite-based dev tooling has the smoothest path on a Node-compatible runtime |
-| Production SSR | **Deno 2** via [`@deno/astro-adapter`](https://github.com/denoland/deno-astro-adapter) | Permission model constrains the request-time runtime to only the network and filesystem it actually needs |
-| Mock GraphQL API | **Deno 2** | Independent process; same security story (see [Mock GraphQL API](#mock-graphql-api)) |
+| Concern          | Tool                                                                                   | Why                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Package manager  | **bun**                                                                                | Fast install, drop-in `package.json` compatibility                                                        |
+| Dev server       | **bun** running `astro dev`                                                            | Vite-based dev tooling has the smoothest path on a Node-compatible runtime                                |
+| Production SSR   | **Deno 2** via [`@deno/astro-adapter`](https://github.com/denoland/deno-astro-adapter) | Permission model constrains the request-time runtime to only the network and filesystem it actually needs |
+| Mock GraphQL API | **Deno 2**                                                                             | Independent process; same security story (see [Mock GraphQL API](#mock-graphql-api))                      |
 
 **Why not run `astro dev` on Deno too?** Astro 6's `astro dev` rewrite uses **Vite's Environment API** to run the production runtime in dev — Deno is officially supported, so this is now technically viable (it wasn't smooth in earlier Astro versions). We still default to bun for dev as a convenience: it sidesteps the per-script permission-flag setup for an environment where the security gain is marginal anyway, since dev tooling (Vite, Tailwind, TS compiler) already needs broad permissions. The security win that matters lives at **request time in production**, where `@deno/astro-adapter` lets the SSR server run with narrow `--allow-net=...` and `--allow-read=./dist` flags. Switching dev to Deno is a one-line config change later if dev/prod parity becomes a concern.
 
 **Pinned versions:**
 
-| Package | Version | Notes |
-|---------|---------|-------|
-| `astro` | `^6.1.0` | Latest stable as of April 2026 |
-| `@deno/astro-adapter` | `^0.4.0` | Peer-deps `astro: ^6.0.0` |
-| Deno | `2.x` | Mock API + production SSR |
-| bun | `1.x` | Package management + dev scripts |
+| Package               | Version  | Notes                            |
+| --------------------- | -------- | -------------------------------- |
+| `astro`               | `^6.1.0` | Latest stable as of April 2026   |
+| `@deno/astro-adapter` | `^0.4.0` | Peer-deps `astro: ^6.0.0`        |
+| Deno                  | `2.x`    | Mock API + production SSR        |
+| bun                   | `1.x`    | Package management + dev scripts |
 
 **Production start command (illustrative — exact entry path depends on adapter output):**
 
@@ -116,14 +116,14 @@ const fixtures = new Map<string, unknown>();
 
 Deno.serve({ port: 4455 }, (req: Request) => {
   const url = new URL(req.url);
-  const operationName = url.searchParams.get("operationName");
-  const wpSite = req.headers.get("wp-site");
+  const operationName = url.searchParams.get('operationName');
+  const wpSite = req.headers.get('wp-site');
 
   if (!wpSite) {
-    return new Response("Missing wp-site header", { status: 400 });
+    return new Response('Missing wp-site header', { status: 400 });
   }
 
-  const fixture = fixtures.get(operationName ?? "");
+  const fixture = fixtures.get(operationName ?? '');
   if (!fixture) {
     return new Response(`Unknown operation: ${operationName}`, { status: 404 });
   }
@@ -133,9 +133,9 @@ Deno.serve({ port: 4455 }, (req: Request) => {
 
   return new Response(JSON.stringify(fixture), {
     headers: {
-      "content-type": "application/json",
-      "access-control-allow-origin": "*",
-      "access-control-allow-headers": "wp-site",
+      'content-type': 'application/json',
+      'access-control-allow-origin': '*',
+      'access-control-allow-headers': 'wp-site',
     },
   });
 });
@@ -171,11 +171,11 @@ curl -s 'https://www.aljazeera.com/graphql?wp-site=aje&operationName=HomePageQue
 
 ### Environment Variables
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `PORT` | `4455` | Server port |
-| `WP_SITE` | `aje` | Default wp-site if header missing (dev convenience) |
-| `FIXTURE_DIR` | `./fixtures` | Path to fixture JSON files |
+| Variable      | Default      | Purpose                                             |
+| ------------- | ------------ | --------------------------------------------------- |
+| `PORT`        | `4455`       | Server port                                         |
+| `WP_SITE`     | `aje`        | Default wp-site if header missing (dev convenience) |
+| `FIXTURE_DIR` | `./fixtures` | Path to fixture JSON files                          |
 
 ### Deno Permissions
 
@@ -195,31 +195,31 @@ All data fetching happens in `.astro` page frontmatter — **server-side only**.
 
 ```typescript
 // src/lib/graphql.ts
-const API_BASE = import.meta.env.PUBLIC_API_BASE || "http://localhost:4455";
+const API_BASE = import.meta.env.PUBLIC_API_BASE || 'http://localhost:4455';
 
 interface GraphQLOptions {
   operationName: string;
   variables?: Record<string, any>;
-  wpSite?: "aje" | "aja";
+  wpSite?: 'aje' | 'aja';
 }
 
 export async function graphqlFetch<T>({
   operationName,
   variables = {},
-  wpSite = "aje",
+  wpSite = 'aje',
 }: GraphQLOptions): Promise<T> {
   const params = new URLSearchParams({
-    "wp-site": wpSite,
+    'wp-site': wpSite,
     operationName,
     variables: JSON.stringify(variables),
-    extensions: "{}",
+    extensions: '{}',
   });
 
   const response = await fetch(`${API_BASE}/graphql?${params}`, {
-    method: "GET",
+    method: 'GET',
     headers: {
-      accept: "application/json",
-      "wp-site": wpSite,
+      accept: 'application/json',
+      'wp-site': wpSite,
     },
   });
 
@@ -233,19 +233,19 @@ export async function graphqlFetch<T>({
 ```astro
 ---
 // src/pages/index.astro — frontmatter (server-side only)
-import { graphqlFetch } from "../lib/graphql";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import HeroCard from "../components/HeroCard.astro";
-import BreakingTicker from "../components/islands/BreakingTicker.tsx";
+import { graphqlFetch } from '../lib/graphql';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroCard from '../components/HeroCard.astro';
+import BreakingTicker from '../components/islands/BreakingTicker.tsx';
 
 const homepage = await graphqlFetch({
-  operationName: "HomePageQuery",
-  variables: { isAtf: true, atfLength: 2, slug: "", preview: "" },
+  operationName: 'HomePageQuery',
+  variables: { isAtf: true, atfLength: 2, slug: '', preview: '' },
 });
 
 const curatedFeed = await graphqlFetch({
-  operationName: "HomePageCuratedFeedQuery",
-  variables: { preview: "", slug: "" },
+  operationName: 'HomePageCuratedFeedQuery',
+  variables: { preview: '', slug: '' },
 });
 ---
 
@@ -313,53 +313,57 @@ export default function LoadMoreButton({ section, categoryType, initialOffset = 
 
 ### Static Components (`.astro` — zero JS)
 
-| Component | Description |
-|-----------|-------------|
-| `BaseLayout.astro` | Global wrapper — nav, footer, ticker slot |
-| `Navigation.astro` | Hardcoded top nav (static part) + island for hamburger toggle |
-| `Footer.astro` | Site footer with link columns |
-| `ThreeColumnLayout.astro` | Homepage grid layout |
-| `SectionLayout.astro` | Section front layout |
-| `HeroCard.astro` | Large featured story card (top story) |
-| `StoryCard.astro` | Standard article card with image, headline, excerpt |
-| `StoryCardCompact.astro` | Smaller card variant (sidebar, related) |
-| `ArticleBody.astro` | Rich text renderer — handles embeds, images, pull quotes |
-| `MostPopular.astro` | Most popular sidebar/module (10 items) |
-| `CuratedCollection.astro` | Editorially curated content block |
+| Component                 | Description                                                   |
+| ------------------------- | ------------------------------------------------------------- |
+| `BaseLayout.astro`        | Global wrapper — nav, footer, ticker slot                     |
+| `Navigation.astro`        | Hardcoded top nav (static part) + island for hamburger toggle |
+| `Footer.astro`            | Site footer with link columns                                 |
+| `ThreeColumnLayout.astro` | Homepage grid layout                                          |
+| `SectionLayout.astro`     | Section front layout                                          |
+| `HeroCard.astro`          | Large featured story card (top story)                         |
+| `StoryCard.astro`         | Standard article card with image, headline, excerpt           |
+| `StoryCardCompact.astro`  | Smaller card variant (sidebar, related)                       |
+| `ArticleBody.astro`       | Rich text renderer — handles embeds, images, pull quotes      |
+| `MostPopular.astro`       | Most popular sidebar/module (10 items)                        |
+| `CuratedCollection.astro` | Editorially curated content block                             |
 
 ### Interactive Islands (`.tsx` — Preact, JS shipped only when hydrated)
 
-| Component | Directive | Description |
-|-----------|-----------|-------------|
-| `BreakingTicker.tsx` | `client:idle` | Polls `ArchipelagoBreakingTickerQuery` every 30s |
-| `LoadMoreButton.tsx` | `client:visible` | Triggers offset-based pagination, appends results |
-| `LiveBlogUpdater.tsx` | `client:idle` | Polls for new live blog entries |
-| `VerticalVideoCarousel.tsx` | `client:visible` | Swipeable vertical video shorts carousel |
-| `VideoPlayer.tsx` | `client:visible` | Brightcove / YouTube embed |
-| `LivestreamPlayer.tsx` | `client:visible` | Livestream video with config from `livestream` field |
-| `NavigationMenu.tsx` | `client:idle` | Hamburger menu toggle for mobile |
+| Component                   | Directive        | Description                                          |
+| --------------------------- | ---------------- | ---------------------------------------------------- |
+| `BreakingTicker.tsx`        | `client:idle`    | Polls `ArchipelagoBreakingTickerQuery` every 30s     |
+| `LoadMoreButton.tsx`        | `client:visible` | Triggers offset-based pagination, appends results    |
+| `LiveBlogUpdater.tsx`       | `client:idle`    | Polls for new live blog entries                      |
+| `VerticalVideoCarousel.tsx` | `client:visible` | Swipeable vertical video shorts carousel             |
+| `VideoPlayer.tsx`           | `client:visible` | Brightcove / YouTube embed                           |
+| `LivestreamPlayer.tsx`      | `client:visible` | Livestream video with config from `livestream` field |
+| `NavigationMenu.tsx`        | `client:idle`    | Hamburger menu toggle for mobile                     |
 
 ---
 
 ## Routing
 
-| Pattern | Page File | Page Type |
-|---------|-----------|-----------|
-| `/` | `src/pages/index.astro` | Homepage |
-| `/news/{year}/{month}/{day}/{slug}` | `src/pages/news/[...slug].astro` | Article |
-| `/news/liveblog/{year}/{month}/{day}/{slug}` | `src/pages/news/liveblog/[...slug].astro` | Live Blog |
-| `/{section}` | `src/pages/[section].astro` | Section Front |
+| Pattern                                      | Page File                                 | Page Type     |
+| -------------------------------------------- | ----------------------------------------- | ------------- |
+| `/`                                          | `src/pages/index.astro`                   | Homepage      |
+| `/news/{year}/{month}/{day}/{slug}`          | `src/pages/news/[...slug].astro`          | Article       |
+| `/news/liveblog/{year}/{month}/{day}/{slug}` | `src/pages/news/liveblog/[...slug].astro` | Live Blog     |
+| `/{section}`                                 | `src/pages/[section].astro`               | Section Front |
 
 ### Section Type Resolution
 
 ```typescript
 const GEOGRAPHIC_SECTIONS = [
-  "middle-east", "asia-pacific", "us-canada",
-  "europe", "africa", "latin-america"
+  'middle-east',
+  'asia-pacific',
+  'us-canada',
+  'europe',
+  'africa',
+  'latin-america',
 ];
 
-function getSectionType(section: string): "geographic" | "topic" {
-  return GEOGRAPHIC_SECTIONS.includes(section) ? "geographic" : "topic";
+function getSectionType(section: string): 'geographic' | 'topic' {
+  return GEOGRAPHIC_SECTIONS.includes(section) ? 'geographic' : 'topic';
 }
 ```
 
@@ -374,39 +378,39 @@ function getSectionType(section: string): "geographic" | "topic" {
 
 The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page acceptance criteria use the stretch column. A measured value worse than the floor fails the milestone outright.
 
-| Metric | "Good" floor | **Stretch (target)** | Measured On |
-|--------|--------------|----------------------|-------------|
-| **LCP** | < 2.5s | **≤ 1.5s** | All page types, 4G throttled |
-| **CLS** | < 0.1 | **≤ 0.05** | All page types |
-| **INP** | < 200ms | **≤ 100ms** | Interactive components (measured via Playwright-driven interactions in the M2 harness) |
+| Metric  | "Good" floor | **Stretch (target)** | Measured On                                                                            |
+| ------- | ------------ | -------------------- | -------------------------------------------------------------------------------------- |
+| **LCP** | < 2.5s       | **≤ 1.5s**           | All page types, 4G throttled                                                           |
+| **CLS** | < 0.1        | **≤ 0.05**           | All page types                                                                         |
+| **INP** | < 200ms      | **≤ 100ms**          | Interactive components (measured via Playwright-driven interactions in the M2 harness) |
 
 > Same stretch targets apply to the Qwik PoC — see top-level [README.md](../../../README.md#performance-targets--stretch-goals).
 
 ### JavaScript Budgets (Compressed)
 
-| Page | JS Target | Notes |
-|------|-----------|-------|
-| **Homepage** | < 50 KB | Preact runtime + ticker + carousel islands |
-| **Article** | < 30 KB | Minimal interactivity — video player if present |
-| **Live Blog** | < 60 KB | Polling + dynamic updates + Preact runtime |
-| **Section Front** | < 45 KB | Load More button + ticker |
+| Page              | JS Target | Notes                                           |
+| ----------------- | --------- | ----------------------------------------------- |
+| **Homepage**      | < 50 KB   | Preact runtime + ticker + carousel islands      |
+| **Article**       | < 30 KB   | Minimal interactivity — video player if present |
+| **Live Blog**     | < 60 KB   | Polling + dynamic updates + Preact runtime      |
+| **Section Front** | < 45 KB   | Load More button + ticker                       |
 
 ### SSR Performance
 
-| Metric | Target |
-|--------|--------|
-| **Homepage TTFB** | < 200ms (from mock API) |
-| **Article TTFB** | < 150ms |
+| Metric             | Target                                 |
+| ------------------ | -------------------------------------- |
+| **Homepage TTFB**  | < 200ms (from mock API)                |
+| **Article TTFB**   | < 150ms                                |
 | **SSR throughput** | > 50 req/s per page type (single core) |
 
 ### Lighthouse Scores
 
-| Category | "Good" floor | **Stretch (target)** |
-|----------|--------------|----------------------|
-| Performance | ≥ 95 | **≥ 98** |
-| Accessibility | ≥ 90 | ≥ 95 |
-| Best Practices | ≥ 95 | ≥ 98 |
-| SEO | ≥ 95 | ≥ 98 |
+| Category       | "Good" floor | **Stretch (target)** |
+| -------------- | ------------ | -------------------- |
+| Performance    | ≥ 95         | **≥ 98**             |
+| Accessibility  | ≥ 90         | ≥ 95                 |
+| Best Practices | ≥ 95         | ≥ 98                 |
+| SEO            | ≥ 95         | ≥ 98                 |
 
 ---
 
@@ -443,7 +447,7 @@ For a news site that embeds third-party content (Twitter/X, YouTube, Instagram),
 export default defineConfig({
   csp: {
     directives: [
-      "frame-src https://www.youtube.com https://platform.twitter.com https://www.instagram.com",
+      'frame-src https://www.youtube.com https://platform.twitter.com https://www.instagram.com',
       "img-src 'self' https: data:",
       "connect-src 'self' http://localhost:4455",
     ],

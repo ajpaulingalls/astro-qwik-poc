@@ -3,6 +3,7 @@
 > 10 milestones from scaffolding to final comparison report.
 >
 > Cross-references:
+>
 > - [ARCHITECTURE.md](./ARCHITECTURE.md) — Astro-specific technical design
 > - [../../../docs/RESEARCH.md](../../../docs/RESEARCH.md) — verified production query patterns (shared with Qwik PoC)
 > - [../../../packages/perf-harness/](../../../packages/perf-harness/) — shared performance harness (built in M2)
@@ -11,20 +12,20 @@
 
 Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear them. Every per-page acceptance criterion uses the stretch column. A value worse than the floor fails the milestone outright.
 
-| Metric | "Good" floor | **Stretch (target)** |
-|--------|--------------|----------------------|
-| LCP | < 2.5s | **≤ 1.5s** |
-| CLS | < 0.1 | **≤ 0.05** |
-| INP | < 200ms | **≤ 100ms** |
-| Lighthouse Performance | ≥ 95 | **≥ 98** |
+| Metric                 | "Good" floor | **Stretch (target)** |
+| ---------------------- | ------------ | -------------------- |
+| LCP                    | < 2.5s       | **≤ 1.5s**           |
+| CLS                    | < 0.1        | **≤ 0.05**           |
+| INP                    | < 200ms      | **≤ 100ms**          |
+| Lighthouse Performance | ≥ 95         | **≥ 98**             |
 
 ### Astro 6 platform features in scope
 
-| Feature | First introduced | Validated |
-|---------|-----------------|-----------|
-| **`@deno/astro-adapter`** — production SSR runs on Deno 2 with explicit permission flags | M1 | M9 |
-| **Fonts API** (`astro:assets/fonts`) — self-hosted fonts with size-adjusted fallbacks for CLS | M1 | M3 + M9 |
-| **CSP** (stable in v6) — automatic script/style hashing and header generation | M1 (baseline) → M5/M7 (embed allowlists) | M9 (audit) |
+| Feature                                                                                       | First introduced                         | Validated  |
+| --------------------------------------------------------------------------------------------- | ---------------------------------------- | ---------- |
+| **`@deno/astro-adapter`** — production SSR runs on Deno 2 with explicit permission flags      | M1                                       | M9         |
+| **Fonts API** (`astro:assets/fonts`) — self-hosted fonts with size-adjusted fallbacks for CLS | M1                                       | M3 + M9    |
+| **CSP** (stable in v6) — automatic script/style hashing and header generation                 | M1 (baseline) → M5/M7 (embed allowlists) | M9 (audit) |
 
 **Considered and rejected:** server islands. See [ARCHITECTURE.md → Why client islands and not server islands](./ARCHITECTURE.md#why-client-islands-and-not-server-islands).
 
@@ -256,16 +257,16 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 
 ### Acceptance Criteria
 
-| Metric | Floor (must pass) | **Stretch (target)** | All four page types |
-|--------|-------------------|----------------------|---------------------|
-| LCP | < 2.5s | **≤ 1.5s** | ✓ |
-| CLS | < 0.1 | **≤ 0.05** | ✓ |
-| INP | < 200ms | **≤ 100ms** | ✓ |
-| Lighthouse Perf | ≥ 95 | **≥ 98** | ✓ |
-| Homepage JS | — | < 50 KB | n/a |
-| Article JS | — | < 30 KB | n/a |
-| Live Blog JS | — | < 60 KB | n/a |
-| Section Front JS | — | < 45 KB | n/a |
+| Metric           | Floor (must pass) | **Stretch (target)** | All four page types |
+| ---------------- | ----------------- | -------------------- | ------------------- |
+| LCP              | < 2.5s            | **≤ 1.5s**           | ✓                   |
+| CLS              | < 0.1             | **≤ 0.05**           | ✓                   |
+| INP              | < 200ms           | **≤ 100ms**          | ✓                   |
+| Lighthouse Perf  | ≥ 95              | **≥ 98**             | ✓                   |
+| Homepage JS      | —                 | < 50 KB              | n/a                 |
+| Article JS       | —                 | < 30 KB              | n/a                 |
+| Live Blog JS     | —                 | < 60 KB              | n/a                 |
+| Section Front JS | —                 | < 45 KB              | n/a                 |
 
 - All Playwright interaction tests pass
 - SSR throughput > 50 req/s per page type
@@ -298,18 +299,18 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 
 ## Timeline Overview
 
-| Milestone | Estimated Effort | Dependencies |
-|-----------|-----------------|--------------|
-| 1. Scaffolding & Mock API | 2–3 days | None |
-| 2. Performance Test Harness | 2–3 days | M1 |
-| 3. Layout & Navigation | 2 days | M1 (M2 strongly recommended for measurement) |
-| 4. Homepage | 3–4 days | M3 |
-| 5. Article Page | 2–3 days | M3 |
-| 6. Section Front | 3–4 days | M3 |
-| 7. Live Blog | 3–4 days | M3 |
-| 8. Breaking Ticker | 1 day | M3 |
-| 9. Final Performance Validation | 2–3 days | M4–M8 |
-| 10. Comparison Report | 2–3 days | M9 + Qwik M9 |
+| Milestone                       | Estimated Effort | Dependencies                                 |
+| ------------------------------- | ---------------- | -------------------------------------------- |
+| 1. Scaffolding & Mock API       | 2–3 days         | None                                         |
+| 2. Performance Test Harness     | 2–3 days         | M1                                           |
+| 3. Layout & Navigation          | 2 days           | M1 (M2 strongly recommended for measurement) |
+| 4. Homepage                     | 3–4 days         | M3                                           |
+| 5. Article Page                 | 2–3 days         | M3                                           |
+| 6. Section Front                | 3–4 days         | M3                                           |
+| 7. Live Blog                    | 3–4 days         | M3                                           |
+| 8. Breaking Ticker              | 1 day            | M3                                           |
+| 9. Final Performance Validation | 2–3 days         | M4–M8                                        |
+| 10. Comparison Report           | 2–3 days         | M9 + Qwik M9                                 |
 
 **Total estimated effort:** ~5 weeks.
 

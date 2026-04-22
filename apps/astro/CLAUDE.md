@@ -21,11 +21,11 @@ The runtime split rationale (why bun for dev even though Astro 6 supports Deno-i
 
 ## Astro 6 platform features in use
 
-| Feature | Configured in | Validated in |
-|---------|--------------|--------------|
-| `@deno/astro-adapter` | M1 (`astro.config.mjs`) | M9 |
-| Fonts API (`astro:assets/fonts`) | M1 (`astro.config.mjs`) | M3 + M9 |
-| CSP (stable in v6) | M1 baseline → M5/M7 embed allowlists | M9 audit |
+| Feature                          | Configured in                        | Validated in |
+| -------------------------------- | ------------------------------------ | ------------ |
+| `@deno/astro-adapter`            | M1 (`astro.config.mjs`)              | M9           |
+| Fonts API (`astro:assets/fonts`) | M1 (`astro.config.mjs`)              | M3 + M9      |
+| CSP (stable in v6)               | M1 baseline → M5/M7 embed allowlists | M9 audit     |
 
 ## Looking up Astro 6 specifics
 
@@ -57,6 +57,7 @@ gh api repos/withastro/docs/contents/src/content/docs/en/<path>.mdx --jq '.conte
 ```
 
 Useful entry points:
+
 - `guides/upgrade-to/v6.mdx` — v5→v6 migration
 - `reference/configuration-reference.mdx` — config schema (use this to cross-check CSP shape)
 

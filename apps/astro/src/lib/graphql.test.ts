@@ -132,8 +132,8 @@ describe('graphqlFetch', () => {
   it('throws when the response status is not ok', async () => {
     mock = mockFetchOnce({ status: 400, rawBody: 'Missing wp-site header' });
 
-    await expect(
-      graphqlFetch({ operationName: 'HomePageQuery' })
-    ).rejects.toThrow(/HomePageQuery.*400/);
+    await expect(graphqlFetch({ operationName: 'HomePageQuery' })).rejects.toThrow(
+      /HomePageQuery.*400/,
+    );
   });
 });
