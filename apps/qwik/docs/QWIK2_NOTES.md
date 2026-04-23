@@ -76,3 +76,25 @@ The jsBytes near-tripling is the most informative number. Vite preview was appar
 Pivoting to Deno once the upstream `static.root` bug is fixed (and once an M11 demo concern justifies the rewrite) is a defensible follow-up.
 
 **`preview:prod` script** added to `apps/qwik/package.json` so manual smoke testing matches what perf-harness does. `bun run preview` (vite-served) stays available for quick dev probing.
+
+### Story-002 layout decisions (sprint-004)
+
+**D1: @qwik.dev/core/testing — worked first try, no fallback needed.** `createDOM()` + `screen.querySelectorAll` + `userEvent('selector', 'click')` is the working API for Qwik 2 beta.32 component tests. `Navigation.test.tsx` is the first such test in the repo; pattern can be mirrored by future component tests. Vitest sees them via the existing `bun --filter aje-poc-qwik test` pipeline (no extra config — happy-dom not needed; `@qwik.dev/core/testing` ships its own DOM container).
+
+**D2: Self-hosted Inter (variable axis, 352KB) vs Astro Fonts API (subsetted ~35KB).** Vendored from `https://rsms.me/inter/font-files/InterVariable.woff2` (sha documented in `global.css` comment) to keep Qwik decoupled from Astro's build artifact path. The font itself is ~10x Astro's payload — full variable axis, all glyphs — because no equivalent of Astro Fonts API exists in Qwik. Subsetting (e.g. `pyftsubset` → Latin only + 3 weights) is deferred to LCP-margin work; recorded as a concern. Metric-matched fallback `@font-face` (`font-family: 'Inter Fallback'`, `local('Arial')`, `size-adjust: 107.1194%` + `ascent-override` / `descent-override` / `line-gap-override`) provides the actual CLS protection — the bare `size-adjust: 100%` from an earlier draft was a no-op (default value). Override values copied from Astro's auto-generated tokens for the same Inter face — they match by construction.
+
+**Story-002 perf gate (n=5, after layout wired):**
+
+| metric  | sprint-003 baseline | story-002 |                             delta |
+| ------- | ------------------: | --------: | --------------------------------: |
+| CLS     |                   0 |         0 |                         unchanged |
+| LCP     |              2110ms |    2410ms | +300ms (slower, framework + font) |
+| LH Perf |                  98 |        96 |                                -2 |
+| jsBytes |              143765 |    144633 |                              +868 |
+
+CLS≤0.05 (story-002 AC) met. LCP and jsBytes margins recorded as concerns — honest data for the M13 comparison report.
+
+**Honest reconciliation with stated targets:**
+
+- **LCP 2410ms vs 2500ms "Good" floor.** That's a **90ms cushion to a hard-fail** (per CLAUDE.md "Good floor is hard-fail"). One un-subsetted font + one component-heavy commit at M6 will eat that cushion. Subsetting Inter (concern recorded) is the highest-leverage move; second is investigating why Qwik's resumability isn't yielding the LCP benefit the framework promises. M5 ships, but M6+ work cannot land without LCP regression budget.
+- **jsBytes 144633 vs ARCHITECTURE.md "Qwik Homepage budget: <15 KB".** That's **9.6× over the published budget**. Two possible reconciliations: (a) the budget was meant for Qwik's _runtime delta_ (the "what does Qwik itself cost" number) and Lighthouse's network-requests:script-size includes the whole framework-graph; (b) the budget is aspirational and assumes the hand-tuned production-bundle splitting work that hasn't happened in this PoC. Either way, ARCHITECTURE.md needs revision before M13 — the current 15KB number can't stand next to a measured 144KB without explanation. Concern recorded.

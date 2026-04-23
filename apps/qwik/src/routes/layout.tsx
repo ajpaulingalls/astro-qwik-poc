@@ -1,4 +1,6 @@
 import { component$, Slot, useVisibleTask$ } from '@qwik.dev/core';
+import { Navigation } from '../components/Navigation';
+import { Footer } from '../components/Footer';
 
 export default component$(() => {
   // eslint-disable-next-line qwik/no-use-visible-task
@@ -7,5 +9,13 @@ export default component$(() => {
     import('../lib/web-vitals');
   });
 
-  return <Slot />;
+  return (
+    <>
+      <Navigation />
+      <main>
+        <Slot />
+      </main>
+      <Footer />
+    </>
+  );
 });
