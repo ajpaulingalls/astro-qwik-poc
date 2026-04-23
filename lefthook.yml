@@ -18,7 +18,11 @@ pre-commit:
       run: deno lint {staged_files}
 
     test-astro:
-      glob: 'apps/astro/**/*'
+      # Match nested files AND top-level files (apps/astro/server.ts,
+      # astro.config.mjs, package.json, etc.) — '**/*' alone misses the latter.
+      glob:
+        - 'apps/astro/*'
+        - 'apps/astro/**/*'
       exclude:
         - 'apps/astro/docs/*'
         - 'apps/astro/docs/**/*'
@@ -26,7 +30,9 @@ pre-commit:
       stage_fixed: false
 
     test-qwik:
-      glob: 'apps/qwik/**/*'
+      glob:
+        - 'apps/qwik/*'
+        - 'apps/qwik/**/*'
       exclude:
         - 'apps/qwik/docs/*'
         - 'apps/qwik/docs/**/*'
