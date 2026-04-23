@@ -1,0 +1,12 @@
+/* Design tokens — AJE PoC. Tailwind 4 CSS-first via @theme.
+ * Astro Fonts API auto-injects --font-inter (see astro.config.mjs)
+ * with system-ui + sans-serif fallbacks already in the @font-face stack;
+ * --font-sans here just aliases it for Tailwind's `font-sans` utility.
+ * Tailwind 4 ships its default neutral palette — don't redefine here. */
+@theme {
+  --font-sans: var(--font-inter);
+
+  /* AJ brand — actual color is orange, not red despite some legacy refs */
+  --color-aj-orange: #fa9000;
+  --color-aj-orange-dark: #c66f00;
+}
