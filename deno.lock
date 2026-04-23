@@ -131,7 +131,8 @@
             "npm:lighthouse@^12.2.0",
             "npm:puppeteer-core@23",
             "npm:typescript@^5.9.0",
-            "npm:vitest@^2.1.0"
+            "npm:vitest@^2.1.0",
+            "npm:web-vitals@^4.2.4"
           ]
         }
       }

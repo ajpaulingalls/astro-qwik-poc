@@ -31,16 +31,45 @@ function spawnMockApi(): ChildProcess {
   );
 }
 
+// Audited against apps/astro/dist/server/{entry.mjs,chunks/*.mjs} and
+// node_modules/@deno/astro-adapter/src/server.ts. The adapter wraps every
+// env read through `setGetEnv((key) => Deno.env.get(key))`, so any key
+// referenced in compiled chunks must be allowed.
+//
+// To re-derive after an Astro upgrade, run from repo root:
+//   grep -rh -oE 'env\.[A-Za-z_][A-Za-z0-9_]*' apps/astro/dist/server/ | sort -u
+//   grep -rh -oE 'n\.[A-Z][A-Z_]*' apps/astro/dist/server/ | sort -u   # destructured
+//
+// Categorized:
+//   NODE_ENV, NODE_DEBUG — Astro/Vite core
+//   ASTRO_INTERNAL_TEST_DISABLE_CONSOLE_FILTER — Astro test hook (defended)
+//   CI, NO_COLOR, FORCE_COLOR, TERM — picocolors color detection (destructured)
+//   PKG_CONFIG_PATH, SHARP_*, npm_package_config_libvips — sharp probe
+//
+// Adapter binds port/hostname at build time (options.port, options.hostname),
+// not via env, so HOST/PORT are not allowed.
+const ASTRO_ALLOWED_ENV = [
+  'NODE_ENV',
+  'NODE_DEBUG',
+  'ASTRO_INTERNAL_TEST_DISABLE_CONSOLE_FILTER',
+  'CI',
+  'NO_COLOR',
+  'FORCE_COLOR',
+  'TERM',
+  'PKG_CONFIG_PATH',
+  'SHARP_FORCE_GLOBAL_LIBVIPS',
+  'SHARP_IGNORE_GLOBAL_LIBVIPS',
+  'npm_package_config_libvips',
+].join(',');
+
 function spawnAstro(): ChildProcess {
-  // --allow-env unscoped: Astro adapter reads CI plus various Vite/Node env vars
-  // at startup. M9 audit will narrow this once the full env-var surface is known.
   return spawn(
     'deno',
     [
       'run',
       '--allow-net=0.0.0.0:8080,localhost:4455',
       '--allow-read=apps/astro/dist',
-      '--allow-env',
+      `--allow-env=${ASTRO_ALLOWED_ENV}`,
       'apps/astro/dist/server/entry.mjs',
     ],
     { cwd: REPO_ROOT, stdio: 'ignore' },
