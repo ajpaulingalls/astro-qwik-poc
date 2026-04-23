@@ -36,3 +36,43 @@ Installed pins: `@qwik.dev/core ~2.0.0-beta.32`, `@qwik.dev/router 2.0.0-beta.32
 - `bun install` from the worktree root resolves cleanly with no `@builder.io/qwik` 1.x in `bun.lock`.
 - `bun run dev:qwik` starts the dev server on `:5173` and the placeholder route logs `HomePageQuery` data with `homepage.layout === "three-column"` server-side (verified against `packages/mock-api/fixtures/HomePageQuery.json`).
 - `bun run build:qwik` produces a `dist/` client bundle (~109 KB largest chunk, gzip ~41 KB) and a `server/entry.ssr.js` SSR bundle (~183 KB) with no errors. Both are local artifacts; `apps/qwik/.gitignore` excludes `server/`.
+
+### Production-equivalent perf-harness path (sprint-004 story-003)
+
+The shared perf-harness (`packages/perf-harness/runner.ts`) initially spawned the Qwik target via `bun run preview` (vite preview), while it spawns Astro via `deno run dist/server/entry.mjs` directly. This methodology asymmetry made cross-framework CWV comparisons dishonest — vite preview's middleware adds layers Astro doesn't have, and bundles are served differently.
+
+**Decision:** spawn Qwik via `node apps/qwik/server.ts` — a hand-rolled Node http wrapper around `server/entry.preview.js`. This matches Astro's "raw runtime spawning the bundled handler" approach.
+
+**Why a wrapper is required.** `apps/qwik/server/entry.preview.js` is one line:
+
+```
+import{e as f}from"./build/q-BrI8OpZO.js";export{f as default};
+```
+
+The default export is a `QwikRouterNodeMiddleware` object (`router`, `notFound`, `staticFile` handlers per `@qwik.dev/router/middleware/node.d.ts`) — _not_ a listening http server. Spawning the file with `node` directly exits immediately. The wrapper composes:
+
+1. A `node:http` `createServer` listening on `HOST`/`PORT` env (default `127.0.0.1:4173`).
+2. Inline static-file serving from `apps/qwik/dist/{build,assets}` — the middleware's bundled `staticFile` defaults to `/dist` relative to a build-time project root that doesn't resolve under raw Node (chunks 500'd before the inline serving was added).
+3. Fall-through to `middleware.router(req, res, next)` for SSR routes.
+4. Guard `res.end()` on `writableEnded` — Qwik's router writes its own 500 page on internal errors then calls `next(err)` afterward; double-write to a closed response is the `ERR_STREAM_WRITE_AFTER_END` that surfaced in the first wrapper iteration.
+
+**Methodology delta.** Smoke run (n=2 vs sprint-003's vite-preview baseline):
+
+| metric  | vite preview | node prod |            delta |
+| ------- | -----------: | --------: | ---------------: |
+| LCP     |      1670 ms |   2108 ms | +438 ms (slower) |
+| CLS     |            0 |         0 |        unchanged |
+| LH Perf |           99 |        98 |               -1 |
+| jsBytes |       60 927 |   143 765 |  +82 838 (~2.4×) |
+
+The jsBytes near-tripling is the most informative number. Vite preview was apparently undercounting transferred-script bytes (likely via dev-mode transforms or compression Lighthouse measured differently than the raw Node static-file path). The Node prod numbers are honest production-equivalent measurements; subsequent story-002+ perf gates and the M13 comparison report will use these as the Qwik baseline.
+
+**Why Node and not Deno.** Qwik 2 beta.32 _does_ ship `@qwik.dev/router/middleware/deno` (verified at `node_modules/.bun/@qwik.dev+router@2.0.0-beta.32+*/node_modules/@qwik.dev/router/lib/middleware/deno/`) — earlier draft of this section claimed no Deno middleware existed; that was wrong. The honest reasons this wrapper uses Node:
+
+1. The bundled `staticFile` `static.root` resolution bug (above) would almost certainly recur for the Deno middleware too — would need to split `entry.preview.tsx` per runtime to test the hypothesis, and there's no upstream Qwik fix yet.
+2. The Deno middleware is `Request → Response` (Web standard), not the Node `(req, res, next)` model. Reusing the same hand-rolled static handler under Deno means rewriting `tryServeStatic` for the new I/O model.
+3. Node `node:http` + `--experimental-strip-types` was the smaller lift; methodology parity with Astro's "raw runtime hosting the bundled handler" is preserved either way.
+
+Pivoting to Deno once the upstream `static.root` bug is fixed (and once an M11 demo concern justifies the rewrite) is a defensible follow-up.
+
+**`preview:prod` script** added to `apps/qwik/package.json` so manual smoke testing matches what perf-harness does. `bun run preview` (vite-served) stays available for quick dev probing.

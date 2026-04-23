@@ -77,9 +77,15 @@ function spawnAstro(): ChildProcess {
 }
 
 function spawnQwik(): ChildProcess {
-  return spawn('bun', ['run', 'preview', '--', '--host', '127.0.0.1'], {
+  // Spawn the production-bundled handler via a Node http wrapper instead
+  // of `vite preview`, so the methodology matches spawnAstro's `deno run
+  // dist/server/entry.mjs` (raw runtime, no Vite middleware in front).
+  // See apps/qwik/server.ts and QWIK2_NOTES.md for why a wrapper is
+  // required (entry.preview.js exports middleware, not a listener).
+  return spawn('node', ['--experimental-strip-types', '--no-warnings', 'server.ts'], {
     cwd: resolve(REPO_ROOT, 'apps/qwik'),
     stdio: 'ignore',
+    env: { ...process.env, HOST: '127.0.0.1', PORT: String(APP_PORT.qwik) },
   });
 }
 

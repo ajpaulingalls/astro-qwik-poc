@@ -8,6 +8,7 @@
     "dev": "vite --mode ssr",
     "build": "vite build && vite build --ssr ./src/entry.ssr.tsx && vite build --ssr ./src/entry.preview.tsx",
     "preview": "vite preview",
+    "preview:prod": "node --experimental-strip-types --no-warnings server.ts",
     "test": "vitest run"
   },
   "dependencies": {

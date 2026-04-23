@@ -43,9 +43,11 @@ import { main } from '../runner.ts';
 
 const ASTRO_REPORT_JSON = resolve(REPORTS_DIR, `${TARGET}-${PAGE}.json`);
 const ASTRO_REPORT_MD = resolve(REPORTS_DIR, `${TARGET}-${PAGE}.md`);
+const QWIK_REPORT_JSON = resolve(REPORTS_DIR, `qwik-${PAGE}.json`);
+const QWIK_REPORT_MD = resolve(REPORTS_DIR, `qwik-${PAGE}.md`);
 
 function cleanupAstroReports() {
-  for (const p of [ASTRO_REPORT_JSON, ASTRO_REPORT_MD]) {
+  for (const p of [ASTRO_REPORT_JSON, ASTRO_REPORT_MD, QWIK_REPORT_JSON, QWIK_REPORT_MD]) {
     if (existsSync(p)) rmSync(p);
   }
 }
@@ -95,6 +97,26 @@ describe('runner main()', () => {
 
     expect(runLighthouseAuditMock).toHaveBeenCalledTimes(3);
     expect(collectWebVitalsMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('spawns qwik via node + server.ts with HOST/PORT env in apps/qwik cwd', async () => {
+    runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 99, jsBytes: 100 });
+    collectWebVitalsMock.mockResolvedValue([]);
+
+    await main(['--target=qwik', '--runs=1', `--page=${PAGE}`]);
+
+    // First spawn = mock-api (deno); second = qwik target.
+    expect(spawnMock).toHaveBeenCalledTimes(2);
+    const [cmd, args, opts] = spawnMock.mock.calls[1] as [
+      string,
+      readonly string[],
+      { cwd?: string; env?: Record<string, string> },
+    ];
+    expect(cmd).toBe('node');
+    expect(args).toContain('server.ts');
+    expect(args).toContain('--experimental-strip-types');
+    expect(opts.env).toMatchObject({ HOST: '127.0.0.1', PORT: '4173' });
+    expect(opts.cwd).toMatch(/apps\/qwik$/);
   });
 
   it('kills both spawned services when the page loop throws', async () => {
