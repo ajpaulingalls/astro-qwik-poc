@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { createServer, type Server } from 'node:net';
-import { buildPageList, parseArgs, waitForPort } from '../runner_helpers.ts';
+import { buildPageList, parseArgs, waitForPort } from '../cli_helpers.ts';
 
 describe('parseArgs', () => {
   it('parses --target=astro with default runs=5', () => {
@@ -11,11 +11,11 @@ describe('parseArgs', () => {
     expect(parseArgs(['--target=qwik', '--runs=10'])).toEqual({ target: 'qwik', runs: 10 });
   });
 
-  it('parses --page=home filter', () => {
-    expect(parseArgs(['--target=astro', '--page=home'])).toEqual({
+  it('parses --page=index filter', () => {
+    expect(parseArgs(['--target=astro', '--page=index'])).toEqual({
       target: 'astro',
       runs: 5,
-      page: 'home',
+      page: 'index',
     });
   });
 
@@ -38,13 +38,13 @@ describe('buildPageList', () => {
   it('returns at least one page for astro', () => {
     const pages = buildPageList('astro');
     expect(pages.length).toBeGreaterThanOrEqual(1);
-    expect(pages.find((p) => p.name === 'home')).toBeDefined();
+    expect(pages.find((p) => p.name === 'index')).toBeDefined();
   });
 
   it('returns at least one page for qwik', () => {
     const pages = buildPageList('qwik');
     expect(pages.length).toBeGreaterThanOrEqual(1);
-    expect(pages.find((p) => p.name === 'home')).toBeDefined();
+    expect(pages.find((p) => p.name === 'index')).toBeDefined();
   });
 
   it('every page has a path starting with /', () => {

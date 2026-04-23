@@ -6,13 +6,8 @@ import { median } from './aggregator.ts';
 import { withChrome } from './chrome.ts';
 import { runLighthouseAudit, type RawMetrics } from './lighthouse.ts';
 import { formatReport, type AggregatedReport } from './reporter.ts';
-import {
-  buildPageList,
-  collectWebVitals,
-  parseArgs,
-  waitForPort,
-  type Target,
-} from './runner_helpers.ts';
+import { buildPageList, parseArgs, waitForPort, type Target } from './cli_helpers.ts';
+import { collectWebVitals } from './web_vitals_collector.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../..');

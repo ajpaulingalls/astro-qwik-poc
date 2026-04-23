@@ -1,24 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const pageMock = {
-  goto: vi.fn(),
-  waitForFunction: vi.fn(),
-  evaluate: vi.fn(),
-  close: vi.fn(),
-};
-
-const browserMock = {
-  newPage: vi.fn(async () => pageMock),
-  disconnect: vi.fn(),
-};
-
-const connectMock = vi.fn(async () => browserMock);
+const { connectMock, browserMock, pageMock } = vi.hoisted(() => {
+  const pageMock = {
+    goto: vi.fn(),
+    waitForFunction: vi.fn(),
+    evaluate: vi.fn(),
+    close: vi.fn(),
+  };
+  const browserMock = {
+    newPage: vi.fn(async () => pageMock),
+    disconnect: vi.fn(),
+  };
+  const connectMock = vi.fn(async () => browserMock);
+  return { connectMock, browserMock, pageMock };
+});
 
 vi.mock('puppeteer-core', () => ({
   default: { connect: connectMock },
 }));
 
-import { collectWebVitals } from '../runner_helpers.ts';
+import { collectWebVitals } from '../web_vitals_collector.ts';
 
 describe('collectWebVitals', () => {
   beforeEach(() => {
@@ -50,8 +51,8 @@ describe('collectWebVitals', () => {
     ]);
   });
 
-  it('returns empty array when page.evaluate returns falsy', async () => {
-    pageMock.evaluate.mockResolvedValueOnce(undefined);
+  it('returns the page-evaluated samples (empty array fallback handled in-page)', async () => {
+    pageMock.evaluate.mockResolvedValueOnce([]);
     const samples = await collectWebVitals('http://localhost:8080/', 9876);
     expect(samples).toEqual([]);
   });

@@ -14,7 +14,7 @@ For a given target (`astro` or `qwik`), the harness:
 
 The mock-api and the app are torn down on exit (SIGTERM, SIGKILL after 2s).
 
-INP is intentionally absent from the lab-metric schema — without a browser-driven session driving real interactions, Lighthouse-only INP is misleading on a no-interaction placeholder page. INP arrives via the `web-vitals` JS lib field-side (`apps/{astro,qwik}/src/lib/web-vitals.ts`), surfaced under `webVitals.samples` in the report. Browser-driving uses puppeteer-core attached to chrome-launcher's Chrome via CDP — see `chrome.ts` and `runner_helpers.ts:collectWebVitals`.
+INP is intentionally absent from the lab-metric schema — without a browser-driven session driving real interactions, Lighthouse-only INP is misleading on a no-interaction placeholder page. INP arrives via the `web-vitals` JS lib field-side (`apps/{astro,qwik}/src/lib/web-vitals.ts`), surfaced under `webVitals.samples` in the report. Browser-driving uses puppeteer-core attached to chrome-launcher's Chrome via CDP — see `chrome.ts` and `web_vitals_collector.ts:collectWebVitals`.
 
 ## Usage
 
@@ -24,7 +24,7 @@ From the repo root:
 bun run perf:astro              # n=5 default
 bun run perf:qwik
 bun run perf:astro -- --runs=10 # statistical-confidence pass (M12)
-bun run perf:astro -- --page=home
+bun run perf:astro -- --page=index
 ```
 
 Equivalent direct invocation from this package:
@@ -63,7 +63,9 @@ For one-off interactive performance investigation outside the CI loop, drive a C
 ## Files
 
 - `runner.ts` — CLI entry, lifecycle orchestration, aggregation
-- `runner_helpers.ts` — `parseArgs`, `waitForPort`, `buildPageList` (unit-tested)
+- `cli_helpers.ts` — `parseArgs`, `waitForPort`, `buildPageList` (unit-tested)
+- `web_vitals_collector.ts` — `collectWebVitals` puppeteer-driven shim reader (puppeteer-mocked unit tests)
+- `chrome.ts` — `withChrome(fn)` chrome-launcher launch/kill wrapper, shared by Lighthouse + collector
 - `lighthouse.ts` — Lighthouse Node API wrapper, throws on missing audits
 - `aggregator.ts` — pure median (mean of two middles for even N)
 - `reporter.ts` — pure JSON+Markdown emit, recursive `sortKeys` for byte-stability
@@ -76,4 +78,4 @@ For one-off interactive performance investigation outside the CI loop, drive a C
 bun run test
 ```
 
-21 tests across aggregator, reporter, and runner_helpers. The runner orchestrator itself is exercised by smoke runs against each target.
+25 tests across aggregator, reporter, cli_helpers, and web_vitals_collector. The runner orchestrator itself is exercised by smoke runs against each target.
