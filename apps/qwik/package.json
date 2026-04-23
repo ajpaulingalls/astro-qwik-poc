@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "description": "Al Jazeera English PoC — Qwik 2 (beta) implementation",
   "type": "module",
+  "engines": {
+    "node": ">=22.15.0"
+  },
   "scripts": {
     "dev": "vite --mode ssr",
     "build": "vite build && vite build --ssr ./src/entry.ssr.tsx && vite build --ssr ./src/entry.preview.tsx",
