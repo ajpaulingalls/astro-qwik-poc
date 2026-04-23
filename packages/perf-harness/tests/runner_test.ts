@@ -107,7 +107,7 @@ describe('runner main()', () => {
 
     // First spawn = mock-api (deno); second = qwik target.
     expect(spawnMock).toHaveBeenCalledTimes(2);
-    const [cmd, args, opts] = spawnMock.mock.calls[1] as [
+    const [cmd, args, opts] = spawnMock.mock.calls[1] as unknown as [
       string,
       readonly string[],
       { cwd?: string; env?: Record<string, string> },

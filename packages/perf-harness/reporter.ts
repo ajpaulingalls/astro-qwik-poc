@@ -1,14 +1,17 @@
 import type { Metric } from 'web-vitals';
+import type { RawMetrics } from './lighthouse.ts';
 
 export interface AggregatedMetric {
   median: number;
   n: number;
 }
 
+export type MetricKey = keyof RawMetrics;
+
 export interface AggregatedReport {
   page: string;
   target: string;
-  metrics: Record<string, AggregatedMetric>;
+  metrics: Record<MetricKey, AggregatedMetric>;
   webVitals: { samples: Metric[] };
 }
 
@@ -31,7 +34,7 @@ function formatJson(report: AggregatedReport): string {
 }
 
 function formatMarkdown(report: AggregatedReport): string {
-  const names = Object.keys(report.metrics).sort();
+  const names = (Object.keys(report.metrics) as MetricKey[]).sort();
   const n = names.length > 0 ? report.metrics[names[0]].n : 0;
   const nameWidth = Math.max(6, ...names.map((n) => n.length));
   const valueStrings = names.map((name) => String(report.metrics[name].median));

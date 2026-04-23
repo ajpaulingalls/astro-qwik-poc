@@ -19,7 +19,7 @@ export async function runLighthouseAudit(url: string): Promise<RawMetrics> {
     if (!result || !result.lhr) {
       throw new Error(`runLighthouseAudit: no result for ${url}`);
     }
-    return extractMetrics(result.lhr);
+    return extractMetrics(result.lhr as unknown as Lhr);
   });
 }
 
