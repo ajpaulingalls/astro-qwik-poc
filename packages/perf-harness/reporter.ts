@@ -1,3 +1,5 @@
+import type { Metric } from 'web-vitals';
+
 export interface AggregatedMetric {
   median: number;
   n: number;
@@ -7,7 +9,7 @@ export interface AggregatedReport {
   page: string;
   target: string;
   metrics: Record<string, AggregatedMetric>;
-  webVitals: { samples: unknown[] };
+  webVitals: { samples: Metric[] };
 }
 
 function sortKeys<T>(value: T): T {

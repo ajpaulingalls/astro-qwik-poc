@@ -2,10 +2,11 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Metric } from 'web-vitals';
 import { median } from './aggregator.ts';
 import { withChrome } from './chrome.ts';
 import { runLighthouseAudit, type RawMetrics } from './lighthouse.ts';
-import { formatReport, type AggregatedReport } from './reporter.ts';
+import { formatReport, type AggregatedMetric, type AggregatedReport } from './reporter.ts';
 import { buildPageList, parseArgs, waitForPort, type Target } from './cli_helpers.ts';
 import { collectWebVitals } from './web_vitals_collector.ts';
 
@@ -74,12 +75,28 @@ function killService(proc: ChildProcess): Promise<void> {
   });
 }
 
+function aggMetric(values: number[], n: number): AggregatedMetric {
+  return { median: median(values), n };
+}
+
 function aggregateRuns(runs: RawMetrics[], n: number): AggregatedReport['metrics'] {
   return {
-    lcp: { median: median(runs.map((r) => r.lcp)), n },
-    cls: { median: median(runs.map((r) => r.cls)), n },
-    lhPerf: { median: median(runs.map((r) => r.lhPerf)), n },
-    jsBytes: { median: median(runs.map((r) => r.jsBytes)), n },
+    lcp: aggMetric(
+      runs.map((r) => r.lcp),
+      n,
+    ),
+    cls: aggMetric(
+      runs.map((r) => r.cls),
+      n,
+    ),
+    lhPerf: aggMetric(
+      runs.map((r) => r.lhPerf),
+      n,
+    ),
+    jsBytes: aggMetric(
+      runs.map((r) => r.jsBytes),
+      n,
+    ),
   };
 }
 
@@ -112,7 +129,7 @@ async function main(): Promise<void> {
     for (const page of pages) {
       const url = `http://localhost:${APP_PORT[args.target]}${page.path}`;
       const samples: RawMetrics[] = [];
-      const wvSamples: unknown[] = [];
+      const wvSamples: Metric[] = [];
       for (let i = 0; i < args.runs; i++) {
         process.stderr.write(`[${args.target}/${page.name}] run ${i + 1}/${args.runs}\n`);
         samples.push(await runLighthouseAudit(url));
