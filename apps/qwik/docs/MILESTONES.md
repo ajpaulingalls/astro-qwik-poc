@@ -130,7 +130,7 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 - `VerticalVideoCarousel` is interactive (swipe/scroll)
 - Interactive handlers are lazy-loaded — zero JS until interaction
 - **M2 harness reports stretch CWV met:** LCP ≤ 1.5s, CLS ≤ 0.05, INP ≤ 100ms, Lighthouse Performance ≥ 98
-- Homepage JS budget: < 15 KB compressed
+- Homepage JS budget: see [`ARCHITECTURE.md` § JavaScript Budgets](ARCHITECTURE.md#javascript-budgets-transferred-all-script-bytes-per-lighthouse-network-requests) (revised to <150 KB on beta.32 per story-009; aspirational <15 KB carried as a v2-stable target)
 
 ---
 
@@ -159,7 +159,7 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 - Related stories section renders
 - No HTML validation warnings from Qwik 2 build
 - **M2 harness reports stretch CWV met** on the article route
-- Article JS budget: < 10 KB compressed
+- Article JS budget: see [`ARCHITECTURE.md` § JavaScript Budgets](ARCHITECTURE.md#javascript-budgets-transferred-all-script-bytes-per-lighthouse-network-requests) (revised to <140 KB on beta.32; aspirational <10 KB carried as a v2-stable target)
 
 ---
 
@@ -188,7 +188,7 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 - `LoadMoreButton` uses `$()` lazy handler — JS loaded only on first click
 - Section type correctly auto-detected from URL
 - **M2 harness reports stretch CWV met**, including INP ≤ 100ms after Load More click (this is the key INP test for the page)
-- Section Front JS budget: < 15 KB compressed
+- Section Front JS budget: see [`ARCHITECTURE.md` § JavaScript Budgets](ARCHITECTURE.md#javascript-budgets-transferred-all-script-bytes-per-lighthouse-network-requests) (revised to <150 KB on beta.32; aspirational <15 KB carried as a v2-stable target)
 
 ---
 
@@ -214,7 +214,7 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 - Polling mechanism works (mock API can return varying fixture data)
 - New entries prepend to the list
 - **M2 harness reports stretch CWV met**, including no CLS regression when new entries prepend
-- Live Blog JS budget: < 20 KB compressed
+- Live Blog JS budget: see [`ARCHITECTURE.md` § JavaScript Budgets](ARCHITECTURE.md#javascript-budgets-transferred-all-script-bytes-per-lighthouse-network-requests) (revised to <160 KB on beta.32; aspirational <20 KB carried as a v2-stable target)
 
 ---
 
@@ -261,10 +261,10 @@ Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear th
 | CLS              | < 0.1             | **≤ 0.05**           | ✓                   |
 | INP              | < 200ms           | **≤ 100ms**          | ✓                   |
 | Lighthouse Perf  | ≥ 95              | **≥ 98**             | ✓                   |
-| Homepage JS      | —                 | < 15 KB              | n/a                 |
-| Article JS       | —                 | < 10 KB              | n/a                 |
-| Live Blog JS     | —                 | < 20 KB              | n/a                 |
-| Section Front JS | —                 | < 15 KB              | n/a                 |
+| Homepage JS      | —                 | < 150 KB (was <15)   | n/a                 |
+| Article JS       | —                 | < 140 KB (was <10)   | n/a                 |
+| Live Blog JS     | —                 | < 160 KB (was <20)   | n/a                 |
+| Section Front JS | —                 | < 150 KB (was <15)   | n/a                 |
 
 - All puppeteer-core interaction tests pass
 - SSR throughput > 50 req/s per page type

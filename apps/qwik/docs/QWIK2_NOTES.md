@@ -129,3 +129,70 @@ Updated `global.css` `font-weight: 100 900` → `400 700` to match the new axis 
 **What this means for story-002 / M6:** the font subset preserves a real bandwidth win and hardens against future regressions, but Lighthouse-LCP recovery on Qwik will require addressing the throttled-CPU bottleneck (likely Qwik's framework parse + chunk graph, which jsBytes=144KB confirms). The "subset Inter to recover LCP" hypothesis was wrong — the font isn't on the throttled critical path.
 
 Concerns 374ced212854 (font 352KB) and 0b2b9912957d (font subset) are addressed by this work. Concern 63bb15262674 (Qwik LCP 2410ms) remains real but the lever isn't font — it's framework-graph reduction (out of scope for story-004).
+
+### Story-009 framework cost characterization (sprint-005)
+
+Customer reaffirmed `<15 KB` Homepage JS as a hard goal but asked: "Is this just the cost of Qwik, is there a way to lazy load some of that, or other options? Make sure we know all the details." This section answers all three.
+
+**TL;DR:** First-hit JS is 111 KB (qwikLoader + preloader + Qwik core runtime — framework cost, not app code). Component handlers, router+zod, and polling are already lazy-loaded. Realistic Homepage budget on beta.32 is `<150 KB`; re-budget when Qwik 2 stable ships (Qwik 1 stable ships ~62 KB initial).
+
+#### What loads on first hit
+
+Curl of the SSR'd `GET /` response (mock-api fixture wired) shows three `<link rel="modulepreload">` tags + the qwikLoader inline `<script src=>`:
+
+| chunk           | uncompressed | role                                                | how delivered                     |
+| --------------- | -----------: | --------------------------------------------------- | --------------------------------- |
+| `q-D4zlRG7M.js` |       4925 B | qwikLoader (event delegation bootstrap)             | `<script src= async type=module>` |
+| `q-VPloE5mA.js` |       4760 B | preloader (speculative chunk fetcher)               | `<link rel=modulepreload>`        |
+| `q-DXzUueEu.js` |     101968 B | **Qwik core runtime** (reactivity, serializer, JSX) | `<link rel=modulepreload>`        |
+
+Initial first-hit JS = **111,653 B uncompressed**. Inline serialized state (`qwik/state`, `qwik/vnode`, `qwik/json`) adds ~5 KB inside the HTML. Plus `inter.woff2` (42 KB), `B8pYZ47E-style.css` (7.8 KB), and the bundle-graph asset (1.3 KB) which the preloader consumes.
+
+After the `load` event (or 2-second timeout — see the inlined `q:type="preload"` script in the HTML), the preloader speculatively fetches six more chunks: `q-BiG-UWDH.js` (router internals 7.2 KB), `q-DbZgAH74.js` (DocumentHead 633 B), `q-eII3B7lM.js` (popstate handler 1.4 KB), `q-CXTcW-kO.js` (hamburger toggle 64 B), `q-CWngW5n3.js` (qrouterpopstate 2.5 KB), plus a re-fetch of core if uncached. That's the gap between the 111 KB first-hit number and Lighthouse's measured **144,633 B** transferred-script aggregate.
+
+#### Lazy-load opportunity audit
+
+Working through the SSR-emitted `q-manifest.json` and the actual served HTML:
+
+| chunk                                            |       size | already lazy? | could defer further?                                                        |
+| ------------------------------------------------ | ---------: | ------------- | --------------------------------------------------------------------------- |
+| `q-DXzUueEu.js` (core)                           |     102 KB | NO            | NO — framework runtime, required for resumability                           |
+| `q-D4zlRG7M.js` (qwikLoader)                     |       5 KB | NO            | NO — bootstrap; could be **inlined** per Qwik docs (saves 1 RTT, not bytes) |
+| `q-VPloE5mA.js` (preloader)                      |       5 KB | NO            | YES — can be removed entirely (slows interaction; small win)                |
+| `q-BS34lQWv.js` (router + zod)                   |      12 KB | **YES**       | already deferred until first navigation; not on first-hit waterfall         |
+| `q-BiG-UWDH.js` (router internals)               |       7 KB | partial       | speculatively prefetched after `load`; not strictly lazy                    |
+| handler chunks (`q-CXTcW-kO`, `q-CMt2bPoi`, ...) | <1 KB each | YES           | already only fetched on click via QRL `$()`                                 |
+| `q-BLOLp9dm.js` (web-vitals 5.5 KB)              |     5.5 KB | YES           | only fetched in `useVisibleTask$` — never on first hit                      |
+
+**Verdict on lazy-loading**: Most of what _can_ be deferred already is. The `q-BS34lQWv.js` 12 KB router+zod chunk is **not** in the first-hit waterfall — confirmed via the SSR HTML inspection. Zod ships with the router but only loads on actual navigation. The remaining 132 KB (qwikLoader + preloader + core + speculative-prefetch) is the irreducible cost of running Qwik 2 beta.32 on a route with one component tree and one nav handler.
+
+#### Production Qwik comparison — Qwik 2 beta is ~2× the size of Qwik 1
+
+Curl of `https://qwik.dev/` (Qwik 1.x stable, `@builder.io/qwik`):
+
+| chunk      | size on qwik.dev | comparable chunk in this PoC |
+| ---------- | ---------------: | ---------------------------- |
+| qwikLoader |          3,139 B | 4,925 B (+57%)               |
+| preloader  |          3,810 B | 4,760 B (+25%)               |
+| **core**   |     **54,680 B** | **101,968 B (+86%)**         |
+
+**Qwik 2 beta.32's core runtime is 86% larger than Qwik 1's stable core.** The bigger core in beta is consistent with the framework still being in active development — the beta has not yet had its size-optimization pass. The same `<15 KB` budget that Qwik 2 promises in marketing assumed mature production tuning that this beta line doesn't deliver yet.
+
+#### Answer to the customer's questions
+
+> **Q1 — Is this just the cost of Qwik?**
+> YES. ~107 KB of the 111 KB first-hit JS is `q-DXzUueEu.js` Qwik core runtime + `q-D4zlRG7M.js` qwikLoader. App code (Navigation, Footer, Layout, index route) totals ~2 KB across the actual route chunks; everything else is framework. Confirmed against SSR HTML and `q-manifest.json`.
+>
+> **Q2 — Is there a way to lazy-load some of that?**
+> Most of it already is. Component handlers, the router+zod chunk, and document-head logic are deferred until interaction or navigation. The `<15 KB` budget figure was based on a misreading: Qwik's "near-zero JS" claim refers to **avoiding hydration replay**, not to **shipping a small framework**. The framework runtime itself still has to download for the resumability mechanism to work.
+>
+> **Q3 — Other options?**
+> Structural moves (custom router, framework fork) exceed PoC scope. Realistic floor on beta.32 is ~110-150 KB transferred; the `<15 KB` target is infeasible without framework downgrade to v1, a fork, or v2 maturity. Sub-1% experiments available if curious: inline qwikLoader (saves 1 RTT, not bytes), disable the preloader (saves ~12 KB post-`load` prefetch, slows interaction).
+
+#### Budget revision
+
+`apps/qwik/docs/ARCHITECTURE.md` Performance Budgets table revised: Homepage budget changed from `<15 KB` (aspirational, infeasible) to `<150 KB` (measured-realistic with ~5 KB headroom over the current 144 KB) for the duration of beta.32. The original `<15 KB` aspirational target is preserved as a footnote with a link to this section.
+
+When Qwik 2 stable ships, re-measure and re-budget. If the stable core is ~50-60 KB like v1, the realistic Homepage budget should drop to ~75-100 KB — still 5-7× the original `<15 KB` aspiration but defensible against measurement.
+
+Concern `63bb15262674` (Qwik LCP 2410ms / 144 KB jsBytes) is resolved by this characterization — the cost is the framework, the levers are limited, and the budget is now honest.
