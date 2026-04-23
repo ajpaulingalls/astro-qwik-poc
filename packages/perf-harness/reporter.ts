@@ -1,5 +1,5 @@
-import type { Metric } from 'web-vitals';
 import type { RawMetrics } from './lighthouse.ts';
+import type { EnrichedMetric } from './web_vitals_collector.ts';
 
 export interface AggregatedMetric {
   median: number;
@@ -12,7 +12,7 @@ export interface AggregatedReport {
   page: string;
   target: string;
   metrics: Record<MetricKey, AggregatedMetric>;
-  webVitals: { samples: Metric[] };
+  webVitals: { samples: EnrichedMetric[] };
 }
 
 function sortKeys<T>(value: T): T {

@@ -69,4 +69,60 @@ describe('collectWebVitals', () => {
     await collectWebVitals('http://localhost:8080/', 9876);
     expect(pageMock.close).toHaveBeenCalled();
   });
+
+  // Run the enrichment callback page.evaluate would have invoked, with a
+  // simulated `globalThis.__webVitals`. Returns whatever the callback produced.
+  async function runEnrichmentWith(webVitals: unknown[]): Promise<Array<Record<string, unknown>>> {
+    let evalCallback: ((..._a: unknown[]) => unknown) | undefined;
+    pageMock.evaluate.mockImplementation((cb: (..._a: unknown[]) => unknown) => {
+      evalCallback = cb;
+      return Promise.resolve([]);
+    });
+    await collectWebVitals('http://localhost:8080/', 9876);
+    const g = globalThis as unknown as { __webVitals?: unknown[] };
+    g.__webVitals = webVitals;
+    try {
+      return evalCallback!() as Array<Record<string, unknown>>;
+    } finally {
+      delete g.__webVitals;
+    }
+  }
+
+  it('extracts LCP element details (tagName/id/className/src) from entries[0].element', async () => {
+    const result = await runEnrichmentWith([
+      {
+        name: 'LCP',
+        value: 800,
+        entries: [
+          {
+            element: {
+              tagName: 'IMG',
+              id: 'hero',
+              className: 'card',
+              currentSrc: '/hero.jpg',
+              src: '/hero.jpg',
+            },
+          },
+        ],
+      },
+      { name: 'CLS', value: 0.001, entries: [] },
+    ]);
+    expect(result[0]).toMatchObject({
+      name: 'LCP',
+      lcpElement: { tagName: 'IMG', id: 'hero', className: 'card', src: '/hero.jpg' },
+    });
+    expect(result[1]).not.toHaveProperty('lcpElement');
+  });
+
+  it('omits id/className/src from lcpElement when the element does not have them', async () => {
+    const result = await runEnrichmentWith([
+      { name: 'LCP', value: 800, entries: [{ element: { tagName: 'H1' } }] },
+    ]);
+    expect(result[0].lcpElement).toEqual({ tagName: 'H1' });
+  });
+
+  it('does not add lcpElement when LCP entry has no element (e.g. cross-origin)', async () => {
+    const result = await runEnrichmentWith([{ name: 'LCP', value: 800, entries: [{}] }]);
+    expect(result[0]).not.toHaveProperty('lcpElement');
+  });
 });
