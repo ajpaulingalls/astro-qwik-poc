@@ -20,7 +20,7 @@ export default defineConfig({
       provider: fontProviders.google(),
       name: 'Inter',
       cssVariable: '--font-inter',
-      weights: [400, 600, 700],
+      weights: [400, 700],
       styles: ['normal'],
       subsets: ['latin'],
       display: 'swap',
