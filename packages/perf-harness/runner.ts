@@ -111,8 +111,8 @@ function writeReports(
   writeFileSync(resolve(REPORTS_DIR, `${stem}.md`), formatted.markdown);
 }
 
-async function main(): Promise<void> {
-  const args = parseArgs(process.argv.slice(2));
+export async function main(argv: readonly string[] = process.argv.slice(2)): Promise<void> {
+  const args = parseArgs(argv);
   const pages = buildPageList(args.target).filter((p) => !args.page || p.name === args.page);
   if (pages.length === 0) {
     throw new Error(`runner: no pages match --page=${args.page}`);
@@ -150,7 +150,9 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err) => {
-  process.stderr.write(`perf-harness: ${err instanceof Error ? err.message : String(err)}\n`);
-  process.exit(1);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main().catch((err) => {
+    process.stderr.write(`perf-harness: ${err instanceof Error ? err.message : String(err)}\n`);
+    process.exit(1);
+  });
+}
