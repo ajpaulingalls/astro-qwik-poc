@@ -400,15 +400,9 @@ function getSectionType(section: string): 'geographic' | 'topic' {
 
 ### Core Web Vitals
 
-The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page acceptance criteria use the stretch column. A measured value worse than the floor fails the milestone outright.
+The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page acceptance criteria use the stretch column; a measured value worse than the floor fails the milestone outright. INP is measured on interactive components via puppeteer-core-driven interactions in the M2 harness; LCP/CLS on all page types under 4G throttling.
 
-| Metric  | "Good" floor | **Stretch (target)** | Measured On                                                                                |
-| ------- | ------------ | -------------------- | ------------------------------------------------------------------------------------------ |
-| **LCP** | < 2.5s       | **≤ 1.5s**           | All page types, 4G throttled                                                               |
-| **CLS** | < 0.1        | **≤ 0.05**           | All page types                                                                             |
-| **INP** | < 200ms      | **≤ 100ms**          | Interactive components (measured via puppeteer-core-driven interactions in the M2 harness) |
-
-> Same stretch targets apply to the Astro PoC — see top-level [README.md](../../../README.md#performance-targets--stretch-goals).
+> Same stretch targets apply to the Astro PoC — see top-level [README.md](../../../README.md#performance-targets--stretch-goals) for the canonical thresholds table.
 
 ### JavaScript Budgets (Compressed)
 
