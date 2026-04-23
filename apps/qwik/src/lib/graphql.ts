@@ -9,8 +9,21 @@ export interface GraphqlFetchOptions {
 const DEFAULT_API_BASE = 'http://localhost:4455';
 
 function resolveApiBase(): string {
-  const fromEnv = import.meta.env?.PUBLIC_API_BASE;
-  return fromEnv && fromEnv.length > 0 ? fromEnv : DEFAULT_API_BASE;
+  // Build-time replacement first (Vite injects PUBLIC_API_BASE at build).
+  const fromBuildEnv = import.meta.env?.PUBLIC_API_BASE;
+  if (fromBuildEnv && fromBuildEnv.length > 0) return fromBuildEnv;
+  // Runtime override on the Node SSR side (perf-harness/acceptance suite
+  // sets PUBLIC_API_BASE=http://localhost:4456 to point Qwik at its own
+  // mock-api instance, leaving Astro on 4455 so test runs can parallelise).
+  // `process` is undefined on the browser side, so this is server-only.
+  const runtimeProcess = (
+    globalThis as {
+      process?: { env?: Record<string, string | undefined> };
+    }
+  ).process;
+  const fromRuntimeEnv = runtimeProcess?.env?.PUBLIC_API_BASE;
+  if (fromRuntimeEnv && fromRuntimeEnv.length > 0) return fromRuntimeEnv;
+  return DEFAULT_API_BASE;
 }
 
 export async function graphqlFetch<T>({

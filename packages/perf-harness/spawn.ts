@@ -11,20 +11,28 @@ import { type Target } from './cli_helpers.ts';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = resolve(__dirname, '../..');
 
-export const MOCK_API_PORT = 4455;
+// One mock-api instance per target so test-astro and test-qwik can run in
+// parallel under lefthook without colliding on a single shared port.
+// Both instances load the same fixture directory — same data, two listeners.
+export const MOCK_API_PORT: Record<Target, number> = { astro: 4455, qwik: 4456 };
 export const APP_PORT: Record<Target, number> = { astro: 8080, qwik: 4173 };
 
-export function spawnMockApi(): ChildProcess {
+export function spawnMockApi(target: Target): ChildProcess {
+  const port = MOCK_API_PORT[target];
   return spawn(
     'deno',
     [
       'run',
-      '--allow-net=0.0.0.0:4455',
+      `--allow-net=0.0.0.0:${port}`,
       '--allow-read=./fixtures',
       '--allow-env=PORT,FIXTURE_DIR',
       'server.ts',
     ],
-    { cwd: resolve(REPO_ROOT, 'packages/mock-api'), stdio: 'ignore' },
+    {
+      cwd: resolve(REPO_ROOT, 'packages/mock-api'),
+      stdio: 'ignore',
+      env: { ...process.env, PORT: String(port) },
+    },
   );
 }
 
@@ -64,7 +72,7 @@ export function spawnAstro(): ChildProcess {
     'deno',
     [
       'run',
-      '--allow-net=0.0.0.0:8080,localhost:4455',
+      `--allow-net=0.0.0.0:${APP_PORT.astro},localhost:${MOCK_API_PORT.astro}`,
       '--allow-read=apps/astro/dist',
       `--allow-env=${ASTRO_ALLOWED_ENV}`,
       'apps/astro/dist/server/entry.mjs',
@@ -79,10 +87,18 @@ export function spawnQwik(): ChildProcess {
   // dist/server/entry.mjs` (raw runtime, no Vite middleware in front).
   // See apps/qwik/server.ts and QWIK2_NOTES.md for why a wrapper is
   // required (entry.preview.js exports middleware, not a listener).
+  // PUBLIC_API_BASE injects the Qwik-target mock-api port at runtime so
+  // the source DEFAULT_API_BASE can stay 4455 (standalone dev with
+  // `bun run mock-api` keeps working).
   return spawn('node', ['--experimental-strip-types', '--no-warnings', 'server.ts'], {
     cwd: resolve(REPO_ROOT, 'apps/qwik'),
     stdio: 'ignore',
-    env: { ...process.env, HOST: '127.0.0.1', PORT: String(APP_PORT.qwik) },
+    env: {
+      ...process.env,
+      HOST: '127.0.0.1',
+      PORT: String(APP_PORT.qwik),
+      PUBLIC_API_BASE: `http://localhost:${MOCK_API_PORT.qwik}`,
+    },
   });
 }
 

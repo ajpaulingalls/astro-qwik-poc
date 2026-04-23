@@ -167,6 +167,8 @@ deno run \
 
 Qwik's GraphQL client is **isomorphic** — the same module runs on both server (`routeLoader$`) and client (`$()` handlers). The server uses it for initial page data; the client uses it for pagination and polling.
 
+**Note on dev-time vs harness-time mock-api ports.** Standalone development uses port 4455 (`bun run mock-api` + `bun run dev:qwik` — both default 4455). Under the perf-harness and acceptance tests, however, the Qwik target's mock-api lives on **4456** so that test-astro and test-qwik can run in parallel under lefthook without colliding on a single shared listener. The harness handles this by setting `PUBLIC_API_BASE=http://localhost:4456` in the spawned Qwik server's environment; `resolveApiBase` checks `process.env.PUBLIC_API_BASE` on the SSR side and overrides the build-time default. Per-target port map lives in `packages/perf-harness/spawn.ts:MOCK_API_PORT`.
+
 ```typescript
 // src/lib/graphql.ts
 const DEFAULT_API_BASE = 'http://localhost:4455';

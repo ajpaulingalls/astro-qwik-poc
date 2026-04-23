@@ -6,7 +6,7 @@ Shared Lighthouse-driven performance harness for the AJE Astro and Qwik PoCs.
 
 For a given target (`astro` or `qwik`), the harness:
 
-1. Spawns the shared mock GraphQL API on `:4455`.
+1. Spawns a per-target mock GraphQL API instance: Astro hits `:4455`, Qwik hits `:4456`. Both load the same fixtures from `packages/mock-api/fixtures/` — separate listeners exist so that test-astro and test-qwik can run in parallel under lefthook without colliding on a shared port.
 2. Spawns the target app's production-built server (Astro: `deno run dist/server/entry.mjs` on `:8080`; Qwik: `vite preview` on `:4173`).
 3. For each configured page, runs Lighthouse N times via `chrome-launcher`.
 4. Aggregates the median per metric (LCP, CLS, Lighthouse Perf score, JS bundle bytes) across the N runs.

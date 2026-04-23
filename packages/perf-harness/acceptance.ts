@@ -52,10 +52,10 @@ export function runAcceptanceSuite(target: Target): void {
 
     beforeAll(async () => {
       const setupStart = Date.now();
-      mockApi = spawnMockApi();
+      mockApi = spawnMockApi(target);
       appProc = spawnApp(target);
       await Promise.all([
-        waitForPort(MOCK_API_PORT, { timeoutMs: 10_000 }),
+        waitForPort(MOCK_API_PORT[target], { timeoutMs: 10_000 }),
         waitForPort(APP_PORT[target], { timeoutMs: 60_000 }),
       ]);
       chrome = await chromeLauncher.launch({

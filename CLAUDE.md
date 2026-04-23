@@ -28,7 +28,7 @@ When you're working on something, the right doc to read first depends on the que
 ## Locked-in structural decisions
 
 - **Workspace tooling:** bun workspaces (`package.json` `workspaces: ["apps/*", "packages/*"]`) for the Node-side packages; Deno workspace (`deno.json`) covers `packages/mock-api/`.
-- **Mock API runtime:** Deno 2 with native `Deno.serve()` — _not_ the deprecated `import { serve } from "deno.land/std/http"`. Port `4455`.
+- **Mock API runtime:** Deno 2 with native `Deno.serve()` — _not_ the deprecated `import { serve } from "deno.land/std/http"`. Default port `4455` (Astro target); the perf-harness spawns a second instance on `4456` for the Qwik target so test runs can parallelise — see `packages/perf-harness/spawn.ts:MOCK_API_PORT`.
 - **Performance harness:** puppeteer-core drives interactions (so INP is captured) by attaching to chrome-launcher's headless Chrome via CDP, Lighthouse runs against the resulting state, results aggregated per page type. (Original spec said Playwright; swapped to puppeteer-core in sprint-003 to avoid the ~300MB bundled-Chromium install — puppeteer-core attaches to the chrome-launcher Chrome we already use for Lighthouse.) `chrome-devtools-mcp` available as a dev-time probe but not part of the CI loop.
 - **Astro app:** Astro 6 + Preact + bun for deps and dev + Deno for production SSR via `@deno/astro-adapter` 0.4.0. Details in `apps/astro/CLAUDE.md`.
 - **Qwik app:** Qwik 2 beta (`@qwik.dev/core` 2.0.0-beta.x) — _not_ the legacy `@builder.io/qwik` 1.x stable. Details in `apps/qwik/CLAUDE.md`.

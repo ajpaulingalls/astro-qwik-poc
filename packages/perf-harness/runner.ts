@@ -56,11 +56,11 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
     throw new Error(`runner: no pages match --page=${args.page}`);
   }
 
-  const services = [spawnMockApi(), spawnApp(args.target)];
+  const services = [spawnMockApi(args.target), spawnApp(args.target)];
 
   try {
     await Promise.all([
-      waitForPort(MOCK_API_PORT, { timeoutMs: 10_000 }),
+      waitForPort(MOCK_API_PORT[args.target], { timeoutMs: 10_000 }),
       waitForPort(APP_PORT[args.target], { timeoutMs: 60_000 }),
     ]);
 
