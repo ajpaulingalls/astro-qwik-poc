@@ -19,11 +19,17 @@ pre-commit:
 
     test-astro:
       glob: 'apps/astro/**/*'
+      exclude:
+        - 'apps/astro/docs/*'
+        - 'apps/astro/docs/**/*'
       run: bun --filter aje-poc-astro test
       stage_fixed: false
 
     test-qwik:
       glob: 'apps/qwik/**/*'
+      exclude:
+        - 'apps/qwik/docs/*'
+        - 'apps/qwik/docs/**/*'
       run: bun --filter aje-poc-qwik test
       stage_fixed: false
 

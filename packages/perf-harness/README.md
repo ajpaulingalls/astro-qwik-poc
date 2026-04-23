@@ -37,7 +37,7 @@ The runner exits 0 on success and 1 on any subprocess timeout, missing Lighthous
 
 ### Prerequisites
 
-- Node 22.12+ (Astro 6 requirement) — `nvm use 22` if your shell default is older.
+- Node 22.15+ (pinned in repo-root `.nvmrc`; Qwik server.ts uses `--experimental-strip-types`, requires Node 22.6+) — `nvm use` from the repo root picks it up automatically.
 - Deno 2 — for the mock-api and Astro production server.
 - The target app must be built first:
   - `bun --filter aje-poc-astro build` for Astro
