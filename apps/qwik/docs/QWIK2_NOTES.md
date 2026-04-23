@@ -98,3 +98,34 @@ CLS≤0.05 (story-002 AC) met. LCP and jsBytes margins recorded as concerns — 
 
 - **LCP 2410ms vs 2500ms "Good" floor.** That's a **90ms cushion to a hard-fail** (per CLAUDE.md "Good floor is hard-fail"). One un-subsetted font + one component-heavy commit at M6 will eat that cushion. Subsetting Inter (concern recorded) is the highest-leverage move; second is investigating why Qwik's resumability isn't yielding the LCP benefit the framework promises. M5 ships, but M6+ work cannot land without LCP regression budget.
 - **jsBytes 144633 vs ARCHITECTURE.md "Qwik Homepage budget: <15 KB".** That's **9.6× over the published budget**. Two possible reconciliations: (a) the budget was meant for Qwik's _runtime delta_ (the "what does Qwik itself cost" number) and Lighthouse's network-requests:script-size includes the whole framework-graph; (b) the budget is aspirational and assumes the hand-tuned production-bundle splitting work that hasn't happened in this PoC. Either way, ARCHITECTURE.md needs revision before M13 — the current 15KB number can't stand next to a measured 144KB without explanation. Concern recorded.
+
+### Story-004 Inter subset (sprint-005) — LCP recovery
+
+Subsetted `apps/qwik/public/fonts/inter.woff2`:
+
+| step                                                                | input                         | output              |                    size |                      reduction |
+| ------------------------------------------------------------------- | ----------------------------- | ------------------- | ----------------------: | -----------------------------: |
+| baseline                                                            | InterVariable.woff2 (rsms.me) | —                   |                352240 B |                              — |
+| 1. instance weight axis (400, 700) via `fontTools.varLib.instancer` | inter-original.ttf            | inter-instanced.ttf | 692960 B (uncompressed) | drops weights 100-300, 800-900 |
+| 2. subset glyphs via `pyftsubset`                                   | inter-instanced.ttf           | inter.woff2         |             **42732 B** |  **88% smaller than baseline** |
+
+Subset definition: `--unicodes="U+0000-007F,U+00A0-00FF,U+2010-2027,U+2030-205E,U+20AC,U+2122,U+0152-0153,U+0160-0161,U+0178,U+017D-017E,U+02C6,U+02DC,U+0192,U+2039-203A"` (Basic Latin + Latin-1 Supplement + general punctuation + euro/trademark/œ/š/Ÿ/ž/etc.). Layout features: `liga,kern,calt`. Stylistic sets (ss01-ss05) dropped — unused in the design system. `--no-hinting --desubroutinize` for further size win.
+
+Updated `global.css` `font-weight: 100 900` → `400 700` to match the new axis range. SHA of the subsetted file lives in `global.css` (single source of truth — pinned alongside the binary).
+
+**Repro:** `pip3 install --user --break-system-packages fonttools brotli`, then run the two-step pipeline against the upstream rsms.me file. Astro Fonts API ships ~35KB for parity weights (Latin only, 3 weights as static instances) — Qwik's variable subset comes in at 42KB, which is comparable; the extra ~7KB is the cost of preserving the variable axis between 400-700.
+
+**Sprint-004 → sprint-005 perf delta (n=5):**
+
+| metric  | sprint-004 | sprint-005 (post-subset) |                       delta |
+| ------- | ---------: | -----------------------: | --------------------------: |
+| LCP     |     2410ms |                   2409ms | -1ms (no improvement, flat) |
+| CLS     |          0 |                        0 |                   unchanged |
+| LH Perf |         96 |                       96 |                   unchanged |
+| jsBytes |     144633 |                   144633 |   unchanged (font isn't JS) |
+
+**LCP did not budge.** The 88% font-size reduction is real (352KB→42KB transferred bandwidth saved) but LCP under Lighthouse's simulated 4G throttle is unchanged. Real-browser LCP (web-vitals API, unthrottled) measures ~50ms across all 5 runs — the page renders almost instantly. The 2409ms is Lighthouse's CPU-throttled+network-throttled simulated number against a placeholder homepage whose LCP element is the `<h1>aje-poc-qwik</h1>` text node — text-LCP doesn't depend on the web font (Lighthouse counts the moment the text node lays out, which happens during fallback-font render before swap).
+
+**What this means for story-002 / M6:** the font subset preserves a real bandwidth win and hardens against future regressions, but Lighthouse-LCP recovery on Qwik will require addressing the throttled-CPU bottleneck (likely Qwik's framework parse + chunk graph, which jsBytes=144KB confirms). The "subset Inter to recover LCP" hypothesis was wrong — the font isn't on the throttled critical path.
+
+Concerns 374ced212854 (font 352KB) and 0b2b9912957d (font subset) are addressed by this work. Concern 63bb15262674 (Qwik LCP 2410ms) remains real but the lever isn't font — it's framework-graph reduction (out of scope for story-004).

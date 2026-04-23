@@ -6,15 +6,17 @@
   --color-aj-orange-dark: #c66f00;
 }
 
-/* Self-hosted Inter Variable (no Qwik equivalent of Astro Fonts API).
- * Source: https://rsms.me/inter/font-files/InterVariable.woff2
- * sha256: 693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3
- * Trade-off: 352KB (vs Astro's ~35KB Google-subsetted file) — full variable
- * axis, all glyphs, 10x payload. Subsetting deferred to LCP-margin work. */
+/* Self-hosted Inter Variable, subsetted for parity with Astro's Fonts API output.
+ * Source: https://rsms.me/inter/font-files/InterVariable.woff2 (full: 352KB)
+ * Subsetted: 42KB (88% reduction). Pipeline:
+ *   1. fontTools varLib.instancer: limit weight axis to (400, 700) — drops weights 100-300, 800-900 we don't use
+ *   2. pyftsubset: Latin-1 + common punctuation + €/™/œ; layout-features=liga,kern,calt; --no-hinting --desubroutinize
+ * sha256: 52f923f1c00e0211c3a8bff5c6918a4ddd742d45ab4c5b9bcf7287c4b9081a11
+ * Repro recipe in apps/qwik/docs/QWIK2_NOTES.md "Story-004" section. */
 @font-face {
   font-family: 'Inter';
   src: url('/fonts/inter.woff2') format('woff2');
-  font-weight: 100 900;
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
 }
