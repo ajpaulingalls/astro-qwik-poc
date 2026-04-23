@@ -27,6 +27,7 @@
         "web-vitals": "^4.2.4",
       },
       "devDependencies": {
+        "@aje-poc/perf-harness": "workspace:*",
         "@tailwindcss/vite": "^4.0.0",
         "@testing-library/preact": "^3.2.4",
         "chrome-launcher": "^1.1.2",
@@ -44,10 +45,13 @@
         "web-vitals": "^4.2.4",
       },
       "devDependencies": {
+        "@aje-poc/perf-harness": "workspace:*",
         "@qwik.dev/core": "~2.0.0-beta.32",
         "@qwik.dev/router": "latest",
         "@tailwindcss/vite": "latest",
         "@types/node": "latest",
+        "chrome-launcher": "^1.1.2",
+        "puppeteer-core": "^23.0.0",
         "tailwindcss": "latest",
         "typescript": "latest",
         "vite": "^7.3.2",

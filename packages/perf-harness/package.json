@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "description": "Shared Lighthouse performance harness for the AJE Astro and Qwik PoCs",
   "type": "module",
+  "exports": {
+    "./acceptance": "./acceptance.ts"
+  },
   "scripts": {
     "run": "node --experimental-strip-types --no-warnings runner.ts",
     "test": "vitest run"
