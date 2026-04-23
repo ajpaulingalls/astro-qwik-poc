@@ -1,0 +1,32 @@
+---
+import '../styles/global.css';
+import { Font } from 'astro:assets';
+import { NavigationMenu } from '../components/NavigationMenu';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+    <Font cssVariable="--font-inter" preload />
+    <script>
+      // Hoisted by Astro into a deferred module chunk in <head>; runs
+      // after HTML parse so doesn't block LCP. Perf-critical: M2/M9 gate
+      // depends on globalThis.__webVitals being populated.
+      import '../lib/web-vitals.ts';
+    </script>
+  </head>
+  <body class="font-sans">
+    <NavigationMenu client:idle />
+    <slot />
+    <Footer />
+  </body>
+</html>
