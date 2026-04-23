@@ -17,13 +17,7 @@ Codified in `docs/ARCHITECTURE.md` — don't relitigate without explicit user in
 
 ## Qwik 2 platform features in use
 
-| Feature                                               | Where used                                                               |
-| ----------------------------------------------------- | ------------------------------------------------------------------------ |
-| `@qwik.dev/core` / `@qwik.dev/router` (renamed scope) | All imports                                                              |
-| `useSerializer$`                                      | Loaders no longer serialize to client by default in v2; opt in here      |
-| `allowStale` on `routeLoader$` / `AsyncSignal`        | Breaking ticker, live blog polling — alternative to manual `setInterval` |
-| `passive:` event markers                              | Vertical video carousel scroll/touch                                     |
-| Build-time HTML validation                            | `ArticleBody.tsx` rich-text rendering                                    |
+See [`docs/ARCHITECTURE.md` § Qwik 2 platform features in use](docs/ARCHITECTURE.md#qwik-2-platform-features-in-use) for the canonical list.
 
 ## Beta caveats
 
@@ -56,19 +50,10 @@ Use the `LSP` tool (`hover`, `goToDefinition`) on any TypeScript symbol. Especia
 
 ### Conceptual / migration docs — `gh api` against `build/v2` branch
 
-Guides aren't shipped in the npm package. Two critical gotchas:
+See [root CLAUDE.md § Looking up framework details](../../CLAUDE.md#looking-up-framework-details) for the full `gh api` recipe. Two Qwik-specific gotchas the root doc covers but worth re-flagging here:
 
 1. **Always pass `?ref=build/v2`** — the `main` branch hosts Qwik 1 docs (`@builder.io/qwik`, `(qwikcity)` route group). Fetching from `main` gives you stale info that imports the wrong package.
 2. **Route groups are in the path:** `(qwik)` for core, `(qwikrouter)` for routing (v1 uses `(qwikcity)` — different name). Easy to grab the wrong file.
-
-```bash
-# 1. Index — hand-curated hierarchy of every doc page with source paths
-gh api 'repos/QwikDev/qwik/contents/packages/docs/src/routes/docs/menu.md?ref=build/v2' --jq '.content' | base64 -d
-
-# 2. A specific page
-gh api 'repos/QwikDev/qwik/contents/packages/docs/src/routes/docs/(qwik)/core/overview/index.mdx?ref=build/v2' --jq '.content' | base64 -d
-gh api 'repos/QwikDev/qwik/contents/packages/docs/src/routes/docs/(qwikrouter)/route-loader/index.mdx?ref=build/v2' --jq '.content' | base64 -d
-```
 
 Useful entry points on `build/v2`:
 
