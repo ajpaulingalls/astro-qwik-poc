@@ -1,1 +1,32 @@
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', 'Inter Fallback', system-ui, sans-serif;
+  --color-aj-orange: #fa9000;
+  --color-aj-orange-dark: #c66f00;
+}
+
+/* Self-hosted Inter Variable (no Qwik equivalent of Astro Fonts API).
+ * Source: https://rsms.me/inter/font-files/InterVariable.woff2
+ * sha256: 693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3
+ * Trade-off: 352KB (vs Astro's ~35KB Google-subsetted file) — full variable
+ * axis, all glyphs, 10x payload. Subsetting deferred to LCP-margin work. */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Metric-matched fallback so swap from system Arial → Inter doesn't shift.
+ * Values from Astro's auto-generated tokens for the same Inter face;
+ * matches font-display:swap to keep CLS ≤ 0.05. */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 107.1194%;
+  ascent-override: 90.4365%;
+  descent-override: 22.518%;
+  line-gap-override: 0%;
+}
