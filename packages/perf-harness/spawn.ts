@@ -114,11 +114,6 @@ export function killService(proc: ChildProcess): Promise<void> {
       clearTimeout(killTimer);
       resolve();
     });
-    if (proc.exitCode !== null) {
-      clearTimeout(killTimer);
-      resolve();
-      return;
-    }
     proc.kill('SIGTERM');
   });
 }
