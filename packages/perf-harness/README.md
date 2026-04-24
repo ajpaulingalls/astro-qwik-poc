@@ -39,7 +39,7 @@ The runner exits 0 on success and 1 on any subprocess timeout, missing Lighthous
 
 - Node 22.15+ (pinned in repo-root `.nvmrc`; Qwik server.ts uses `--experimental-strip-types`, requires Node 22.6+) — `nvm use` from the repo root picks it up automatically.
 - Deno 2 — for the mock-api and Astro production server.
-- The target app must be built first:
+- The target app must be built first. `bun run perf:astro` / `perf:qwik` chain the build automatically; bare `bun run perf -- --target=...` does not — build manually:
   - `bun --filter aje-poc-astro build` for Astro
   - `bun --filter aje-poc-qwik build` for Qwik (also needs `src/entry.preview.tsx` — story-003 work)
 
