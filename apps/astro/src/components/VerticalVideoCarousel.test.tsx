@@ -20,7 +20,7 @@ describe('VerticalVideoCarousel', () => {
 
   it('renders all 10 video tiles in fixture order', () => {
     const { container } = render(<VerticalVideoCarousel videos={videos} />);
-    const tiles = container.querySelectorAll('[data-tile]');
+    const tiles = container.querySelectorAll('button[data-video-id]');
     expect(tiles.length).toBe(10);
     videos.forEach((v, i) => {
       expect(tiles[i].textContent).toContain(v.name);
@@ -42,14 +42,14 @@ describe('VerticalVideoCarousel', () => {
 
   it('strip has horizontal-scroll class enabling native swipe/touch behavior', () => {
     const { container } = render(<VerticalVideoCarousel videos={videos} />);
-    const strip = container.querySelector('[data-carousel]')!;
+    const strip = container.querySelector('section > div')!;
     expect(strip.className).toContain('overflow-x-auto');
     expect(strip.className).toContain('flex');
   });
 
   it('clicking a tile dispatches a custom event with the video id', () => {
     const { container } = render(<VerticalVideoCarousel videos={videos} />);
-    const tile = container.querySelectorAll('[data-tile]')[2] as HTMLElement;
+    const tile = container.querySelectorAll('button[data-video-id]')[2] as HTMLElement;
     let captured: string | null = null;
     document.addEventListener('vertical-video:open', (e) => {
       captured = (e as CustomEvent<{ id: string }>).detail.id;
@@ -60,6 +60,6 @@ describe('VerticalVideoCarousel', () => {
 
   it('returns null when videos array is empty', () => {
     const { container } = render(<VerticalVideoCarousel videos={[]} />);
-    expect(container.querySelector('[data-carousel]')).toBeNull();
+    expect(container.querySelector('section')).toBeNull();
   });
 });

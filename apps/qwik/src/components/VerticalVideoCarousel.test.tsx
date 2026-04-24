@@ -19,7 +19,7 @@ describe('VerticalVideoCarousel', () => {
   it('renders all 10 video tiles in fixture order', async () => {
     const { screen, render } = await createDOM();
     await render(<VerticalVideoCarousel videos={videos} />);
-    const tiles = screen.querySelectorAll('[data-tile]');
+    const tiles = screen.querySelectorAll('button[data-video-id]');
     expect(tiles.length).toBe(10);
     videos.forEach((v, i) => {
       expect(tiles[i].textContent).toContain(v.name);
@@ -44,7 +44,7 @@ describe('VerticalVideoCarousel', () => {
   it('strip has horizontal-scroll class enabling native swipe/touch', async () => {
     const { screen, render } = await createDOM();
     await render(<VerticalVideoCarousel videos={videos} />);
-    const strip = screen.querySelector('[data-carousel]')!;
+    const strip = screen.querySelector('section > div')!;
     expect(strip.className).toContain('overflow-x-auto');
     expect(strip.className).toContain('flex');
   });
@@ -60,18 +60,18 @@ describe('VerticalVideoCarousel', () => {
     };
     document.addEventListener('vertical-video:open', listener);
     try {
-      await userEvent('[data-tile]:nth-of-type(3)', 'click');
+      await userEvent('button[data-video-id]:nth-of-type(3)', 'click');
       expect(captured).toBe(videos[2].id);
     } finally {
       document.removeEventListener('vertical-video:open', listener);
     }
     // sanity: querySelector found 10 tiles
-    expect(screen.querySelectorAll('[data-tile]').length).toBe(10);
+    expect(screen.querySelectorAll('button[data-video-id]').length).toBe(10);
   });
 
   it('returns null when videos array is empty', async () => {
     const { screen, render } = await createDOM();
     await render(<VerticalVideoCarousel videos={[]} />);
-    expect(screen.querySelector('[data-carousel]')).toBeFalsy();
+    expect(screen.querySelector('section')).toBeFalsy();
   });
 });

@@ -9,14 +9,13 @@ interface Props {
 export const VerticalVideoCarousel = component$<Props>(({ videos }) => {
   if (videos.length === 0) return null;
   return (
-    <section class="vertical-video-carousel">
+    <section>
       <SectionHeading>Videos</SectionHeading>
-      <div data-carousel class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2">
+      <div class="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2">
         {videos.map((v) => (
           <button
             key={v.id}
             type="button"
-            data-tile
             data-video-id={v.id}
             onClick$={$(() => {
               document.dispatchEvent(
