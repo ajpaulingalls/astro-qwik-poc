@@ -5,12 +5,6 @@ interface Props {
   videos: VerticalVideo[];
 }
 
-// Inline 2-line clamp because Tailwind 4 utilities.css doesn't ship `line-clamp-N`
-// (verified by greping the installed package); keeps the thumbnail strip's caption
-// to two lines without pulling in a Tailwind plugin.
-const TWO_LINE_CLAMP =
-  'overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';
-
 export function VerticalVideoCarousel({ videos }: Props) {
   if (videos.length === 0) return null;
   return (
@@ -44,9 +38,7 @@ export function VerticalVideoCarousel({ videos }: Props) {
                 </span>
               )}
             </div>
-            <p class="text-xs mt-1" style={TWO_LINE_CLAMP}>
-              {v.name}
-            </p>
+            <p class="text-xs mt-1 line-clamp-2">{v.name}</p>
           </button>
         ))}
       </div>
