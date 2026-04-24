@@ -50,6 +50,8 @@ describe('VerticalVideoCarousel', () => {
   });
 
   it('clicking a tile dispatches a vertical-video:open CustomEvent with the video id', async () => {
+    // Relies on happy-dom's shared global `document`: this listener and
+    // userEvent's click dispatch must hit the same Document instance.
     const { screen, render, userEvent } = await createDOM();
     await render(<VerticalVideoCarousel videos={videos} />);
     let captured: string | null = null;
