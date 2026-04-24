@@ -22,10 +22,12 @@ const post: HomepagePost = {
 describe('HeroCard', () => {
   afterEach(cleanup);
 
-  it('renders the post title and links to post.link', () => {
+  it('renders the post title as h2 and links to post.link', () => {
     const { getByRole } = render(<HeroCard post={post} />);
     const link = getByRole('link', { name: /Iran war live/i });
     expect(link.getAttribute('href')).toBe('/news/liveblog/2026/4/22/iran-war-live');
+    const heading = getByRole('heading', { level: 2, name: /Iran war live/i });
+    expect(heading).toBeTruthy();
   });
 
   it('renders the featuredImage with eager loading + fetchpriority high (LCP element)', () => {
