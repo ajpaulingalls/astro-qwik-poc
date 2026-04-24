@@ -1,5 +1,6 @@
 import type { CuratedCollectionItem } from '../lib/homepage-types';
 import { getDisplayHeadline } from '../lib/headline';
+import { SectionHeading } from './SectionHeading';
 
 interface Props {
   collection: CuratedCollectionItem;
@@ -16,7 +17,7 @@ export function CuratedCollection({ collection }: Props) {
   );
   return (
     <section class="curated-collection">
-      <h3 class="text-aj-orange mb-3 text-sm font-bold tracking-wider uppercase">{heading}</h3>
+      <SectionHeading>{heading}</SectionHeading>
       <ul class="space-y-3">
         {collection.posts.map((post) => (
           <li>

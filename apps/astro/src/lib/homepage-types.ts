@@ -23,3 +23,12 @@ export interface CuratedCollectionItem {
   overrideLink?: string;
   posts: HomepagePost[];
 }
+
+export interface VerticalVideo {
+  id: string;
+  name: string;
+  thumbnail: string;
+  poster?: string;
+  duration?: string;
+  accountId: string;
+}
