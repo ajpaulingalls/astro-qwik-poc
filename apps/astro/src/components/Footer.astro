@@ -1,4 +1,6 @@
 ---
+import { SectionHeading } from './SectionHeading';
+
 const COLUMNS = [
   {
     title: 'About',
@@ -32,9 +34,7 @@ const COLUMNS = [
     {
       COLUMNS.map((col) => (
         <div>
-          <h2 class="text-aj-orange mb-3 text-sm font-bold tracking-wider uppercase">
-            {col.title}
-          </h2>
+          <SectionHeading as="h2">{col.title}</SectionHeading>
           <ul class="space-y-2">
             {col.links.map((l) => (
               <li>

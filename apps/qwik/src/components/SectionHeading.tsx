@@ -1,8 +1,18 @@
 import { component$, Slot } from '@qwik.dev/core';
 
-export const SectionHeading = component$(() => {
-  return (
-    <h3 class="text-aj-orange mb-3 text-sm font-bold tracking-wider uppercase">
+interface Props {
+  as?: 'h2' | 'h3';
+}
+
+const CLASS = 'text-aj-orange mb-3 text-sm font-bold tracking-wider uppercase';
+
+export const SectionHeading = component$<Props>(({ as = 'h3' }) => {
+  return as === 'h2' ? (
+    <h2 class={CLASS}>
+      <Slot />
+    </h2>
+  ) : (
+    <h3 class={CLASS}>
       <Slot />
     </h3>
   );

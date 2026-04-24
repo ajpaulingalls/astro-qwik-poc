@@ -1,4 +1,5 @@
 import { component$ } from '@qwik.dev/core';
+import { SectionHeading } from './SectionHeading';
 
 interface Link {
   href: string;
@@ -43,9 +44,7 @@ export const Footer = component$(() => {
       <div class="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-8 md:grid-cols-3">
         {COLUMNS.map((col) => (
           <div key={col.title}>
-            <h2 class="text-aj-orange mb-3 text-sm font-bold tracking-wider uppercase">
-              {col.title}
-            </h2>
+            <SectionHeading as="h2">{col.title}</SectionHeading>
             <ul class="space-y-2">
               {col.links.map((l) => (
                 <li key={l.href}>

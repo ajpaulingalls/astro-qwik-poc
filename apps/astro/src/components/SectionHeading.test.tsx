@@ -29,4 +29,11 @@ describe('SectionHeading', () => {
     expect(h3.className).toContain('uppercase');
     expect(h3.className).toContain('tracking-wider');
   });
+
+  it('renders as h2 when as="h2" (Footer landmark headings)', () => {
+    const { getByRole, container } = render(<SectionHeading as="h2">Section</SectionHeading>);
+    expect(getByRole('heading', { level: 2, name: 'Section' })).toBeTruthy();
+    expect(container.querySelector('h3')).toBeFalsy();
+    expect(container.querySelector('h2')!.className).toContain('text-aj-orange');
+  });
 });
