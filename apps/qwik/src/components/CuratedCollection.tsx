@@ -1,6 +1,7 @@
 import { component$ } from '@qwik.dev/core';
 import type { CuratedCollectionItem } from '../lib/homepage-types';
 import { getDisplayHeadline } from '../lib/headline';
+import { SectionHeading } from './SectionHeading';
 
 interface Props {
   collection: CuratedCollectionItem;
@@ -10,7 +11,7 @@ export const CuratedCollection = component$<Props>(({ collection }) => {
   if (collection.posts.length === 0) return null;
   return (
     <section class="curated-collection">
-      <h3 class="text-aj-orange mb-3 text-sm font-bold tracking-wider uppercase">
+      <SectionHeading>
         {collection.overrideLink ? (
           <a href={collection.overrideLink} class="hover:text-aj-orange">
             {collection.title}
@@ -18,7 +19,7 @@ export const CuratedCollection = component$<Props>(({ collection }) => {
         ) : (
           collection.title
         )}
-      </h3>
+      </SectionHeading>
       <ul class="space-y-3">
         {collection.posts.map((post) => (
           <li key={post.id}>
