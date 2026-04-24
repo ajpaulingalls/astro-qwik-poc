@@ -17,3 +17,9 @@ export interface HomepagePost {
   featuredImage?: HomepageImage | null;
   replacementHeadline?: string;
 }
+
+export interface CuratedCollectionItem {
+  title: string;
+  overrideLink?: string;
+  posts: HomepagePost[];
+}
