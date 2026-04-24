@@ -1,7 +1,7 @@
-// Mirror of apps/astro/src/lib/homepage-types.ts. Both apps consume the
-// same fixture shape; per-app duplication is acknowledged in plan concern
-// 1fa6ff30b786, deferred to a packages/shared-types/ extraction once
-// drift becomes painful.
+// DEPRECATED — being migrated to @aje-poc/shared-types in Step 1B/1C of
+// concern 1fa6ff30b786 consolidation. Do NOT add fields here; edit
+// packages/shared-types/index.ts instead. Imports here will be rewritten
+// to @aje-poc/shared-types and this file deleted.
 
 export interface HomepageImage {
   sourceUrl: string;

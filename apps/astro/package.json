@@ -14,6 +14,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aje-poc/shared-types": "workspace:*",
     "@astrojs/preact": "^5.0.0",
     "@deno/astro-adapter": "^0.4.0",
     "astro": "^6.1.8",

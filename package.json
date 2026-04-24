@@ -6,7 +6,8 @@
   "workspaces": [
     "apps/astro",
     "apps/qwik",
-    "packages/perf-harness"
+    "packages/perf-harness",
+    "packages/shared-types"
   ],
   "scripts": {
     "mock-api": "cd packages/mock-api && deno task dev",

@@ -20,6 +20,7 @@
       "name": "aje-poc-astro",
       "version": "0.0.1",
       "dependencies": {
+        "@aje-poc/shared-types": "workspace:*",
         "@astrojs/preact": "^5.0.0",
         "@deno/astro-adapter": "^0.4.0",
         "astro": "^6.1.8",
@@ -42,6 +43,7 @@
       "name": "aje-poc-qwik",
       "version": "0.0.0",
       "dependencies": {
+        "@aje-poc/shared-types": "workspace:*",
         "web-vitals": "^4.2.4",
       },
       "devDependencies": {
@@ -73,9 +75,15 @@
         "web-vitals": "^4.2.4",
       },
     },
+    "packages/shared-types": {
+      "name": "@aje-poc/shared-types",
+      "version": "0.0.0",
+    },
   },
   "packages": {
     "@aje-poc/perf-harness": ["@aje-poc/perf-harness@workspace:packages/perf-harness"],
+
+    "@aje-poc/shared-types": ["@aje-poc/shared-types@workspace:packages/shared-types"],
 
     "@astrojs/compiler": ["@astrojs/compiler@2.13.1", "", {}, "sha512-f3FN83d2G/v32ipNClRKgYv30onQlMZX1vCeZMjPsMMPl1mDpmbl0+N5BYo4S/ofzqJyS5hvwacEo0CCVDn/Qg=="],
 

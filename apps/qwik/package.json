@@ -15,6 +15,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@aje-poc/shared-types": "workspace:*",
     "web-vitals": "^4.2.4"
   },
   "devDependencies": {

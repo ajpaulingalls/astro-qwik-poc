@@ -1,0 +1,10 @@
+{
+  "name": "@aje-poc/shared-types",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Hand-curated subset of homepage UI fields, mirroring fixture data in packages/mock-api — consumed by both Astro and Qwik apps",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  }
+}
