@@ -81,17 +81,6 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = ({ resolveValue }) => {
-  const data = resolveValue(useHomepageData);
-  const heroSrc = data.page.homepage.featuredPosts?.[0]?.featuredImage?.sourceUrl;
-  return {
-    title: 'AJE PoC — Qwik 2',
-    links: heroSrc
-      ? [
-          // Preload the LCP hero image. Production-correct optimization;
-          // no-op locally because mock-api doesn't proxy /wp-content/uploads/*.
-          { rel: 'preload', as: 'image', href: heroSrc, fetchpriority: 'high' },
-        ]
-      : [],
-  };
+export const head: DocumentHead = {
+  title: 'AJE PoC — Qwik 2',
 };
