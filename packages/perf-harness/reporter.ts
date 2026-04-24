@@ -50,6 +50,13 @@ function formatMarkdown(report: AggregatedReport): string {
   }
   lines.push('');
   lines.push(`web-vitals samples: ${report.webVitals.samples.length}`);
+  // className intentionally omitted — Tailwind class soup would bloat the line.
+  const lcpElement = report.webVitals.samples.find((s) => s.lcpElement)?.lcpElement;
+  if (lcpElement) {
+    const id = lcpElement.id ? `#${lcpElement.id}` : '';
+    const src = lcpElement.src ? ` ${lcpElement.src}` : '';
+    lines.push(`lcp element: ${lcpElement.tagName}${id}${src}`);
+  }
   lines.push('');
   return lines.join('\n');
 }

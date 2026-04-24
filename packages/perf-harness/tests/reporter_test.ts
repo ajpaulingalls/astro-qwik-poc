@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { formatReport, type AggregatedReport } from '../reporter.ts';
+import type { EnrichedMetric } from '../web_vitals_collector.ts';
 
 const fixture: AggregatedReport = {
   page: 'home',
@@ -78,5 +79,32 @@ describe('formatReport', () => {
     const parsed = JSON.parse(json);
     expect(Object.keys(parsed.metrics).sort()).toEqual(['cls', 'jsBytes', 'lcp', 'lhPerf']);
     expect(parsed.metrics.lcp).toEqual({ median: 800, n: 5 });
+  });
+
+  it('emits lcp element line in markdown when first sample has lcpElement', () => {
+    const withLcp: AggregatedReport = {
+      ...fixture,
+      webVitals: {
+        samples: [
+          {
+            name: 'LCP',
+            value: 800,
+            id: 'v3-1',
+            delta: 800,
+            entries: [],
+            navigationType: 'navigate',
+            rating: 'good',
+            lcpElement: { tagName: 'IMG', id: 'hero-img', src: 'https://cdn.example/hero.jpg' },
+          } as EnrichedMetric,
+        ],
+      },
+    };
+    const { markdown } = formatReport(withLcp);
+    expect(markdown).toContain('lcp element: IMG#hero-img https://cdn.example/hero.jpg');
+  });
+
+  it('omits lcp element line when no sample has lcpElement', () => {
+    const { markdown } = formatReport(fixture);
+    expect(markdown).not.toContain('lcp element:');
   });
 });
