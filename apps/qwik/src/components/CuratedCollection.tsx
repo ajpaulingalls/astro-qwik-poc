@@ -1,5 +1,5 @@
 import { component$ } from '@qwik.dev/core';
-import type { CuratedCollectionItem } from '../lib/homepage-types';
+import type { CuratedCollectionItem } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
 import { SectionHeading } from './SectionHeading';
 

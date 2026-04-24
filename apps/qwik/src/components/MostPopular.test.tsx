@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { MostPopular } from './MostPopular';
-import type { HomepagePost } from '../lib/homepage-types';
+import type { HomepagePost } from '@aje-poc/shared-types';
 
 const items: HomepagePost[] = Array.from({ length: 10 }).map((_, i) => ({
   id: String(1000 + i),

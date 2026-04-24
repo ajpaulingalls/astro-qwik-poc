@@ -1,5 +1,5 @@
 import { component$, useSignal, useOnDocument, useTask$, $ } from '@qwik.dev/core';
-import type { Livestream } from '../lib/homepage-types';
+import type { Livestream } from '@aje-poc/shared-types';
 import { SectionHeading } from './SectionHeading';
 
 interface Props {

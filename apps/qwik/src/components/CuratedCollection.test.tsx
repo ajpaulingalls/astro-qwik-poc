@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { CuratedCollection } from './CuratedCollection';
-import type { CuratedCollectionItem, HomepagePost } from '../lib/homepage-types';
+import type { CuratedCollectionItem, HomepagePost } from '@aje-poc/shared-types';
 
 const post = (i: number): HomepagePost => ({
   id: String(2000 + i),

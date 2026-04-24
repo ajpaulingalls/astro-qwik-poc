@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { HeroCard } from './HeroCard';
-import type { HomepagePost } from '../lib/homepage-types';
+import type { HomepagePost } from '@aje-poc/shared-types';
 
 const post: HomepagePost = {
   id: '4511785',

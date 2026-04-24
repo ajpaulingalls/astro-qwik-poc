@@ -1,5 +1,5 @@
 import { component$, $ } from '@qwik.dev/core';
-import type { VerticalVideo } from '../lib/homepage-types';
+import type { VerticalVideo } from '@aje-poc/shared-types';
 import { SectionHeading } from './SectionHeading';
 
 interface Props {

@@ -1,5 +1,5 @@
 import { component$ } from '@qwik.dev/core';
-import type { HomepagePost } from '../lib/homepage-types';
+import type { HomepagePost } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
 
 interface Props {
