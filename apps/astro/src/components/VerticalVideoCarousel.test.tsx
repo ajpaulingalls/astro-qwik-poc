@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, fireEvent, cleanup } from '@testing-library/preact';
 import { VerticalVideoCarousel } from './VerticalVideoCarousel';
-import type { VerticalVideo } from '../lib/homepage-types';
+import type { VerticalVideo } from '@aje-poc/shared-types';
 
 const video = (i: number): VerticalVideo => ({
   id: String(6393598694000 + i),

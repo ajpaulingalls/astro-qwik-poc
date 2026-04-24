@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, fireEvent, cleanup, act } from '@testing-library/preact';
 import { LivestreamPlayer } from './LivestreamPlayer';
-import type { Livestream } from '../lib/homepage-types';
+import type { Livestream } from '@aje-poc/shared-types';
 
 const livestream: Livestream = {
   accountId: '665003303001',

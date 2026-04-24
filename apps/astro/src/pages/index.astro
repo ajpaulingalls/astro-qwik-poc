@@ -12,7 +12,7 @@ import type {
   CuratedCollectionItem,
   VerticalVideo,
   Livestream,
-} from '../lib/homepage-types';
+} from '@aje-poc/shared-types';
 
 interface HomePageData {
   homepage: {

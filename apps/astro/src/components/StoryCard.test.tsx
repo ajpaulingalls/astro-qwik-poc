@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/preact';
 import { StoryCard } from './StoryCard';
-import type { HomepagePost } from '../lib/homepage-types';
+import type { HomepagePost } from '@aje-poc/shared-types';
 
 const post: HomepagePost = {
   id: '4511786',

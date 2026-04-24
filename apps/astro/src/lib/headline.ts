@@ -1,4 +1,4 @@
-import type { HomepagePost } from './homepage-types';
+import type { HomepagePost } from '@aje-poc/shared-types';
 
 /**
  * Editor override: production CMS lets editors set a headline that

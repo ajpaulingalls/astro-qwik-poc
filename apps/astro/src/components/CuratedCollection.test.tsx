@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/preact';
 import { CuratedCollection } from './CuratedCollection';
-import type { CuratedCollectionItem, HomepagePost } from '../lib/homepage-types';
+import type { CuratedCollectionItem, HomepagePost } from '@aje-poc/shared-types';
 
 const post = (i: number): HomepagePost => ({
   id: String(2000 + i),
