@@ -55,4 +55,8 @@ describe('LivestreamPlayer', () => {
     await render(<LivestreamPlayer livestream={{ ...livestream, featuredImage: null }} />);
     expect(screen.querySelector('img')).toBeFalsy();
   });
+
+  // useOnDocument can't be exercised here: createDOM() doesn't bootstrap
+  // qwikLoader, so the serialized listener never wires up. Inbound
+  // `vertical-video:open` handling needs a real-browser e2e.
 });
