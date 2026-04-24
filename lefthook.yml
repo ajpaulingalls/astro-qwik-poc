@@ -36,7 +36,10 @@ pre-commit:
       exclude:
         - 'apps/qwik/docs/*'
         - 'apps/qwik/docs/**/*'
-      run: bun --filter aje-poc-qwik test
+      # Source nvm + use Node 22 (per .nvmrc) so the acceptance test's
+      # `node --experimental-strip-types server.ts` spawn works in a
+      # subshell that wouldn't otherwise pick up nvm.
+      run: bash -c 'source ~/.nvm/nvm.sh && nvm use 22 > /dev/null && bun --filter aje-poc-qwik test'
       stage_fixed: false
 
     test-mock-api:

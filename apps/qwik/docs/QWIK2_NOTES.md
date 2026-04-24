@@ -20,6 +20,8 @@ Installed pins: `@qwik.dev/core ~2.0.0-beta.32`, `@qwik.dev/router 2.0.0-beta.32
 - `component$`, `useSignal`, `useVisibleTask$`, `useTask$`, `Slot`, `useSerializer$`, `createSerializer$`, `AsyncSignal`, `isServer`, `isBrowser` (`@qwik.dev/core/public.d.ts`)
 - `routeLoader$`, `RouterOutlet`, `useQwikRouter`, `useLocation`, `DocumentHeadTags`, `createRenderer`, `Form`, `globalAction$`, `Link`, `ErrorBoundary` (`@qwik.dev/router/lib/index.d.ts`)
 - `qwikVite` (`@qwik.dev/core/optimizer`), `qwikRouter` (`@qwik.dev/router/vite`)
+- `useOnDocument` (`@qwik.dev/core/public.d.ts:72`) — canonical pattern for cross-island document-level event listeners; preferred over `useVisibleTask$` + `addEventListener` because the handler lazy-loads via `$()` instead of being part of the visible-task chunk
+- `fetchPriority` JSX prop (camelCase, typed in `core-internal.d.ts`) — Qwik 2 beta typed only the camelCase form; renders as the HTML `fetchpriority` attribute. Use `<img fetchPriority="high">` for LCP optimization, NOT lowercase `fetchpriority` (would compile as untyped attribute)
 
 ### Tooling
 
