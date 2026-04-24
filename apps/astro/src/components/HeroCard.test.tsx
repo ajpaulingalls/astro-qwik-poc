@@ -65,4 +65,12 @@ describe('HeroCard', () => {
     const { container } = render(<HeroCard post={{ ...post, featuredImage: null }} />);
     expect(container.querySelector('img')).toBeNull();
   });
+
+  it('uses replacementHeadline when present instead of title', () => {
+    const { getByRole, queryByRole } = render(
+      <HeroCard post={{ ...post, replacementHeadline: 'Editor override headline' }} />,
+    );
+    expect(getByRole('heading', { level: 2, name: /Editor override headline/i })).toBeTruthy();
+    expect(queryByRole('heading', { level: 2, name: /Iran war live/i })).toBeNull();
+  });
 });

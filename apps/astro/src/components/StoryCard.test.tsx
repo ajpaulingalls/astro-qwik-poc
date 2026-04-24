@@ -58,4 +58,12 @@ describe('StoryCard', () => {
     const { container } = render(<StoryCard post={{ ...post, featuredImage: null }} />);
     expect(container.querySelector('img')).toBeNull();
   });
+
+  it('uses replacementHeadline when present instead of title', () => {
+    const { getByRole, queryByRole } = render(
+      <StoryCard post={{ ...post, replacementHeadline: 'Editor override headline' }} />,
+    );
+    expect(getByRole('heading', { level: 3, name: /Editor override headline/i })).toBeTruthy();
+    expect(queryByRole('heading', { level: 3, name: /Lebanon raises death toll/i })).toBeNull();
+  });
 });

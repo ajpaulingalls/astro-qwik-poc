@@ -1,4 +1,5 @@
 import type { HomepagePost } from '../lib/homepage-types';
+import { getDisplayHeadline } from '../lib/headline';
 
 interface Props {
   post: HomepagePost;
@@ -26,7 +27,7 @@ export function HeroCard({ post }: Props) {
               LIVE
             </span>
           )}
-          <h2 class="text-2xl font-bold mt-1">{post.title}</h2>
+          <h2 class="text-2xl font-bold mt-1">{getDisplayHeadline(post)}</h2>
           {post.excerpt && <p class="excerpt mt-2 text-neutral-700">{post.excerpt}</p>}
         </div>
       </a>

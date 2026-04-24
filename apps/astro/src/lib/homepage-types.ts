@@ -15,4 +15,5 @@ export interface HomepagePost {
   isLive?: boolean;
   isBreaking?: boolean;
   featuredImage?: HomepageImage | null;
+  replacementHeadline?: string;
 }
