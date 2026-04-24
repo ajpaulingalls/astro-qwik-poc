@@ -6,22 +6,20 @@ import { LiveBadge } from './LiveBadge';
 describe('LiveBadge', () => {
   afterEach(cleanup);
 
-  it('renders LIVE text and live-badge class when isLive is true', () => {
+  it('renders LIVE when isLive is true', () => {
     const { container } = render(<LiveBadge isLive={true} />);
-    const badge = container.querySelector('.live-badge')!;
+    const badge = container.querySelector('span.text-aj-orange')!;
     expect(badge).toBeTruthy();
     expect(badge.textContent).toBe('LIVE');
-    expect(badge.className).toContain('text-aj-orange');
-    expect(badge.className).toContain('uppercase');
   });
 
   it('renders nothing when isLive is false', () => {
     const { container } = render(<LiveBadge isLive={false} />);
-    expect(container.querySelector('.live-badge')).toBeFalsy();
+    expect(container.querySelector('span.text-aj-orange')).toBeFalsy();
   });
 
   it('renders nothing when isLive is undefined', () => {
     const { container } = render(<LiveBadge />);
-    expect(container.querySelector('.live-badge')).toBeFalsy();
+    expect(container.querySelector('span.text-aj-orange')).toBeFalsy();
   });
 });

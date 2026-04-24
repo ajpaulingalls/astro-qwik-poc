@@ -54,13 +54,13 @@ describe('HeroCard', () => {
   it('shows a LIVE badge when isLive is true', async () => {
     const { screen, render } = await createDOM();
     await render(<HeroCard post={post} />);
-    expect(screen.querySelector('.live-badge')?.textContent).toBe('LIVE');
+    expect(screen.querySelector('span.text-aj-orange')?.textContent).toBe('LIVE');
   });
 
   it('omits LIVE badge when isLive is false', async () => {
     const { screen, render } = await createDOM();
     await render(<HeroCard post={{ ...post, isLive: false }} />);
-    expect(screen.querySelector('.live-badge')).toBeFalsy();
+    expect(screen.querySelector('span.text-aj-orange')).toBeFalsy();
   });
 
   it('renders without an image when featuredImage is null', async () => {

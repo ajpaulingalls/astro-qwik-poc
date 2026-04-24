@@ -51,7 +51,7 @@ describe('StoryCard', () => {
 
   it('shows LIVE badge when isLive is true', () => {
     const { container } = render(<StoryCard post={{ ...post, isLive: true }} />);
-    expect(container.querySelector('.live-badge')?.textContent).toBe('LIVE');
+    expect(container.querySelector('span.text-aj-orange')?.textContent).toBe('LIVE');
   });
 
   it('renders without an image when featuredImage is null', () => {

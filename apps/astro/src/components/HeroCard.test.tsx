@@ -52,13 +52,13 @@ describe('HeroCard', () => {
 
   it('shows a LIVE badge when isLive is true', () => {
     const { container } = render(<HeroCard post={post} />);
-    const badge = container.querySelector('.live-badge');
+    const badge = container.querySelector('span.text-aj-orange');
     expect(badge?.textContent).toBe('LIVE');
   });
 
   it('omits LIVE badge when isLive is false', () => {
     const { container } = render(<HeroCard post={{ ...post, isLive: false }} />);
-    expect(container.querySelector('.live-badge')).toBeNull();
+    expect(container.querySelector('span.text-aj-orange')).toBeNull();
   });
 
   it('renders without an image when featuredImage is null', () => {
