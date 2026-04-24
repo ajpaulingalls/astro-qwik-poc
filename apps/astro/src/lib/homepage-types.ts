@@ -32,3 +32,13 @@ export interface VerticalVideo {
   duration?: string;
   accountId: string;
 }
+
+export interface Livestream {
+  accountId: string;
+  playerID: string;
+  videoID: string;
+  title: string;
+  source?: string;
+  bcPlaybackUrl?: string;
+  featuredImage?: HomepageImage | null;
+}
