@@ -23,6 +23,10 @@ Installed pins: `@qwik.dev/core ~2.0.0-beta.32`, `@qwik.dev/router 2.0.0-beta.32
 - `useOnDocument` (`@qwik.dev/core/public.d.ts:72`) — canonical pattern for cross-island document-level event listeners; preferred over `useVisibleTask$` + `addEventListener` because the handler lazy-loads via `$()` instead of being part of the visible-task chunk. **Testing limitation:** `createDOM()` does not bootstrap qwikLoader, so the serialized listener never wires up to the global `document`. Inbound contracts that depend on `useOnDocument` firing need a real-browser e2e — they cannot be unit-tested via `@qwik.dev/core/testing`. Empirically confirmed in `LivestreamPlayer.test.tsx` cross-island attempt (sprint-006).
 - `fetchPriority` JSX prop (camelCase, typed in `core-internal.d.ts`) — Qwik 2 beta typed only the camelCase form; renders as the HTML `fetchpriority` attribute. Use `<img fetchPriority="high">` for LCP optimization, NOT lowercase `fetchpriority` (would compile as untyped attribute)
 
+### Leaf component convention
+
+Stateless leaf components (no signals, no `$()`-wrapped handlers, no `Slot`) should be plain functions, **not** `component$`. The `component$` wrapper introduces a Qrl serialization boundary and a separate chunk per call site — pure overhead against the 150 KB framework-graph budget (story-009). `LiveBadge` (`apps/qwik/src/components/LiveBadge.tsx`) is the canonical example. Use `component$` only when you genuinely need a lazy boundary, signals, `useTask$`, or `Slot` (e.g. `SectionHeading` needs `Slot` so it must be `component$`).
+
 ### Tooling
 
 - **Tailwind 4** has no `tailwind.config.ts`. Configured via `@tailwindcss/vite` plugin + `src/styles/global.css` containing `@import "tailwindcss";`. Future tokens live in `@theme` blocks in CSS, not a TS config.

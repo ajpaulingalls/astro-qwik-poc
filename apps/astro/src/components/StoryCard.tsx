@@ -1,5 +1,6 @@
 import type { HomepagePost } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
+import { LiveBadge } from './LiveBadge';
 
 interface Props {
   post: HomepagePost;
@@ -21,11 +22,7 @@ export function StoryCard({ post }: Props) {
           />
         )}
         <div class="px-3 py-2">
-          {post.isLive && (
-            <span class="live-badge text-aj-orange text-xs font-bold tracking-wider uppercase">
-              LIVE
-            </span>
-          )}
+          <LiveBadge isLive={post.isLive} />
           <h3 class="text-base font-bold mt-1">{getDisplayHeadline(post)}</h3>
           {post.excerpt && <p class="excerpt mt-1 text-sm text-neutral-700">{post.excerpt}</p>}
         </div>
