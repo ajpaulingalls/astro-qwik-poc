@@ -1,5 +1,6 @@
 import type { HomepagePost } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
+import { resolveImageUrl } from '../lib/image-url';
 import { LiveBadge } from './LiveBadge';
 
 interface Props {
@@ -13,7 +14,7 @@ export function StoryCard({ post }: Props) {
       <a href={post.link} class="block">
         {img && (
           <img
-            src={img.sourceUrl}
+            src={resolveImageUrl(img.sourceUrl)}
             alt={img.alt ?? ''}
             width={img.width}
             height={img.height}

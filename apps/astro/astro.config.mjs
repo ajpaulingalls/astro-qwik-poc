@@ -31,7 +31,7 @@ export default defineConfig({
     csp: {
       directives: [
         "default-src 'self'",
-        "img-src 'self' https: data:",
+        "img-src 'self' https: data: http://localhost:4455",
         "font-src 'self' data:",
         "connect-src 'self' http://localhost:4455",
       ],

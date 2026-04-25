@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { Livestream } from '@aje-poc/shared-types';
+import { resolveImageUrl } from '../lib/image-url';
 import { SectionHeading } from './SectionHeading';
 
 interface Props {
@@ -52,7 +53,7 @@ export function LivestreamPlayer({ livestream }: Props) {
           <>
             {livestream.featuredImage && (
               <img
-                src={livestream.featuredImage.sourceUrl}
+                src={resolveImageUrl(livestream.featuredImage.sourceUrl)}
                 alt={livestream.featuredImage.alt ?? livestream.title}
                 width={livestream.featuredImage.width}
                 height={livestream.featuredImage.height}
