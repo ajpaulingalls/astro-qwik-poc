@@ -8,7 +8,7 @@ export interface GraphqlFetchOptions {
 
 const DEFAULT_API_BASE = 'http://localhost:4455';
 
-function resolveApiBase(): string {
+export function resolveApiBase(): string {
   // Build-time replacement first (Vite injects PUBLIC_API_BASE at build).
   const fromBuildEnv = import.meta.env?.PUBLIC_API_BASE;
   if (fromBuildEnv && fromBuildEnv.length > 0) return fromBuildEnv;
