@@ -1,5 +1,6 @@
 import { component$, useSignal, useOnDocument, useTask$, $ } from '@qwik.dev/core';
 import type { Livestream } from '@aje-poc/shared-types';
+import { resolveImageUrl } from '../lib/image-url';
 import { SectionHeading } from './SectionHeading';
 
 interface Props {
@@ -56,7 +57,7 @@ export const LivestreamPlayer = component$<Props>(({ livestream }) => {
           <>
             {livestream.featuredImage && (
               <img
-                src={livestream.featuredImage.sourceUrl}
+                src={resolveImageUrl(livestream.featuredImage.sourceUrl)}
                 alt={livestream.featuredImage.alt ?? livestream.title}
                 width={livestream.featuredImage.width}
                 height={livestream.featuredImage.height}
