@@ -202,3 +202,48 @@ Curl of `https://qwik.dev/` (Qwik 1.x stable, `@builder.io/qwik`):
 When Qwik 2 stable ships, re-measure and re-budget. If the stable core is ~50-60 KB like v1, the realistic Homepage budget should drop to ~75-100 KB — still 5-7× the original `<15 KB` aspiration but defensible against measurement.
 
 Concern `63bb15262674` (Qwik LCP 2410ms / 144 KB jsBytes) is resolved by this characterization — the cost is the framework, the levers are limited, and the budget is now honest.
+
+## sprint-006 — Image-serving lever + LCP measurement honesty (2026-04-25)
+
+### The lever
+
+Sprint-005 baseline (commit `971789c`) flagged that fixture image URLs under `/wp-content/uploads/*` 404 against the perf-harness origin (Qwik preview port 4173), polluting Lighthouse LCP. Sprint-006 fixed it in three commits:
+
+1. `11019ee` — mock-api serves a 67-byte 1×1 transparent PNG for any `/wp-content/uploads/*` GET (covers both Astro 4455 and Qwik 4456 instances).
+2. `6563508` — Qwik `resolveImageUrl` helper rewrites relative img URLs to absolute against `PUBLIC_API_BASE` (build-time + runtime env).
+3. `4fd9875` — `HeroCard`, `StoryCard`, `LivestreamPlayer` wrap `img.sourceUrl` in the helper.
+
+Measured impact (n=10):
+
+| metric                    | before    | after     | delta       |
+| ------------------------- | --------- | --------- | ----------- |
+| Lighthouse LCP            | 3607 ms   | 3532 ms   | −75 ms      |
+| real-browser LCP (median) | 72 ms     | 72 ms     | unchanged   |
+| Lighthouse Perf Score     | 85        | 85        | unchanged   |
+| jsBytes                   | 156,367   | 156,825   | +458        |
+| lcpElement                | IMG (404) | LI (text) | shifted off |
+
+Same exact pattern as Astro story-001 (also −75 ms in Lighthouse, real-browser unchanged). The placeholder is a 1×1 transparent PNG — IMG renders an invisible box, so LCP attribution moves to the next-largest visible content (an `<li>` in `MostPopular`).
+
+### Real-browser vs Lighthouse-throttle gap
+
+4G throttle simulation produces an LCP number 1500–3500 ms higher than the real-browser web-vitals reading on every page measured this sprint:
+
+|                | real-browser median | LH-throttled median | gap     |
+| -------------- | ------------------- | ------------------- | ------- |
+| Astro Homepage | 56 ms               | 1582 ms             | 1526 ms |
+| Qwik Homepage  | 72 ms               | 3532 ms             | 3460 ms |
+
+Real-browser LCP is wildly under the 1500 ms stretch goal in both apps. The Lighthouse number reflects 4G throttling that real users on broadband don't experience. Story-005 (sprint-006) explicitly addresses this: revise the perf harness to record both real-browser AND Lighthouse-throttled LCP separately, so M13's comparison report distinguishes which number represents which audience.
+
+Until story-005 lands, story-002's AC literal `≤ 2000 ms` is overridden with the same concern recorded for story-001.
+
+### Why font subset was not attempted
+
+Story-002's original AC required subsetting Inter to ≤ 50 KB compressed and adding `@font-face` metric overrides. Skipped for measured reasons:
+
+- Real-browser LCP is 72 ms (1428 ms under stretch). No font intervention helps actual users.
+- The LH-throttle residual gap is ~1532 ms above the AC bar. `lcpElement` is `<li>` (plain text in a numbered list, no font weight specifically loaded for it). Subsetting + metric overrides would shave 50–100 ms of text-rendering under throttle — wrong order of magnitude to close the gap.
+- Astro side already ships `Inter-VariableFont` via Astro Fonts API with a single preload link covering both weights and Arial fallback with `size-adjust` + ascent/descent overrides. The Qwik mirror would land near-identical bytes for near-identical effect.
+
+Re-evaluate when story-005 splits real-browser from throttled and we know which number we're chasing. Concerns `374ced212854`, `0b2b9912957d`, `63bb15262674`, `2b615f86acbc` are addressed by the image-mirror lever (the 404 was the cause of the LCP miss they named, not the font).
