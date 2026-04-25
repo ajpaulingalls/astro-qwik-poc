@@ -184,3 +184,32 @@ Deno.test("handler: variants param is optional (defaults to {})", () => {
   });
   assertEquals(res.status, 200);
 });
+
+Deno.test("handler: GET /wp-content/uploads/<any path> returns 200 image/png placeholder", async () => {
+  // Fixture image URLs in HomePageQuery point at /wp-content/uploads/<year>/<month>/<filename>.
+  // The path is served by the same origin as the page, so it lands here. Returning a
+  // valid placeholder lets perf-harness measure honest LCP instead of a 404 artifact.
+  const req = new Request(
+    "http://localhost:4455/wp-content/uploads/2026/04/anything-goes.jpg",
+    { method: "GET" },
+  );
+  const res = handle(req, { fixtures });
+  assertEquals(res.status, 200);
+  assertEquals(res.headers.get("content-type"), "image/png");
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  // PNG magic: 89 50 4E 47 0D 0A 1A 0A
+  assertEquals(bytes[0], 0x89);
+  assertEquals(bytes[1], 0x50);
+  assertEquals(bytes[2], 0x4e);
+  assertEquals(bytes[3], 0x47);
+});
+
+Deno.test("handler: /wp-content/uploads/* placeholder does NOT require wp-site header", () => {
+  // Image fetches from the browser don't carry the wp-site header.
+  const req = new Request(
+    "http://localhost:4455/wp-content/uploads/whatever.jpg",
+    { method: "GET" },
+  );
+  const res = handle(req, { fixtures });
+  assertEquals(res.status, 200);
+});

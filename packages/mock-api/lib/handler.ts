@@ -14,6 +14,79 @@ const CORS_HEADERS: HeadersInit = {
   "access-control-allow-headers": "wp-site, content-type",
 };
 
+// 1x1 transparent PNG (67 bytes). Served for any /wp-content/uploads/* request so
+// perf-harness LCP measurements don't time out on a 404. We don't ship realistic
+// fixture images yet — production media live on a CDN; this lets Lighthouse complete
+// honestly without fabricating image-decode data.
+const PLACEHOLDER_PNG = Uint8Array.from([
+  0x89,
+  0x50,
+  0x4e,
+  0x47,
+  0x0d,
+  0x0a,
+  0x1a,
+  0x0a,
+  0x00,
+  0x00,
+  0x00,
+  0x0d,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x3a,
+  0x7e,
+  0x9b,
+  0x55,
+  0x00,
+  0x00,
+  0x00,
+  0x0a,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x78,
+  0x9c,
+  0x63,
+  0x00,
+  0x00,
+  0x00,
+  0x02,
+  0x00,
+  0x01,
+  0xe2,
+  0x21,
+  0xbc,
+  0x33,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4e,
+  0x44,
+  0xae,
+  0x42,
+  0x60,
+  0x82,
+]);
+
 export function handle(req: Request, deps: HandlerDeps): Response {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -24,6 +97,13 @@ export function handle(req: Request, deps: HandlerDeps): Response {
   }
 
   const url = new URL(req.url);
+
+  if (url.pathname.startsWith("/wp-content/uploads/")) {
+    return new Response(PLACEHOLDER_PNG, {
+      status: 200,
+      headers: { ...CORS_HEADERS, "content-type": "image/png" },
+    });
+  }
 
   if (url.pathname !== "/graphql") {
     return text(404, `Not found: ${url.pathname}`);
