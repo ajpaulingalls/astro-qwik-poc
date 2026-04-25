@@ -8,7 +8,7 @@ export interface GraphqlFetchOptions {
 
 const DEFAULT_API_BASE = 'http://localhost:4455';
 
-function resolveApiBase(): string {
+export function resolveApiBase(): string {
   const fromEnv = import.meta.env?.PUBLIC_API_BASE;
   return fromEnv && fromEnv.length > 0 ? fromEnv : DEFAULT_API_BASE;
 }
