@@ -8,11 +8,17 @@ export interface AggregatedMetric {
 
 export type MetricKey = keyof RawMetrics;
 
+// `metrics.lcp` is Lighthouse-throttled (4G simulation) — what the lab reports.
+// `webVitals.aggregated.lcp` is real-browser median — what real users experience.
+// Both shipped together so M13 comparison is honest about which audience each number serves.
 export interface AggregatedReport {
   page: string;
   target: string;
   metrics: Record<MetricKey, AggregatedMetric>;
-  webVitals: { samples: EnrichedMetric[] };
+  webVitals: {
+    samples: EnrichedMetric[];
+    aggregated?: { lcp: AggregatedMetric };
+  };
 }
 
 function sortKeys<T>(value: T): T {
@@ -50,6 +56,10 @@ function formatMarkdown(report: AggregatedReport): string {
   }
   lines.push('');
   lines.push(`web-vitals samples: ${report.webVitals.samples.length}`);
+  const aggLcp = report.webVitals.aggregated?.lcp;
+  if (aggLcp) {
+    lines.push(`real-browser lcp median: ${aggLcp.median}ms (n=${aggLcp.n})`);
+  }
   // className intentionally omitted — Tailwind class soup would bloat the line.
   const lcpElement = report.webVitals.samples.find((s) => s.lcpElement)?.lcpElement;
   if (lcpElement) {

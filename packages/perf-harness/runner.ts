@@ -72,11 +72,20 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
         samples.push(await runLighthouseAudit(url));
         wvSamples.push(...(await withChrome((port) => collectWebVitals(url, port))));
       }
+      // n = LCP sample count, not run count. They match in practice (collectWebVitals
+      // resolves once per nav with 1 LCP entry), but if web-vitals ever reports multiple
+      // LCP candidates per page the sample count diverges from args.runs.
+      const lcpValues = wvSamples.filter((s) => s.name === 'LCP').map((s) => s.value);
       const report: AggregatedReport = {
         page: page.name,
         target: args.target,
         metrics: aggregateRuns(samples, args.runs),
-        webVitals: { samples: wvSamples },
+        webVitals: {
+          samples: wvSamples,
+          ...(lcpValues.length > 0
+            ? { aggregated: { lcp: aggMetric(lcpValues, lcpValues.length) } }
+            : {}),
+        },
       };
       const formatted = formatReport(report);
       writeReports(args.target, page.name, formatted);

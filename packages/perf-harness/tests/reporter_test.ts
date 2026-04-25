@@ -107,4 +107,34 @@ describe('formatReport', () => {
     const { markdown } = formatReport(fixture);
     expect(markdown).not.toContain('lcp element:');
   });
+
+  it('emits real-browser lcp median line in markdown when webVitals.aggregated.lcp present', () => {
+    const withAgg: AggregatedReport = {
+      ...fixture,
+      webVitals: {
+        samples: [],
+        aggregated: { lcp: { median: 72, n: 10 } },
+      },
+    };
+    const { markdown } = formatReport(withAgg);
+    expect(markdown).toContain('real-browser lcp median: 72ms (n=10)');
+  });
+
+  it('omits real-browser lcp median line when webVitals.aggregated absent', () => {
+    const { markdown } = formatReport(fixture);
+    expect(markdown).not.toContain('real-browser lcp median');
+  });
+
+  it('includes webVitals.aggregated.lcp in JSON when present', () => {
+    const withAgg: AggregatedReport = {
+      ...fixture,
+      webVitals: {
+        samples: [],
+        aggregated: { lcp: { median: 56.5, n: 10 } },
+      },
+    };
+    const { json } = formatReport(withAgg);
+    const parsed = JSON.parse(json);
+    expect(parsed.webVitals.aggregated.lcp).toEqual({ median: 56.5, n: 10 });
+  });
 });
