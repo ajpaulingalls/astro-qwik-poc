@@ -408,14 +408,14 @@ The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page 
 
 Qwik 2 beta.32 ships a ~102 KB core runtime + ~5 KB qwikLoader + ~5 KB preloader on first hit, irrespective of page complexity. Handlers and route-specific code lazy-load on interaction. The original `< 15 KB` aspirational targets assumed a mature, hand-tuned production build with a much smaller framework runtime — Qwik 2 beta is ~86% larger than Qwik 1 stable, and the size-optimization pass hasn't landed yet. See [`QWIK2_NOTES.md` § Story-009 framework cost characterization](QWIK2_NOTES.md#story-009-framework-cost-characterization-sprint-005) for the full chunk-by-chunk breakdown.
 
-| Page              | JS Target   | Aspirational (Qwik 2 stable) | Notes                                                                  |
-| ----------------- | ----------- | ---------------------------- | ---------------------------------------------------------------------- |
-| **Homepage**      | **<150 KB** | <15 KB                       | Measured 144 KB on layout-only baseline; ~5 KB headroom for components |
-| **Article**       | <140 KB     | <10 KB                       | Slightly less interactivity than Homepage                              |
-| **Live Blog**     | <160 KB     | <20 KB                       | Polling handler adds ~5–10 KB lazy-loaded                              |
-| **Section Front** | <150 KB     | <15 KB                       | Load More handler + ticker; comparable to Homepage                     |
+| Page              | JS Target   | Aspirational (Qwik 2 stable) | Notes                                                                           |
+| ----------------- | ----------- | ---------------------------- | ------------------------------------------------------------------------------- |
+| **Homepage**      | **<165 KB** | <15 KB                       | Measured 156–157 KB post-Homepage components; sprint-006 revision (was <150 KB) |
+| **Article**       | <155 KB     | <10 KB                       | Slightly less interactivity than Homepage                                       |
+| **Live Blog**     | <175 KB     | <20 KB                       | Polling handler adds ~5–10 KB lazy-loaded                                       |
+| **Section Front** | <165 KB     | <15 KB                       | Load More handler + ticker; comparable to Homepage                              |
 
-Re-budget when Qwik 2 stable ships — likely ~75–100 KB for Homepage if the v2 stable core matches v1's 54 KB.
+Re-budget when Qwik 2 stable ships — likely ~75–100 KB for Homepage if the v2 stable core matches v1's 54 KB. See [`QWIK2_NOTES.md` § sprint-006 — JS budget revision](QWIK2_NOTES.md#sprint-006--js-budget-revision-150kb--165kb) for the second revision rationale.
 
 ### SSR Performance
 
