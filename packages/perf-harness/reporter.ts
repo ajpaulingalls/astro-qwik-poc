@@ -7,6 +7,8 @@ export interface AggregatedMetric {
   n: number;
 }
 
+export const MISSING_METRIC: AggregatedMetric = { median: null, n: 0 };
+
 export type MetricKey = keyof RawMetrics;
 
 // `metrics.lcp` is Lighthouse-throttled (4G simulation) — what the lab reports.
@@ -18,7 +20,7 @@ export interface AggregatedReport {
   metrics: Record<MetricKey, AggregatedMetric>;
   webVitals: {
     samples: EnrichedMetric[];
-    aggregated?: { lcp: AggregatedMetric };
+    aggregated: { lcp: AggregatedMetric };
   };
 }
 
@@ -60,10 +62,10 @@ function formatMarkdown(report: AggregatedReport): string {
   }
   lines.push('');
   lines.push(`web-vitals samples: ${report.webVitals.samples.length}`);
-  const aggLcp = report.webVitals.aggregated?.lcp;
-  if (aggLcp && aggLcp.n === 0) {
+  const aggLcp = report.webVitals.aggregated.lcp;
+  if (aggLcp.n === 0) {
     lines.push(`real-browser lcp median: MISSING (0/${report.metrics.lcp.n} runs)`);
-  } else if (aggLcp) {
+  } else {
     lines.push(`real-browser lcp median: ${aggLcp.median}ms (n=${aggLcp.n})`);
   }
   // className intentionally omitted — Tailwind class soup would bloat the line.

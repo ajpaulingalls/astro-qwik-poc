@@ -4,7 +4,12 @@ import { fileURLToPath } from 'node:url';
 import { median } from './aggregator.ts';
 import { withChrome } from './chrome.ts';
 import { runLighthouseAudit, type RawMetrics } from './lighthouse.ts';
-import { formatReport, type AggregatedMetric, type AggregatedReport } from './reporter.ts';
+import {
+  formatReport,
+  MISSING_METRIC,
+  type AggregatedMetric,
+  type AggregatedReport,
+} from './reporter.ts';
 import { buildPageList, parseArgs, waitForPort, type Target } from './cli_helpers.ts';
 import { collectWebVitals, type EnrichedMetric } from './web_vitals_collector.ts';
 import { APP_PORT, MOCK_API_PORT, killService, spawnApp, spawnMockApi } from './spawn.ts';
@@ -76,15 +81,16 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
       // resolves once per nav with 1 LCP entry), but if web-vitals ever reports multiple
       // LCP candidates per page the sample count diverges from args.runs.
       const lcpValues = wvSamples.filter((s) => s.name === 'LCP').map((s) => s.value);
+      // MISSING_METRIC keeps real-browser LCP gaps visible — see AggregatedMetric (SMM be23cb2d0a70).
+      const aggregatedLcp =
+        lcpValues.length > 0 ? aggMetric(lcpValues, lcpValues.length) : MISSING_METRIC;
       const report: AggregatedReport = {
         page: page.name,
         target: args.target,
         metrics: aggregateRuns(samples, args.runs),
         webVitals: {
           samples: wvSamples,
-          ...(lcpValues.length > 0
-            ? { aggregated: { lcp: aggMetric(lcpValues, lcpValues.length) } }
-            : {}),
+          aggregated: { lcp: aggregatedLcp },
         },
       };
       const formatted = formatReport(report);
