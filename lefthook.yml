@@ -17,6 +17,12 @@ pre-commit:
       glob: 'packages/mock-api/**/*.ts'
       run: deno lint {staged_files}
 
+# pre-push runs the slow build+test commands. pre-commit must stay <5s on
+# staged-file workspace; tests moved here to unblock the tripwire.
+# test-mock-api joins so all test commands run at the same gate.
+pre-push:
+  parallel: true
+  commands:
     test-astro:
       # Match nested files AND top-level files (apps/astro/server.ts,
       # astro.config.mjs, package.json, etc.) — '**/*' alone misses the latter.
@@ -46,6 +52,8 @@ pre-commit:
 
     test-mock-api:
       glob: 'packages/mock-api/**/*.ts'
+      # root: scopes lefthook to the Deno workspace so `deno task test` runs
+      # from the package root (where deno.json lives, not the repo root).
       root: 'packages/mock-api/'
       run: deno task test
       stage_fixed: false
