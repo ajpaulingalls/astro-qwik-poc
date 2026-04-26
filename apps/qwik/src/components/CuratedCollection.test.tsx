@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { CuratedCollection } from './CuratedCollection';
+import { getByHeading } from '../test-utils/dom';
 import type { CuratedCollectionItem, HomepagePost } from '@aje-poc/shared-types';
 
 const post = (i: number): HomepagePost => ({
@@ -19,8 +20,7 @@ describe('CuratedCollection', () => {
   it('renders the collection title as a section heading linked to overrideLink', async () => {
     const { screen, render } = await createDOM();
     await render(<CuratedCollection collection={collection} />);
-    const h3 = screen.querySelector('h3')!;
-    expect(h3.textContent).toContain('Featured');
+    const h3 = getByHeading(screen, 3, /Featured/i);
     const titleLink = h3.querySelector('a')!;
     expect(titleLink.getAttribute('href')).toBe('https://www.aljazeera.com/features/');
   });
@@ -28,8 +28,7 @@ describe('CuratedCollection', () => {
   it('renders the heading without a link when overrideLink is missing', async () => {
     const { screen, render } = await createDOM();
     await render(<CuratedCollection collection={{ ...collection, overrideLink: undefined }} />);
-    const h3 = screen.querySelector('h3')!;
-    expect(h3.textContent).toContain('Featured');
+    const h3 = getByHeading(screen, 3, /Featured/i);
     expect(h3.querySelector('a')).toBeFalsy();
   });
 
