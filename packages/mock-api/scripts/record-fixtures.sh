@@ -53,13 +53,17 @@ record() {
 
 # --- Main: operator-supplied slugs and 13-fixture recording ---
 
-ARTICLE_SLUG="${ARTICLE_SLUG:-}"
+ARTICLE_SLUGS="${ARTICLE_SLUGS:-${ARTICLE_SLUG:-}}"
 LIVEBLOG_SLUG="${LIVEBLOG_SLUG:-}"
 LIVEBLOG_UPDATE_POST_ID="${LIVEBLOG_UPDATE_POST_ID:-}"
 
-require ARTICLE_SLUG "$ARTICLE_SLUG"
+require ARTICLE_SLUGS "$ARTICLE_SLUGS"
 require LIVEBLOG_SLUG "$LIVEBLOG_SLUG"
 require LIVEBLOG_UPDATE_POST_ID "$LIVEBLOG_UPDATE_POST_ID"
+
+# Split ARTICLE_SLUGS on whitespace into a bash array. Single ARTICLE_SLUG
+# remains supported via the default-value fallback above (one-element array).
+read -ra _article_slugs <<<"$ARTICLE_SLUGS"
 
 mkdir -p "$OUT_DIR"
 
@@ -74,10 +78,12 @@ record HomePageCuratedFeedQuery HomePageCuratedFeedQuery \
 
 record ArchipelagoBreakingTickerQuery ArchipelagoBreakingTickerQuery '{}'
 
-# --- Article ---
-record "ArchipelagoSingleArticleQuery--$(slugify "$ARTICLE_SLUG")" \
-  ArchipelagoSingleArticleQuery \
-  "$(jq -nc --arg name "$ARTICLE_SLUG" '{name:$name,postType:"post",preview:""}')"
+# --- Article (one fixture per slug in ARTICLE_SLUGS) ---
+for _slug in "${_article_slugs[@]}"; do
+  record "ArchipelagoSingleArticleQuery--$(slugify "$_slug")" \
+    ArchipelagoSingleArticleQuery \
+    "$(jq -nc --arg name "$_slug" '{name:$name,postType:"post",preview:""}')"
+done
 
 # --- Live blog (shell + children + one update) ---
 record "ArchipelagoSingleLiveBlogQuery--$(slugify "$LIVEBLOG_SLUG")" \

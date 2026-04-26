@@ -1,5 +1,6 @@
-import { assertEquals, assertStringIncludes } from "@std/assert";
+import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { handle } from "../lib/handler.ts";
+import { loadFixtures } from "../lib/fixtures.ts";
 
 const fixtures = new Map<string, string>([
   [
@@ -212,4 +213,50 @@ Deno.test("handler: /wp-content/uploads/* placeholder does NOT require wp-site h
   );
   const res = handle(req, { fixtures });
   assertEquals(res.status, 200);
+});
+
+Deno.test("handler: ArchipelagoSingleArticleQuery resolves all on-disk slug variants (M7 embed coverage)", async () => {
+  // M7 acceptance: "all embed types display" requires 4 distinct article fixtures
+  // (existing Brightcove + Tweet + Instagram + Gallery). Asserts both that the
+  // 4 fixture files exist on disk AND that the handler routes each slug to its
+  // matching variant body. RED until story-001 step 3 records the new fixtures.
+  //
+  // The exact-count assertion is intentional, not lazy: this is an acceptance
+  // trace for M7, so adding a 5th article fixture should be a deliberate act
+  // that updates this test (and ideally adds a per-embed-type render assertion
+  // elsewhere). If that pressure feels wrong, fix M7 acceptance first, not this
+  // test.
+  const realFixtures = await loadFixtures("./fixtures");
+  const articleKeys = [...realFixtures.keys()].filter((k) =>
+    k.startsWith("ArchipelagoSingleArticleQuery--")
+  );
+  assertEquals(
+    articleKeys.length,
+    4,
+    `expected 4 ArchipelagoSingleArticleQuery--*.json fixtures, found ${articleKeys.length}: ${
+      articleKeys.join(", ")
+    }`,
+  );
+
+  // Each fixture key has the form ArchipelagoSingleArticleQuery--<slug>;
+  // the handler resolves by looking up the same key from variables.name → slugify().
+  // Asserting handle() returns 200 + article body for each key proves the round-trip.
+  const seenBodies = new Set<string>();
+  for (const key of articleKeys) {
+    const slug = key.slice("ArchipelagoSingleArticleQuery--".length);
+    const res = handle(
+      buildRequest({
+        operationName: "ArchipelagoSingleArticleQuery",
+        variables: { name: slug, postType: "post", preview: "" },
+      }),
+      { fixtures: realFixtures },
+    );
+    assertEquals(res.status, 200, `slug ${slug} did not resolve`);
+    const body = await res.text();
+    assert(
+      !seenBodies.has(body),
+      `slug ${slug} returned a duplicate body — variants must be distinct`,
+    );
+    seenBodies.add(body);
+  }
 });
