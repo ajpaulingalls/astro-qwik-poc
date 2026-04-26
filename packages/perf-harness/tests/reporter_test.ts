@@ -137,4 +137,19 @@ describe('formatReport', () => {
     const parsed = JSON.parse(json);
     expect(parsed.webVitals.aggregated.lcp).toEqual({ median: 56.5, n: 10 });
   });
+
+  it('emits MISSING markdown line and preserves median:null in JSON when aggregated.lcp.n === 0', () => {
+    const withMissing: AggregatedReport = {
+      ...fixture, // metrics.lcp.n === 5 → denominator for "0/5 runs"
+      webVitals: {
+        samples: [],
+        aggregated: { lcp: { median: null, n: 0 } },
+      },
+    };
+    const { markdown, json } = formatReport(withMissing);
+    expect(markdown).toContain('real-browser lcp median: MISSING (0/5 runs)');
+    expect(markdown).not.toContain('real-browser lcp median: null');
+    const parsed = JSON.parse(json);
+    expect(parsed.webVitals.aggregated.lcp).toEqual({ median: null, n: 0 });
+  });
 });
