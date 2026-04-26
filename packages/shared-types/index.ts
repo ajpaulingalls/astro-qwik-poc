@@ -61,6 +61,7 @@ export interface Article {
   title: string;
   subheading?: string;
   date: string;
+  content: string;
   author: ArticleAuthor[];
   categories: ArticleCategory[];
 }
