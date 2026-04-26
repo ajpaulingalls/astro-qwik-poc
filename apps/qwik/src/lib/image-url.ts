@@ -1,9 +1,8 @@
 import { resolveApiBase } from './graphql';
 
-// Fixture image URLs are relative (/wp-content/uploads/<year>/<month>/...) — they
-// resolve against the page origin (4173) and 404, breaking Lighthouse LCP.
-// This helper rewrites them to absolute URLs against PUBLIC_API_BASE so the
-// browser fetches from mock-api in dev/perf and from aljazeera.com in M11 demo.
+// Coexists with the same-origin proxy in vite.config.ts (dev/preview) and
+// server.ts (perf-harness production); removing it requires per-component audits.
+// See apps/qwik/docs/QWIK2_NOTES.md § sprint-007.
 export function resolveImageUrl(sourceUrl: string | null | undefined): string {
   if (!sourceUrl) return '';
   if (/^https?:\/\//i.test(sourceUrl)) return sourceUrl;
