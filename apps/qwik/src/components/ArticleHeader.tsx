@@ -1,0 +1,65 @@
+export interface ArticleAuthor {
+  name: string;
+  link?: string;
+}
+
+export interface ArticleCategory {
+  name: string;
+  link: string;
+}
+
+interface Props {
+  title: string;
+  subheading?: string;
+  authors: ArticleAuthor[];
+  date: string;
+  categories: ArticleCategory[];
+}
+
+const DATE_FORMAT: Intl.DateTimeFormatOptions = {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+};
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', DATE_FORMAT);
+}
+
+export function ArticleHeader({ title, subheading, authors, date, categories }: Props) {
+  return (
+    <header class="article-header mb-6">
+      {categories.length > 0 && (
+        <nav class="categories text-aj-orange text-sm font-bold tracking-wider uppercase mb-2">
+          {categories.map((cat, i) => (
+            <span key={cat.link}>
+              {i > 0 && <span class="mx-1">·</span>}
+              <a href={cat.link} class="hover:underline">
+                {cat.name}
+              </a>
+            </span>
+          ))}
+        </nav>
+      )}
+      <h1 class="text-3xl md:text-4xl font-bold leading-tight">{title}</h1>
+      {subheading && <p class="subheading mt-3 text-lg text-neutral-700">{subheading}</p>}
+      <div class="byline mt-4 text-sm text-neutral-600 flex flex-wrap gap-x-2">
+        <span>By </span>
+        {authors.map((a, i) => (
+          <span key={a.link ?? a.name}>
+            {i > 0 && <span class="mr-1">,</span>}
+            {a.link ? (
+              <a href={a.link} class="hover:text-aj-orange font-medium">
+                {a.name}
+              </a>
+            ) : (
+              <span class="font-medium">{a.name}</span>
+            )}
+          </span>
+        ))}
+        <span class="mx-1">·</span>
+        <time datetime={date}>{formatDate(date)}</time>
+      </div>
+    </header>
+  );
+}
