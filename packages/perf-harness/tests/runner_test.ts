@@ -91,7 +91,7 @@ describe('runner main()', () => {
     expect(md).toContain('real-browser lcp median: 60ms (n=2)');
   });
 
-  it('omits webVitals.aggregated when web-vitals collected zero LCP samples', async () => {
+  it('emits MISSING aggregated (median=null, n=0) when web-vitals collected zero LCP samples', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 100, jsBytes: 0 });
     // Non-LCP samples only (e.g. only CLS/FCP arrived).
     collectWebVitalsMock.mockResolvedValue([{ name: 'CLS', value: 0.01, id: 'x' }]);
@@ -99,9 +99,9 @@ describe('runner main()', () => {
     await main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`]);
 
     const json = JSON.parse(readFileSync(ASTRO_REPORT_JSON, 'utf8'));
-    expect(json.webVitals.aggregated).toBeUndefined();
+    expect(json.webVitals.aggregated.lcp).toEqual({ median: null, n: 0 });
     const md = readFileSync(ASTRO_REPORT_MD, 'utf8');
-    expect(md).not.toContain('real-browser lcp median');
+    expect(md).toContain('real-browser lcp median: MISSING (0/2 runs)');
   });
 
   it('runs Lighthouse + collectWebVitals exactly --runs times', async () => {

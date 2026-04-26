@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { median } from '../aggregator.ts';
 
 describe('median', () => {
-  it('throws on empty input (fail-loud)', () => {
+  it('throws on empty input', () => {
     expect(() => median([])).toThrow(/empty/i);
   });
 
