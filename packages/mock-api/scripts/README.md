@@ -17,14 +17,17 @@ the recording script names files accordingly.
 
 ## Running
 
-The script needs three operator-supplied slugs (production content rotates; pick
+The script needs operator-supplied slugs (production content rotates; pick
 whatever's current):
 
 ```bash
-# Pick a current article slug from the homepage's featuredPosts, e.g.:
+# Pick one or more article slugs from the homepage's featuredPosts, e.g.:
 #   curl -sH 'wp-site: aje' 'https://www.aljazeera.com/graphql?operationName=HomePageQuery&variables=%7B%7D' \
-#     | jq -r '.data.homepage.featuredPosts[0].slug'
-ARTICLE_SLUG="some-current-article-slug"
+#     | jq -r '.data.homepage.featuredPosts[].slug'
+# Multiple slugs (space-separated) record one fixture per slug — useful when
+# you need variants exercising different embed types (Tweet, Brightcove video,
+# image figure). Single-slug callers can keep using ARTICLE_SLUG.
+ARTICLE_SLUGS="article-slug-with-tweet other-slug-with-brightcove"
 
 # Pick a current live blog from a section page or the homepage. Live blog
 # slugs are the WP post name (typically the URL's last segment).
@@ -36,27 +39,50 @@ LIVEBLOG_SLUG="some-current-liveblog-slug"
 #     | jq '.data.article.children[0]'
 LIVEBLOG_UPDATE_POST_ID="4512107"
 
-ARTICLE_SLUG="$ARTICLE_SLUG" \
+ARTICLE_SLUGS="$ARTICLE_SLUGS" \
 LIVEBLOG_SLUG="$LIVEBLOG_SLUG" \
 LIVEBLOG_UPDATE_POST_ID="$LIVEBLOG_UPDATE_POST_ID" \
   bash packages/mock-api/scripts/record-fixtures.sh
 ```
 
 The script fails loud on missing slugs (so you can't accidentally record
-placeholder fixtures).
+placeholder fixtures). `ARTICLE_SLUGS` accepts whitespace-separated values and
+produces one `ArchipelagoSingleArticleQuery--<slug>.json` fixture per slug.
+`ARTICLE_SLUG` (singular, legacy) still works as a one-element fallback.
+
+### Picking article slugs by embed type
+
+Different M7 embed components need different fixture content. The fastest
+discovery loop is the GraphQL endpoint itself — fetch one or more candidate
+articles and grep `article.content` for the embed marker:
+
+| Embed      | Marker in `article.content`                |
+| ---------- | ------------------------------------------ |
+| Brightcove | `video-js` or `brightcove`                 |
+| Tweet      | `twitter-tweet` or `platform.twitter.com`  |
+| YouTube    | `youtube.com/embed` or `youtu.be`          |
+| Instagram  | `instagram-media` or `instagram.com/embed` |
+| Gallery    | `wp-block-gallery` or `class="gallery`     |
+
+Production scouting (sprint-007 story-001) found Brightcove video ubiquitous;
+Tweet present in some news/opinion/features (postType-dependent); Instagram
+embeds absent in current ArchipelagoSingleArticleQuery responses; gallery
+articles use a _different_ operationName entirely (out of M7 scope). The 2
+sample-* fixtures in `packages/mock-api/fixtures/` cover the gaps — see
+`packages/mock-api/README.md §Synthetic vs recorded fixtures`.
 
 ## What gets captured
 
 15 fixtures covering all four production page types (per `docs/RESEARCH.md`
 §Verified Queries by Page):
 
-| Page type            | Operations                                                                                   | Fixtures |
-| -------------------- | -------------------------------------------------------------------------------------------- | -------- |
-| Homepage             | HomePageQuery, HomePageCuratedFeedQuery, ArchipelagoBreakingTickerQuery                      | 3        |
-| Article              | ArchipelagoSingleArticleQuery (1 slug variant)                                               | 1        |
-| Live blog            | ArchipelagoSingleLiveBlogQuery, SingleLiveBlogChildrensQuery, LiveBlogUpdateQuery (1 each)   | 3        |
-| Section (geographic) | ArchipelagoSectionQuery (middle-east), ArchipelagoAjeSectionPostsQuery (offsets 0, 9, 18)    | 4        |
-| Section (topic)      | ArchipelagoTopicsPageQuery (opinion), ArchipelagoPaginatedTopicsFeedQuery (offsets 0, 9, 18) | 4        |
+| Page type            | Operations                                                                                   | Fixtures                |
+| -------------------- | -------------------------------------------------------------------------------------------- | ----------------------- |
+| Homepage             | HomePageQuery, HomePageCuratedFeedQuery, ArchipelagoBreakingTickerQuery                      | 3                       |
+| Article              | ArchipelagoSingleArticleQuery (N slug variants per ARTICLE_SLUGS)                            | N (recorded) + 2 sample |
+| Live blog            | ArchipelagoSingleLiveBlogQuery, SingleLiveBlogChildrensQuery, LiveBlogUpdateQuery (1 each)   | 3                       |
+| Section (geographic) | ArchipelagoSectionQuery (middle-east), ArchipelagoAjeSectionPostsQuery (offsets 0, 9, 18)    | 4                       |
+| Section (topic)      | ArchipelagoTopicsPageQuery (opinion), ArchipelagoPaginatedTopicsFeedQuery (offsets 0, 9, 18) | 4                       |
 
 Three pagination offsets (`0, 9, 18`) match the production "Load More" pattern
 documented in SMM Constraints — enough to test multi-page Load More semantics in
@@ -121,10 +147,11 @@ new fields obvious.
 
 ## Environment variables
 
-| Variable                  | Default                      | Purpose                                              |
-| ------------------------- | ---------------------------- | ---------------------------------------------------- |
-| `WP_SITE`                 | `aje`                        | `wp-site` header value (`aje` English, `aja` Arabic) |
-| `OUT_DIR`                 | `packages/mock-api/fixtures` | Output directory                                     |
-| `ARTICLE_SLUG`            | (required)                   | Slug for the article fixture                         |
-| `LIVEBLOG_SLUG`           | (required)                   | Slug for the live blog fixture                       |
-| `LIVEBLOG_UPDATE_POST_ID` | (required)                   | Numeric WP post ID for one live blog update          |
+| Variable                  | Default                      | Purpose                                                                               |
+| ------------------------- | ---------------------------- | ------------------------------------------------------------------------------------- |
+| `WP_SITE`                 | `aje`                        | `wp-site` header value (`aje` English, `aja` Arabic)                                  |
+| `OUT_DIR`                 | `packages/mock-api/fixtures` | Output directory                                                                      |
+| `ARTICLE_SLUGS`           | (required)                   | Whitespace-separated article slugs — records one fixture per slug                     |
+| `ARTICLE_SLUG`            | (legacy)                     | Single article slug; used as fallback when `ARTICLE_SLUGS` is unset (one-slug record) |
+| `LIVEBLOG_SLUG`           | (required)                   | Slug for the live blog fixture                                                        |
+| `LIVEBLOG_UPDATE_POST_ID` | (required)                   | Numeric WP post ID for one live blog update                                           |
