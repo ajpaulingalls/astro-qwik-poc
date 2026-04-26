@@ -1,0 +1,97 @@
+import { component$ } from '@qwik.dev/core';
+import { routeLoader$, type DocumentHead } from '@qwik.dev/router';
+import { graphqlFetch } from '../../../lib/graphql';
+import { ArticleHeader } from '../../../components/ArticleHeader';
+import { ArticleBody } from '../../../components/ArticleBody';
+import { RelatedStories } from '../../../components/RelatedStories';
+import type { HomepagePost, CuratedCollectionItem } from '@aje-poc/shared-types';
+
+interface ArticleAuthor {
+  id: string;
+  name: string;
+  link: string;
+}
+
+interface ArticleCategory {
+  id: string;
+  name: string;
+  slug: string;
+  link: string;
+}
+
+interface Article {
+  id: string;
+  title: string;
+  subheading?: string;
+  excerpt?: string;
+  content: string;
+  date: string;
+  link: string;
+  replacementHeadline?: string;
+  featuredImage?: { sourceUrl: string; alt?: string; width?: number; height?: number } | null;
+  author: ArticleAuthor[];
+  categories: ArticleCategory[];
+}
+
+interface SingleArticleData {
+  article: Article;
+}
+
+interface CuratedFeedData {
+  homepage: { curatedCollection: CuratedCollectionItem[] };
+}
+
+// Production aljazeera.com slugs are the last segment of a nested URL like
+// /features/2026/4/24/russian-oil-exports-slump... — the GraphQL query keys
+// off the trailing segment only. Mock-api mirrors this contract.
+function lastSegment(slug: string): string {
+  const parts = slug.split('/').filter(Boolean);
+  return parts[parts.length - 1] ?? '';
+}
+
+export const useArticleData = routeLoader$(async ({ params }) => {
+  const articleSlug = lastSegment(params.slug ?? '');
+  const [articleData, curatedData] = await Promise.all([
+    graphqlFetch<SingleArticleData>({
+      operationName: 'ArchipelagoSingleArticleQuery',
+      variables: { name: articleSlug, preview: '' },
+    }),
+    graphqlFetch<CuratedFeedData>({
+      operationName: 'HomePageCuratedFeedQuery',
+      variables: { offset: 0 },
+    }),
+  ]);
+  return { article: articleData.article, curated: curatedData };
+});
+
+function relatedPostsFrom(curated: CuratedFeedData): HomepagePost[] {
+  return curated.homepage.curatedCollection[0]?.posts ?? [];
+}
+
+export default component$(() => {
+  const data = useArticleData();
+  const { article, curated } = data.value;
+
+  return (
+    <article class="mx-auto max-w-3xl px-4 py-6">
+      <ArticleHeader
+        title={article.replacementHeadline || article.title}
+        subheading={article.subheading || article.excerpt}
+        authors={article.author.map((a) => ({ name: a.name, link: a.link }))}
+        date={article.date}
+        categories={article.categories.map((c) => ({ name: c.name, link: c.link }))}
+        featuredImage={article.featuredImage}
+      />
+      <ArticleBody content={article.content} />
+      <RelatedStories posts={relatedPostsFrom(curated)} />
+    </article>
+  );
+});
+
+export const head: DocumentHead = ({ resolveValue }) => {
+  const data = resolveValue(useArticleData);
+  return {
+    title: data.article.title,
+    meta: [{ name: 'description', content: data.article.excerpt ?? data.article.subheading ?? '' }],
+  };
+};

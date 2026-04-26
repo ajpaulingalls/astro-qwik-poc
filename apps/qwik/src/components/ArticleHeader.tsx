@@ -1,3 +1,5 @@
+import { resolveImageUrl } from '../lib/image-url';
+
 export interface ArticleAuthor {
   name: string;
   link?: string;
@@ -8,12 +10,20 @@ export interface ArticleCategory {
   link: string;
 }
 
+export interface ArticleLeadImage {
+  sourceUrl: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+}
+
 interface Props {
   title: string;
   subheading?: string;
   authors: ArticleAuthor[];
   date: string;
   categories: ArticleCategory[];
+  featuredImage?: ArticleLeadImage | null;
 }
 
 const DATE_FORMAT: Intl.DateTimeFormatOptions = {
@@ -26,7 +36,14 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', DATE_FORMAT);
 }
 
-export function ArticleHeader({ title, subheading, authors, date, categories }: Props) {
+export function ArticleHeader({
+  title,
+  subheading,
+  authors,
+  date,
+  categories,
+  featuredImage,
+}: Props) {
   return (
     <header class="article-header mb-6">
       {categories.length > 0 && (
@@ -43,6 +60,17 @@ export function ArticleHeader({ title, subheading, authors, date, categories }: 
       )}
       <h1 class="text-3xl md:text-4xl font-bold leading-tight">{title}</h1>
       {subheading && <p class="subheading mt-3 text-lg text-neutral-700">{subheading}</p>}
+      {featuredImage && (
+        <img
+          class="lead-image mt-4 w-full h-auto rounded aspect-[3/2] object-cover"
+          src={resolveImageUrl(featuredImage.sourceUrl)}
+          alt={featuredImage.alt ?? ''}
+          width={featuredImage.width}
+          height={featuredImage.height}
+          loading="eager"
+          fetchPriority="high"
+        />
+      )}
       <div class="byline mt-4 text-sm text-neutral-600 flex flex-wrap gap-x-2">
         <span>By </span>
         {authors.map((a, i) => (

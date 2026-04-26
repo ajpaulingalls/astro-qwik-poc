@@ -79,4 +79,33 @@ describe('ArticleHeader', () => {
     await render(<ArticleHeader {...props} categories={[]} />);
     expect(screen.querySelector('.categories')).toBeFalsy();
   });
+
+  it('renders featuredImage with eager loading + fetchpriority high (article LCP)', async () => {
+    const { screen, render } = await createDOM();
+    await render(
+      <ArticleHeader
+        {...props}
+        featuredImage={{
+          sourceUrl: '/wp-content/uploads/2026/04/oil.jpg',
+          alt: 'Oil spill at Tuapse',
+          width: 1200,
+          height: 800,
+        }}
+      />,
+    );
+    const img = screen.querySelector('img.lead-image')!;
+    expect(img).toBeTruthy();
+    expect(img.getAttribute('src')).toBe(
+      'http://localhost:4455/wp-content/uploads/2026/04/oil.jpg',
+    );
+    expect(img.getAttribute('alt')).toBe('Oil spill at Tuapse');
+    expect(img.getAttribute('loading')).toBe('eager');
+    expect(img.getAttribute('fetchpriority')).toBe('high');
+  });
+
+  it('omits the lead image cleanly when featuredImage is missing', async () => {
+    const { screen, render } = await createDOM();
+    await render(<ArticleHeader {...props} />);
+    expect(screen.querySelector('img.lead-image')).toBeFalsy();
+  });
 });
