@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { HeroCard } from './HeroCard';
+import { getByHeading } from '../test-utils/dom';
 import type { HomepagePost } from '@aje-poc/shared-types';
 
 const post: HomepagePost = {
@@ -22,8 +23,7 @@ describe('HeroCard', () => {
   it('renders the post title as h2 and links to post.link', async () => {
     const { screen, render } = await createDOM();
     await render(<HeroCard post={post} />);
-    const h2 = screen.querySelector('h2')!;
-    expect(h2.textContent).toContain('Iran war live');
+    expect(getByHeading(screen, 2, /Iran war live/i)).toBeTruthy();
     const link = screen.querySelector('a')!;
     expect(link.getAttribute('href')).toBe('/news/liveblog/2026/4/22/iran-war-live');
   });
@@ -74,6 +74,6 @@ describe('HeroCard', () => {
   it('honors replacementHeadline when present', async () => {
     const { screen, render } = await createDOM();
     await render(<HeroCard post={{ ...post, replacementHeadline: 'Editor override' }} />);
-    expect(screen.querySelector('h2')?.textContent).toContain('Editor override');
+    expect(getByHeading(screen, 2, /Editor override/i)).toBeTruthy();
   });
 });

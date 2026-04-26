@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { MostPopular } from './MostPopular';
+import { getByHeading } from '../test-utils/dom';
 import type { HomepagePost } from '@aje-poc/shared-types';
 
 const items: HomepagePost[] = Array.from({ length: 10 }).map((_, i) => ({
@@ -34,8 +35,7 @@ describe('MostPopular', () => {
   it('renders an h3 section heading (subordinate to HeroCard h2)', async () => {
     const { screen, render } = await createDOM();
     await render(<MostPopular items={items} />);
-    const h3 = screen.querySelector('h3')!;
-    expect(h3.textContent).toContain('Most Popular');
+    expect(getByHeading(screen, 3, /Most Popular/i)).toBeTruthy();
   });
 
   it('renders nothing when items array is empty', async () => {
