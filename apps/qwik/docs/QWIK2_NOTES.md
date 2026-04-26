@@ -291,3 +291,15 @@ The 156–157 KB current floor crosses the `<150 KB` budget by ~5 KB. The breach
 Total expected feature growth ~16 KB; 165 KB budget gives 8 KB above current 157 KB and accounts for ~half the projected feature additions. M9 may need a third revision if all features land lazily on Homepage; defer that decision to actual measurement.
 
 When Qwik 2 stable ships, re-measure and re-budget. If stable core matches v1's 54 KB, realistic Homepage budget should drop to ~75–100 KB — still 5–7× the original `<15 KB` aspiration but defensible against measurement.
+
+### sprint-006 — testing-library/dom incompatibility (story-006)
+
+Tried adopting `@testing-library/dom` to bring `getByRole('heading', { level, name })` to Qwik card tests (parity with Astro's `@testing-library/preact`). Two beta-friction blockers:
+
+1. **`@testing-library/dom`'s role queries crash on createDOM screen.** `dom-accessibility-api` (transitive via `@testing-library/dom@10.4.1`) calls `window.getComputedStyle.bind(window)` on `screen.ownerDocument.defaultView`. Qwik 2 beta.32's bundled DOM (returned by `createDOM()`) doesn't expose `getComputedStyle` on its window. `// @vitest-environment happy-dom` doesn't help — the screen's own window isn't happy-dom's window.
+
+2. **`renderToString` workaround crashes inside vitest.** Tried rendering Qwik components SSR-side then mounting into happy-dom's `document.body` — clean separation that should let testing-library run on a known-good DOM. Qwik's own SSR pipeline throws `TypeError: Cannot set property Symbol(backRef) of [object Object] which has only a getter` inside `getSubscriber` (`@qwik.dev/core/dist/server.mjs:2447 → ssr-render-component.js:20 → reactive-primitives/subscriber.js:11`). Reproduces in both happy-dom and node test envs — the bug is in `renderToString` itself in beta.32, not in env interop.
+
+**Pivot:** wrote tiny `apps/qwik/src/test-utils/dom.ts` (`getByHeading(screen, level, name)`) — bypasses both blockers by walking `screen.querySelectorAll('h${level}')` and matching `textContent`. Catches `<h3>` → `<div>` regressions (the actual story-006 AC value) without the dep or compat headaches. Documented in the helper's source comment too.
+
+Revisit when Qwik 2 stable ships — testing-library compatibility may land then. If it does, the helper can be replaced with a direct `getByRole({ level, name })` import in the same migration sweep that uses Astro as canonical.
