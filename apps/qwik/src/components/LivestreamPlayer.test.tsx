@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { LivestreamPlayer } from './LivestreamPlayer';
+import { getByHeading } from '../test-utils/dom';
 import type { Livestream } from '@aje-poc/shared-types';
 
 const livestream: Livestream = {
@@ -22,8 +23,7 @@ describe('LivestreamPlayer', () => {
   it('renders the title and poster placeholder before play is clicked', async () => {
     const { screen, render } = await createDOM();
     await render(<LivestreamPlayer livestream={livestream} />);
-    const h3 = screen.querySelector('h3')!;
-    expect(h3.textContent).toContain('Al Jazeera Live');
+    expect(getByHeading(screen, 3, /Al Jazeera Live/i)).toBeTruthy();
     const img = screen.querySelector('img')!;
     expect(img.getAttribute('src')).toBe('https://cdn.example/aje-live-poster.jpg');
     expect(screen.querySelector('iframe')).toBeFalsy();
