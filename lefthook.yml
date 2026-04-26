@@ -1,3 +1,5 @@
+# Two-stage gate: pre-commit runs fast lint/format; pre-push runs slow tests
+# in parallel. Tests on push (not commit) keeps the local feedback loop snappy.
 pre-commit:
   parallel: true
   commands:
@@ -17,6 +19,13 @@ pre-commit:
       glob: 'packages/mock-api/**/*.ts'
       run: deno lint {staged_files}
 
+# pre-push runs the slow build+test commands. pre-commit must stay <5s on
+# staged-file workspace; tests moved here to unblock the tripwire.
+# test-mock-api joins so all test commands run at the same gate.
+pre-push:
+  parallel: true
+  commands:
+    # scripts/with-node.sh sources nvm + runs under .nvmrc Node (see script header for why).
     test-astro:
       # Match nested files AND top-level files (apps/astro/server.ts,
       # astro.config.mjs, package.json, etc.) — '**/*' alone misses the latter.
@@ -26,9 +35,7 @@ pre-commit:
       exclude:
         - 'apps/astro/docs/*'
         - 'apps/astro/docs/**/*'
-      # Source nvm + use Node 22 (per .nvmrc) — `test` chains `build` which
-      # requires Node >=22.12.0 (Astro 6 engine). Same wrapper as test-qwik.
-      run: bash -c 'source ~/.nvm/nvm.sh && nvm use > /dev/null && bun --filter aje-poc-astro test'
+      run: scripts/with-node.sh bun --filter aje-poc-astro test
       stage_fixed: false
 
     test-qwik:
@@ -38,14 +45,13 @@ pre-commit:
       exclude:
         - 'apps/qwik/docs/*'
         - 'apps/qwik/docs/**/*'
-      # Source nvm + use Node 22 (per .nvmrc) so the acceptance test's
-      # `node --experimental-strip-types server.ts` spawn works in a
-      # subshell that wouldn't otherwise pick up nvm.
-      run: bash -c 'source ~/.nvm/nvm.sh && nvm use > /dev/null && bun --filter aje-poc-qwik test'
+      run: scripts/with-node.sh bun --filter aje-poc-qwik test
       stage_fixed: false
 
     test-mock-api:
       glob: 'packages/mock-api/**/*.ts'
+      # root: scopes lefthook to the Deno workspace so `deno task test` runs
+      # from the package root (where deno.json lives, not the repo root).
       root: 'packages/mock-api/'
       run: deno task test
       stage_fixed: false
