@@ -2,6 +2,12 @@
 
 Live log of beta-specific workarounds, missing features, and divergences from the architecture doc. Updated as items are encountered.
 
+## M7 article shell — 2026-04-25
+
+### Divergences from `apps/qwik/docs/ARCHITECTURE.md`
+
+1. **`@testing-library/dom`'s `getByRole` does not work on Qwik 2 beta.32's `createDOM` screen.** `dom-accessibility-api` (transitive dep) needs `window.getComputedStyle`, but the bundled DOM returned by `createDOM()` doesn't expose it. Qwik's `renderToString` SSR-then-mount workaround also crashes inside vitest with `TypeError: Cannot set property Symbol(backRef) of [object Object] which has only a getter` (`@qwik.dev/core/dist/server.mjs` → `ssr-render-component.js` → `reactive-primitives/subscriber.js`). Both blockers reproduce in node and happy-dom envs — they're inside the beta runtime, not the test env. The mitigation is `apps/qwik/src/test-utils/dom.ts:getByHeading(screen, level, name)` — a `querySelectorAll('h${level}')` + `textContent` walk that catches `<h3>` → `<div>` regressions without the dep or compat headaches. Use `getByHeading` in component tests until Qwik 2 stable ships and testing-library compat lands. The same WHY also lives at the top of the helper source so future readers don't strip it as dead.
+
 ## M3 scaffolding — 2026-04-21
 
 Installed pins: `@qwik.dev/core ~2.0.0-beta.32`, `@qwik.dev/router 2.0.0-beta.32`, `@qwik.dev/optimizer 2.1.0-beta.2` (transitive).
