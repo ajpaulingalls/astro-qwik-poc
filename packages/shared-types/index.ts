@@ -45,3 +45,22 @@ export interface Livestream {
   bcPlaybackUrl?: string;
   featuredImage?: HomepageImage | null;
 }
+
+export interface ArticleAuthor {
+  name: string;
+  link: string;
+}
+
+export interface ArticleCategory {
+  name: string;
+  link: string;
+  slug: string;
+}
+
+export interface Article {
+  title: string;
+  subheading?: string;
+  date: string;
+  author: ArticleAuthor[];
+  categories: ArticleCategory[];
+}
