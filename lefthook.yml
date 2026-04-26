@@ -23,6 +23,7 @@ pre-commit:
 pre-push:
   parallel: true
   commands:
+    # scripts/with-node.sh sources nvm + runs under .nvmrc Node (see script header for why).
     test-astro:
       # Match nested files AND top-level files (apps/astro/server.ts,
       # astro.config.mjs, package.json, etc.) — '**/*' alone misses the latter.
@@ -32,9 +33,7 @@ pre-push:
       exclude:
         - 'apps/astro/docs/*'
         - 'apps/astro/docs/**/*'
-      # Source nvm + use Node 22 (per .nvmrc) — `test` chains `build` which
-      # requires Node >=22.12.0 (Astro 6 engine). Same wrapper as test-qwik.
-      run: bash -c 'source ~/.nvm/nvm.sh && nvm use > /dev/null && bun --filter aje-poc-astro test'
+      run: scripts/with-node.sh bun --filter aje-poc-astro test
       stage_fixed: false
 
     test-qwik:
@@ -44,10 +43,7 @@ pre-push:
       exclude:
         - 'apps/qwik/docs/*'
         - 'apps/qwik/docs/**/*'
-      # Source nvm + use Node 22 (per .nvmrc) so the acceptance test's
-      # `node --experimental-strip-types server.ts` spawn works in a
-      # subshell that wouldn't otherwise pick up nvm.
-      run: bash -c 'source ~/.nvm/nvm.sh && nvm use > /dev/null && bun --filter aje-poc-qwik test'
+      run: scripts/with-node.sh bun --filter aje-poc-qwik test
       stage_fixed: false
 
     test-mock-api:
