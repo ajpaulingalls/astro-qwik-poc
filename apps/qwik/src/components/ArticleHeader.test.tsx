@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { ArticleHeader } from './ArticleHeader';
+import { resolveImageUrl } from '../lib/image-url';
 import { getByHeading } from '../test-utils/dom';
 
 const props = {
@@ -95,9 +96,7 @@ describe('ArticleHeader', () => {
     );
     const img = screen.querySelector('img.lead-image')!;
     expect(img).toBeTruthy();
-    expect(img.getAttribute('src')).toBe(
-      'http://localhost:4455/wp-content/uploads/2026/04/oil.jpg',
-    );
+    expect(img.getAttribute('src')).toBe(resolveImageUrl('/wp-content/uploads/2026/04/oil.jpg'));
     expect(img.getAttribute('alt')).toBe('Oil spill at Tuapse');
     expect(img.getAttribute('loading')).toBe('eager');
     expect(img.getAttribute('fetchpriority')).toBe('high');
