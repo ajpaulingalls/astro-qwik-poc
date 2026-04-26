@@ -68,6 +68,22 @@ filename.
 A malformed fixture aborts startup with the offending filename — no silent 500s
 at request time.
 
+### Synthetic vs recorded fixtures
+
+Most fixtures are recorded verbatim from production via
+`scripts/record-fixtures.sh`. A few are hand-crafted to cover embed types
+production doesn't expose in our scouted query surface:
+
+| Fixture                                                                  | Origin                                                                          |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `ArchipelagoSingleArticleQuery--sample-article-with-instagram-embed`     | Hand-crafted. Production news articles don't carry Instagram embeds in scouting | 
+| `ArchipelagoSingleArticleQuery--sample-article-with-gallery-embed`       | Hand-crafted. Production `/gallery/*` uses a different `operationName` (out of M7 scope) |
+
+Synthetic fixtures are flagged in-band: `title` ends with `(sample)`, `id` uses
+the 9000000-block (e.g. `9001001`, `9002001`), and `socialMediaSummary` /
+`excerpt` / `subheading` start with `Sample fixture:`. Don't strip these
+markers — they're how renderers and screenshots stay honest about provenance.
+
 ## Architecture
 
 | File                         | Role                                                                                                                                                                         |
