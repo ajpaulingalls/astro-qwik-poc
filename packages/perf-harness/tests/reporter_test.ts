@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatReport, type AggregatedReport } from '../reporter.ts';
+import { formatReport, MISSING_METRIC, type AggregatedReport } from '../reporter.ts';
 import type { EnrichedMetric } from '../web_vitals_collector.ts';
 
 const fixture: AggregatedReport = {
@@ -11,7 +11,7 @@ const fixture: AggregatedReport = {
     lhPerf: { median: 99, n: 5 },
     jsBytes: { median: 12345, n: 5 },
   },
-  webVitals: { samples: [] },
+  webVitals: { samples: [], aggregated: { lcp: MISSING_METRIC } },
 };
 
 describe('formatReport', () => {
@@ -41,6 +41,12 @@ describe('formatReport', () => {
         '  "page": "home",',
         '  "target": "astro",',
         '  "webVitals": {',
+        '    "aggregated": {',
+        '      "lcp": {',
+        '        "median": null,',
+        '        "n": 0',
+        '      }',
+        '    },',
         '    "samples": []',
         '  }',
         '}',
@@ -62,6 +68,7 @@ describe('formatReport', () => {
         '| lhPerf  |     99 |',
         '',
         'web-vitals samples: 0',
+        'real-browser lcp median: MISSING (0/5 runs)',
         '',
       ].join('\n'),
     );
@@ -97,6 +104,7 @@ describe('formatReport', () => {
             lcpElement: { tagName: 'IMG', id: 'hero-img', src: 'https://cdn.example/hero.jpg' },
           } as EnrichedMetric,
         ],
+        aggregated: { lcp: MISSING_METRIC },
       },
     };
     const { markdown } = formatReport(withLcp);
@@ -120,11 +128,6 @@ describe('formatReport', () => {
     expect(markdown).toContain('real-browser lcp median: 72ms (n=10)');
   });
 
-  it('omits real-browser lcp median line when webVitals.aggregated absent', () => {
-    const { markdown } = formatReport(fixture);
-    expect(markdown).not.toContain('real-browser lcp median');
-  });
-
   it('includes webVitals.aggregated.lcp in JSON when present', () => {
     const withAgg: AggregatedReport = {
       ...fixture,
@@ -136,5 +139,20 @@ describe('formatReport', () => {
     const { json } = formatReport(withAgg);
     const parsed = JSON.parse(json);
     expect(parsed.webVitals.aggregated.lcp).toEqual({ median: 56.5, n: 10 });
+  });
+
+  it('emits MISSING markdown line and preserves median:null in JSON when aggregated.lcp.n === 0', () => {
+    const withMissing: AggregatedReport = {
+      ...fixture, // metrics.lcp.n === 5 → denominator for "0/5 runs"
+      webVitals: {
+        samples: [],
+        aggregated: { lcp: { median: null, n: 0 } },
+      },
+    };
+    const { markdown, json } = formatReport(withMissing);
+    expect(markdown).toContain('real-browser lcp median: MISSING (0/5 runs)');
+    expect(markdown).not.toContain('real-browser lcp median: null');
+    const parsed = JSON.parse(json);
+    expect(parsed.webVitals.aggregated.lcp).toEqual({ median: null, n: 0 });
   });
 });
