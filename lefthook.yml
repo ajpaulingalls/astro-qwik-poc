@@ -1,3 +1,5 @@
+# Two-stage gate: pre-commit runs fast lint/format; pre-push runs slow tests
+# in parallel. Tests on push (not commit) keeps the local feedback loop snappy.
 pre-commit:
   parallel: true
   commands:
