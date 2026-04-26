@@ -20,6 +20,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { createReadStream, statSync } from 'node:fs';
 import { dirname, extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import middleware from './server/entry.preview.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -27,6 +29,9 @@ const DIST_ROOT = resolve(__dirname, 'dist');
 
 const HOST = process.env.HOST ?? '127.0.0.1';
 const PORT = Number(process.env.PORT ?? 4173);
+// Same-origin proxy target for /wp-content/uploads/* — see vite.config.ts
+// for the dev/preview equivalent and docs/QWIK2_NOTES.md for the why.
+const API_BASE = process.env.PUBLIC_API_BASE ?? 'http://localhost:4455';
 
 const MIME: Record<string, string> = {
   '.js': 'text/javascript; charset=utf-8',
@@ -43,6 +48,30 @@ const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
 };
+
+async function tryProxyUploads(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
+  const url = req.url ?? '/';
+  if (!url.startsWith('/wp-content/uploads/')) return false;
+  try {
+    const upstream = await fetch(`${API_BASE}${url}`);
+    const headers: Record<string, string> = {};
+    const ct = upstream.headers.get('content-type');
+    const cl = upstream.headers.get('content-length');
+    if (ct) headers['Content-Type'] = ct;
+    if (cl) headers['Content-Length'] = cl;
+    res.writeHead(upstream.status, headers);
+    if (!upstream.body) {
+      res.end();
+      return true;
+    }
+    // pipeline destroys both streams on either-side error/close, so a client
+    // disconnect mid-image releases the upstream socket back to undici's pool.
+    await pipeline(Readable.fromWeb(upstream.body as Parameters<typeof Readable.fromWeb>[0]), res);
+  } catch (err) {
+    fail(res, err);
+  }
+  return true;
+}
 
 function tryServeStatic(req: IncomingMessage, res: ServerResponse): boolean {
   const url = req.url ?? '/';
@@ -80,7 +109,8 @@ function fail(res: ServerResponse, err: unknown): void {
   res.end(String(err));
 }
 
-createServer((req: IncomingMessage, res: ServerResponse) => {
+createServer(async (req: IncomingMessage, res: ServerResponse) => {
+  if (await tryProxyUploads(req, res)) return;
   if (tryServeStatic(req, res)) return;
   middleware.router(req, res, (err?: unknown) => {
     if (err) fail(res, err);

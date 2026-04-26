@@ -152,6 +152,19 @@ export function runAcceptanceSuite(target: Target): void {
       });
     });
 
+    // Each app must serve /wp-content/uploads/* from the app origin (via an
+    // app-side proxy to mock-api), so any code path that emits a relative
+    // /wp-content/uploads/* URL (e.g. M11 same-origin demo, or a component
+    // that bypasses resolveImageUrl) resolves to a real image instead of a
+    // 404 against the app origin.
+    it('proxies /wp-content/uploads/* to mock-api (returns 200 image/png)', async () => {
+      const probe = await fetch(
+        `http://127.0.0.1:${APP_PORT[target]}/wp-content/uploads/probe.png`,
+      );
+      expect(probe.status).toBe(200);
+      expect(probe.headers.get('content-type')).toBe('image/png');
+    });
+
     it('Inter web font is loaded with no CLS-triggering FOIT', async () => {
       const fontInfo = await withPage(DESKTOP, async (page) => {
         await page.evaluate(() => document.fonts.ready);

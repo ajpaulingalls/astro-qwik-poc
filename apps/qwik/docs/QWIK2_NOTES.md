@@ -309,3 +309,36 @@ Tried adopting `@testing-library/dom` to bring `getByRole('heading', { level, na
 **Pivot:** wrote tiny `apps/qwik/src/test-utils/dom.ts` (`getByHeading(screen, level, name)`) — bypasses both blockers by walking `screen.querySelectorAll('h${level}')` and matching `textContent`. Catches `<h3>` → `<div>` regressions (the actual story-006 AC value) without the dep or compat headaches. Documented in the helper's source comment too.
 
 Revisit when Qwik 2 stable ships — testing-library compatibility may land then. If it does, the helper can be replaced with a direct `getByRole({ level, name })` import in the same migration sweep that uses Astro as canonical.
+
+## sprint-007 — Image placeholder URL strategy: app-side proxy (2026-04-25)
+
+### Strategy
+
+Concern `b37c6a07a3f1` (Honesty) flagged that the sprint-006 fix above was only partial. Sprint-006 made `resolveImageUrl()` rewrite relative `/wp-content/uploads/*` to absolute `http://localhost:4455/...` for components that opt in (`HeroCard`, `StoryCard`, `LivestreamPlayer`). Any code path that emits a raw relative URL — HTML embeds, future M11 paths, anything not yet routed through the helper — still 404s against the app origin. The acceptance probe added in this sprint (`packages/perf-harness/acceptance.ts`) made that gap loud.
+
+Customer chose **app-side dev/SSR proxy → mock-api**: have each app's origin handle `/wp-content/uploads/*` and forward to mock-api. More authentic to the eventual production deployment (browsers fetch from page origin) and removes the per-component opt-in hazard.
+
+### Qwik wiring (two layers required)
+
+Qwik dev/preview goes through Vite middleware; the perf-harness boots `apps/qwik/server.ts`, a custom Node http wrapper that bypasses Vite. So both need the proxy:
+
+| Runtime                               | File                           | Mechanism                                                                                          |
+| ------------------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `bun run dev:qwik`                    | `vite.config.ts:server.proxy`  | Vite proxy → `PUBLIC_API_BASE` (default 4455)                                                      |
+| `bun run preview`                     | `vite.config.ts:preview.proxy` | Vite proxy → `PUBLIC_API_BASE` (default 4455)                                                      |
+| `bun run preview:prod` (perf-harness) | `server.ts:tryProxyUploads`    | `fetch` + `node:stream/promises pipeline` → `PUBLIC_API_BASE` (default 4455; harness sets to 4456) |
+
+`server.ts` uses `pipeline()` rather than `Readable.fromWeb(...).pipe(res)` so a client disconnect mid-image releases the upstream socket back to undici's pool — same fail-loud discipline as `tryServeStatic` (story-009).
+
+### Why the helper still exists
+
+`resolveImageUrl()` continues to rewrite relative URLs to absolute ones at component render time. That makes the proxy dead code for the components currently using the helper — they hit mock-api directly. The proxy fires only for code paths that bypass the helper (and for the acceptance probe). This is intentional: removing the helper requires per-component audits and a CSP simplification (`img-src 'self' https: data:` could drop `http://localhost:4455`). Out of scope for story-010; recorded as a follow-up.
+
+### Beta-friction notes
+
+- `@qwik.dev/router` 2 doesn't have a documented file-based "catch-all middleware" pattern equivalent to Astro's `pages/wp-content/uploads/[...path].ts`. The custom `server.ts` wrapper was already in place for static-file serving (sprint-005); adding `tryProxyUploads` before `tryServeStatic` reuses that wrapper rather than introducing a new Qwik route file. If Qwik 2 stable ships a clean `routes/wp-content/uploads/[...path]/index.ts` `RequestHandler` API, revisit and consolidate.
+- Vite's `server.proxy`/`preview.proxy` syntax is identical between modes; reused via shared `UPLOADS_PROXY` const to keep the two declarations in sync.
+
+### Limitation: header passthrough asymmetry
+
+The Astro twin (`apps/astro/src/pages/wp-content/uploads/[...path].ts`) forwards all upstream headers via `new Response(response.body, response)`. Qwik's `server.ts` forwards only `Content-Type` and `Content-Length`. Same behavior for the current 1×1 PNG mock-api fixture, but if M11 swaps in real aljazeera.com upstream, missing `Cache-Control`/`ETag`/`Last-Modified` on the Qwik path could cause repeated full fetches. Revisit in M11.

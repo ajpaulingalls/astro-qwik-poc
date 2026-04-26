@@ -1,9 +1,8 @@
 import { resolveApiBase } from './graphql';
 
-// Fixture image URLs are relative (/wp-content/uploads/<year>/<month>/...) — they
-// resolve against the page origin (8080) and 404, breaking Lighthouse LCP.
-// This helper rewrites them to absolute URLs against PUBLIC_API_BASE so the
-// browser fetches from mock-api in dev/perf and from aljazeera.com in M11 demo.
+// Coexists with the same-origin proxy at src/pages/wp-content/uploads/[...path].ts;
+// removing it requires per-component audits + a CSP simplification.
+// See apps/astro/docs/SECURITY.md § Same-origin proxy for /wp-content/uploads/*.
 export function resolveImageUrl(sourceUrl: string | null | undefined): string {
   if (!sourceUrl) return '';
   if (/^https?:\/\//i.test(sourceUrl)) return sourceUrl;
