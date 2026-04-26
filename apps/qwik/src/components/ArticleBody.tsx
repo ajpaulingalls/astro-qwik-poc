@@ -2,7 +2,6 @@ import type { JSXOutput } from '@qwik.dev/core';
 
 interface Props {
   content: string;
-  // Seam for story-005 embed dispatch — overrides the default raw-HTML sink.
   embedRenderer?: (html: string) => JSXOutput;
 }
 

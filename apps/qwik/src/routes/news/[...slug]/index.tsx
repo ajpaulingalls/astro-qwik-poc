@@ -1,9 +1,10 @@
 import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead } from '@qwik.dev/router';
 import { graphqlFetch } from '../../../lib/graphql';
+import { getDisplayHeadline } from '../../../lib/headline';
 import { ArticleHeader } from '../../../components/ArticleHeader';
 import { ArticleBody } from '../../../components/ArticleBody';
-import { RelatedStories } from '../../../components/RelatedStories';
+import { RelatedStories, MAX_RELATED } from '../../../components/RelatedStories';
 import type { HomepagePost, CuratedCollectionItem } from '@aje-poc/shared-types';
 
 interface ArticleAuthor {
@@ -61,21 +62,23 @@ export const useArticleData = routeLoader$(async ({ params }) => {
       variables: { offset: 0 },
     }),
   ]);
-  return { article: articleData.article, curated: curatedData };
+  // Return only what the page renders. Qwik 2 serializes the full loader value
+  // into the resume payload, so trimming here directly shrinks what ships to
+  // the browser — the in-component slice would not.
+  const relatedPosts: HomepagePost[] = (
+    curatedData.homepage.curatedCollection[0]?.posts ?? []
+  ).slice(0, MAX_RELATED);
+  return { article: articleData.article, relatedPosts };
 });
-
-function relatedPostsFrom(curated: CuratedFeedData): HomepagePost[] {
-  return curated.homepage.curatedCollection[0]?.posts ?? [];
-}
 
 export default component$(() => {
   const data = useArticleData();
-  const { article, curated } = data.value;
+  const { article, relatedPosts } = data.value;
 
   return (
     <article class="mx-auto max-w-3xl px-4 py-6">
       <ArticleHeader
-        title={article.replacementHeadline || article.title}
+        title={getDisplayHeadline(article)}
         subheading={article.subheading || article.excerpt}
         authors={article.author.map((a) => ({ name: a.name, link: a.link }))}
         date={article.date}
@@ -83,7 +86,7 @@ export default component$(() => {
         featuredImage={article.featuredImage}
       />
       <ArticleBody content={article.content} />
-      <RelatedStories posts={relatedPostsFrom(curated)} />
+      <RelatedStories posts={relatedPosts} />
     </article>
   );
 });

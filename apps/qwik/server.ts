@@ -49,16 +49,30 @@ const MIME: Record<string, string> = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
+// Astro's proxy forwards the entire upstream response via `new Response(body, response)`,
+// and the Deno runtime strips hop-by-hop headers at the wire boundary. We hand-build
+// headers for Node's http server, so we have to do the stripping ourselves. RFC 7230 §6.1.
+const HOP_BY_HOP = new Set([
+  'connection',
+  'keep-alive',
+  'proxy-authenticate',
+  'proxy-authorization',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+]);
+
 async function tryProxyUploads(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
   const url = req.url ?? '/';
   if (!url.startsWith('/wp-content/uploads/')) return false;
   try {
     const upstream = await fetch(`${API_BASE}${url}`);
     const headers: Record<string, string> = {};
-    const ct = upstream.headers.get('content-type');
-    const cl = upstream.headers.get('content-length');
-    if (ct) headers['Content-Type'] = ct;
-    if (cl) headers['Content-Length'] = cl;
+    // Headers iteration yields lowercased names per WHATWG; no toLowerCase needed.
+    upstream.headers.forEach((value, name) => {
+      if (!HOP_BY_HOP.has(name)) headers[name] = value;
+    });
     res.writeHead(upstream.status, headers);
     if (!upstream.body) {
       res.end();

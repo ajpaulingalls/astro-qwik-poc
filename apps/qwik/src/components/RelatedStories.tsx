@@ -7,7 +7,7 @@ interface Props {
   title?: string;
 }
 
-const MAX_RELATED = 6;
+export const MAX_RELATED = 6;
 
 export function RelatedStories({ posts, title = 'Related stories' }: Props) {
   if (posts.length === 0) return null;

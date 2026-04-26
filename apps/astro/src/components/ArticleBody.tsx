@@ -1,6 +1,5 @@
 interface Props {
   content: string;
-  // Story-003 plugs embed dispatch in here (HTML rewrite before SSR).
   transformContent?: (html: string) => string;
 }
 

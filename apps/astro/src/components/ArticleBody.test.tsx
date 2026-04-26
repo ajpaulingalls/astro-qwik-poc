@@ -64,11 +64,11 @@ describe('ArticleBody', () => {
   it('renders nothing when content is empty', () => {
     const { container } = render(<ArticleBody content="" />);
     const article = container.querySelector('article');
-    expect(article?.textContent ?? '').toBe('');
+    expect(article).toBeTruthy();
+    expect(article!.textContent).toBe('');
   });
 
   it('transforms HTML via transformContent when provided', () => {
-    // Story-003 plugs embed dispatch here; this test guarantees the seam.
     const transformContent = (html: string) =>
       html.replace('<blockquote>', '<blockquote data-transformed="yes">');
     const { container } = render(
