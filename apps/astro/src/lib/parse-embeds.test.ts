@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { parseEmbeds } from './parse-embeds';
 
 describe('parseEmbeds', () => {
@@ -143,5 +143,41 @@ describe('parseEmbeds', () => {
   it('falls back to html segment for an unclosed blockquote (silent skip)', () => {
     const html = '<blockquote class="twitter-tweet"><p>tweet without closing tag';
     expect(parseEmbeds(html)).toEqual([{ kind: 'html', html }]);
+  });
+
+  describe('orphan video-js warnings', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    afterEach(() => {
+      warnSpy.mockClear();
+    });
+
+    it('warns when video-js is present but Brightcove comment markers are missing', () => {
+      const html = `<p>intro</p><div><video-js id="x" data-account="A" data-player="P" class="video-js"></video-js></div><p>outro</p>`;
+      parseEmbeds(html);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      const msg = warnSpy.mock.calls[0]?.[0];
+      expect(msg).toContain('Brightcove');
+      expect(msg).toContain('video-js');
+    });
+
+    it('warns when Brightcove comment markers are present but data-account/data-player are missing', () => {
+      const html = `<!-- Start of Brightcove Player -->
+<div><video-js id="x" class="video-js"></video-js></div>
+<!-- End of Brightcove Player -->`;
+      parseEmbeds(html);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      const msg = warnSpy.mock.calls[0]?.[0];
+      expect(msg).toContain('Brightcove');
+      expect(msg).toContain('video-js');
+    });
+
+    it('does not warn when a well-formed Brightcove embed parses successfully', () => {
+      const html = `<!-- Start of Brightcove Player -->
+<div><video-js id="x" data-video-id="V" data-account="A" data-player="P" class="video-js"></video-js></div>
+<!-- End of Brightcove Player -->`;
+      parseEmbeds(html);
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
   });
 });

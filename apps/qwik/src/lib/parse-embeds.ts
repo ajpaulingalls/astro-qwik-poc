@@ -36,6 +36,8 @@ const TWITTER_TRAIL =
 const INSTAGRAM_TRAIL =
   /^\s*<script\b[^>]*src="[^"]*instagram\.com\/embed\.js[^"]*"[^>]*><\/script>/i;
 
+const VIDEO_JS_TAG = /<video-js\b/gi;
+
 export function parseEmbeds(html: string): Segment[] {
   const segments: Segment[] = [];
   let pos = 0;
@@ -63,6 +65,16 @@ export function parseEmbeds(html: string): Segment[] {
       segments.push({ kind: 'embed', type: match.type, html: match.html });
     }
     pos = match.end;
+  }
+  const videoJsCount = (html.match(VIDEO_JS_TAG) ?? []).length;
+  const brightcoveCount = segments.filter(
+    (s) => s.kind === 'embed' && s.type === 'brightcove',
+  ).length;
+  const orphans = Math.max(0, videoJsCount - brightcoveCount);
+  if (orphans > 0) {
+    console.warn(
+      `parse-embeds: ${orphans} orphan video-js element(s) seen but no Brightcove embed extracted — missing comment markers or data-account/data-player attrs`,
+    );
   }
   return segments;
 }
