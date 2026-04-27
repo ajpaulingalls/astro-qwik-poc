@@ -53,6 +53,26 @@ describe('ArticleHeader', () => {
     expect(container.querySelector('.byline')).toBeNull();
   });
 
+  it('renders unlinked authors as plain text spans (mirror of Qwik contract)', () => {
+    const { container } = render(
+      <ArticleHeader
+        article={{
+          ...baseArticle,
+          author: [
+            { name: 'John T Psaropoulos', link: '/author/john_psaropoulos' },
+            { name: 'Anonymous Wire' },
+          ],
+        }}
+      />,
+    );
+    const byline = container.querySelector('.byline')!;
+    expect(byline).toBeTruthy();
+    const links = byline.querySelectorAll('a');
+    expect(links.length).toBe(1);
+    expect(links[0].getAttribute('href')).toBe('/author/john_psaropoulos');
+    expect(byline.textContent).toContain('Anonymous Wire');
+  });
+
   it('renders the date inside a <time> element with ISO datetime attribute', () => {
     const { container } = render(<ArticleHeader article={baseArticle} />);
     const time = container.querySelector('time');

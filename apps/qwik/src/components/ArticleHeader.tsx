@@ -1,22 +1,6 @@
-import { resolveImageUrl } from '../lib/image-url';
 import { formatDate } from '../lib/format-date';
-
-export interface ArticleAuthor {
-  name: string;
-  link?: string;
-}
-
-export interface ArticleCategory {
-  name: string;
-  link: string;
-}
-
-export interface ArticleLeadImage {
-  sourceUrl: string;
-  alt?: string;
-  width?: number;
-  height?: number;
-}
+import { LeadImage } from './LeadImage';
+import type { ArticleAuthor, ArticleCategory, HomepageImage } from '@aje-poc/shared-types';
 
 interface Props {
   title: string;
@@ -24,7 +8,7 @@ interface Props {
   authors: ArticleAuthor[];
   date: string;
   categories: ArticleCategory[];
-  featuredImage?: ArticleLeadImage | null;
+  featuredImage?: HomepageImage | null;
 }
 
 export function ArticleHeader({
@@ -38,30 +22,20 @@ export function ArticleHeader({
   return (
     <header class="article-header mb-6">
       {categories.length > 0 && (
-        <nav class="categories text-aj-orange text-sm font-bold tracking-wider uppercase mb-2">
-          {categories.map((cat, i) => (
-            <span key={cat.link}>
-              {i > 0 && <span class="mx-1">·</span>}
+        <ul class="categories flex gap-2 text-sm uppercase tracking-wider text-aj-orange mb-2">
+          {categories.map((cat) => (
+            <li key={cat.slug}>
               <a href={cat.link} class="hover:underline">
                 {cat.name}
               </a>
-            </span>
+            </li>
           ))}
-        </nav>
+        </ul>
       )}
       <h1 class="text-3xl md:text-4xl font-bold leading-tight">{title}</h1>
       {subheading && <p class="subheading mt-3 text-lg text-neutral-700">{subheading}</p>}
       {featuredImage && (
-        <img
-          class="lead-image mt-4 w-full h-auto rounded aspect-[3/2] object-cover"
-          src={resolveImageUrl(featuredImage.sourceUrl)}
-          alt={featuredImage.alt ?? ''}
-          width={featuredImage.width}
-          height={featuredImage.height}
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-        />
+        <LeadImage image={featuredImage} priority="eager" extraClass="lead-image mt-4" />
       )}
       <div class="byline mt-4 text-sm text-neutral-600 flex flex-wrap gap-x-2">
         <span>By </span>

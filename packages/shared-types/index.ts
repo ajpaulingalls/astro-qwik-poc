@@ -48,7 +48,7 @@ export interface Livestream {
 
 export interface ArticleAuthor {
   name: string;
-  link: string;
+  link?: string;
 }
 
 export interface ArticleCategory {
@@ -58,8 +58,12 @@ export interface ArticleCategory {
 }
 
 export interface Article {
+  id: string;
   title: string;
+  link: string;
   subheading?: string;
+  excerpt?: string;
+  replacementHeadline?: string;
   date: string;
   content: string;
   author: ArticleAuthor[];

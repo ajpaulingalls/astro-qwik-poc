@@ -1,4 +1,5 @@
 import type { HomepagePost } from '@aje-poc/shared-types';
+import { MAX_RELATED } from '../lib/related-posts';
 import { SectionHeading } from './SectionHeading';
 import { StoryCard } from './StoryCard';
 
@@ -6,8 +7,6 @@ interface Props {
   posts: HomepagePost[];
   title?: string;
 }
-
-export const MAX_RELATED = 6;
 
 export function RelatedStories({ posts, title = 'Related stories' }: Props) {
   if (posts.length === 0) return null;
