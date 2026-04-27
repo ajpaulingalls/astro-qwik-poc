@@ -1,0 +1,16 @@
+{
+  "name": "@aje-poc/shared-csp",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Single source of truth for CSP origins + apiBase substitution shared across the Astro and Qwik PoCs",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0"
+  }
+}

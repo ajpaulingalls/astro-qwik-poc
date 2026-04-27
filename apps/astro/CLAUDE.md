@@ -19,7 +19,7 @@ Codified in `docs/ARCHITECTURE.md` — don't relitigate without explicit user in
 
 The runtime split rationale (why bun for dev even though Astro 6 supports Deno-in-dev via the Vite Environment API) is in `docs/ARCHITECTURE.md → Runtime & Tooling`.
 
-The `build` script is `bun --bun astro build` (not bare `astro build`). Astro 6's CLI hard-checks `process.version >= 22.12`; the `--bun` flag forces the script to run under bun's runtime, which Astro accepts as a non-Node runtime and skips the version gate. Without the flag, builds fail under Node 20.x with `Node.js v20.x.x is not supported by Astro!`. Same trick is needed for any Astro CLI invocation.
+The `build`/`dev`/`preview` scripts all use `bun --bun astro <subcmd>` (not bare `astro <subcmd>`). Astro 6's CLI hard-checks `process.version >= 22.12`; the `--bun` flag forces the script to run under bun's runtime, which Astro accepts as a non-Node runtime and skips the version gate. Without the flag, the command fails under Node 20.x with `Node.js v20.x.x is not supported by Astro!`. Any new Astro CLI script you add must use `bun --bun astro …`.
 
 ## Astro 6 platform features in use
 

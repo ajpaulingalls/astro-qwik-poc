@@ -8,6 +8,7 @@
     "apps/astro",
     "apps/qwik",
     "packages/perf-harness",
+    "packages/shared-csp",
     "packages/shared-types"
   ],
   "scripts": {
