@@ -3,6 +3,7 @@ import { TwitterEmbed } from './embeds/TwitterEmbed';
 import { InstagramEmbed } from './embeds/InstagramEmbed';
 import { GalleryEmbed } from './embeds/GalleryEmbed';
 import { BrightcoveEmbed } from './embeds/BrightcoveEmbed';
+import { YouTubeEmbed } from './embeds/YouTubeEmbed';
 
 interface Props {
   content: string;
@@ -31,6 +32,8 @@ export function ArticleBody({ content, transformContent }: Props) {
             return <InstagramEmbed key={i} html={seg.html} />;
           case 'gallery':
             return <GalleryEmbed key={i} html={seg.html} />;
+          case 'youtube':
+            return <YouTubeEmbed key={i} html={seg.html} />;
           case 'brightcove':
             return (
               <BrightcoveEmbed key={i} html={seg.html} account={seg.account} player={seg.player} />

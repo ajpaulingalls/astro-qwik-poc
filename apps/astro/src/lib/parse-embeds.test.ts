@@ -145,6 +145,48 @@ describe('parseEmbeds', () => {
     expect(parseEmbeds(html)).toEqual([{ kind: 'html', html }]);
   });
 
+  it('detects a YouTube iframe embed', () => {
+    const html = `<p>Intro.</p><figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio">
+<div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="YouTube video player" width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?feature=oembed" frameborder="0" allow="accelerometer" allowfullscreen></iframe>
+</div>
+</figure><p>Outro.</p>`;
+    const segments = parseEmbeds(html);
+    expect(segments.map((s) => s.kind)).toEqual(['html', 'embed', 'html']);
+    const embed = segments[1];
+    if (embed.kind === 'embed') {
+      expect(embed.type).toBe('youtube');
+      expect(embed.html).toContain('youtube.com/embed/dQw4w9WgXcQ');
+      expect(embed.html).toContain('<iframe');
+    } else {
+      throw new Error('expected youtube embed segment');
+    }
+  });
+
+  it('detects a bare YouTube iframe (no wp-block-embed wrapper)', () => {
+    const html = `<p>before</p><iframe src="https://www.youtube.com/embed/abc123XYZ_-" allowfullscreen></iframe><p>after</p>`;
+    const segments = parseEmbeds(html);
+    expect(segments.map((s) => s.kind)).toEqual(['html', 'embed', 'html']);
+    const embed = segments[1];
+    if (embed.kind === 'embed') {
+      expect(embed.type).toBe('youtube');
+      expect(embed.html).toContain('youtube.com/embed/abc123XYZ_-');
+    } else {
+      throw new Error('expected youtube embed segment');
+    }
+  });
+
+  it('detects a youtube-nocookie iframe', () => {
+    const html = `<iframe src="https://www.youtube-nocookie.com/embed/PRIVACY_ID"></iframe>`;
+    const segments = parseEmbeds(html);
+    expect(segments).toHaveLength(1);
+    if (segments[0].kind === 'embed') {
+      expect(segments[0].type).toBe('youtube');
+    } else {
+      throw new Error('expected youtube embed segment');
+    }
+  });
+
   describe('orphan video-js warnings', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 

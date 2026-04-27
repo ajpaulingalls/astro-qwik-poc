@@ -6,11 +6,11 @@
 //
 // PARITY: keep behaviour aligned with apps/astro/src/lib/parse-embeds.ts.
 
-export type EmbedType = 'twitter' | 'instagram' | 'gallery' | 'brightcove';
+export type EmbedType = 'twitter' | 'instagram' | 'gallery' | 'brightcove' | 'youtube';
 
 export type Segment =
   | { kind: 'html'; html: string }
-  | { kind: 'embed'; type: 'twitter' | 'instagram' | 'gallery'; html: string }
+  | { kind: 'embed'; type: 'twitter' | 'instagram' | 'gallery' | 'youtube'; html: string }
   | {
       kind: 'embed';
       type: 'brightcove';
@@ -21,7 +21,7 @@ export type Segment =
     };
 
 type Match = { start: number; end: number } & (
-  | { type: 'twitter' | 'instagram' | 'gallery'; html: string }
+  | { type: 'twitter' | 'instagram' | 'gallery' | 'youtube'; html: string }
   | { type: 'brightcove'; html: string; account: string; player: string; videoId?: string }
 );
 
@@ -30,6 +30,9 @@ const INSTAGRAM_BLOCKQUOTE = /<blockquote\b[^>]*\bclass="[^"]*\binstagram-media\
 const GALLERY_DIV = /<div\b[^>]*\bclass="[^"]*\bwp-block-gallery\b[^"]*"[^>]*>/i;
 const BRIGHTCOVE_COMMENT_START = /<!--\s*Start of Brightcove Player\s*-->/i;
 const BRIGHTCOVE_COMMENT_END = /<!--\s*End of Brightcove Player\s*-->/i;
+const YOUTUBE_IFRAME =
+  /<iframe\b[^>]*\bsrc="https?:\/\/(?:www\.)?youtube(?:-nocookie)?\.com\/embed\/[^"]*"[^>]*>/i;
+const YOUTUBE_FIGURE_OPEN = /<figure\b[^>]*\bclass="[^"]*\bwp-block-embed-youtube\b[^"]*"[^>]*>/i;
 
 const TWITTER_TRAIL =
   /^\s*(?:<p>\s*)?<script\b[^>]*src="[^"]*platform\.twitter\.com[^"]*"[^>]*><\/script>(?:\s*<\/p>)?/i;
@@ -102,6 +105,16 @@ function findNextEmbed(html: string, from: number): Match | null {
       extract: (s, i) => extractBlockquote(s, i, 'instagram', INSTAGRAM_TRAIL),
     },
     { type: 'gallery', idx: indexOrInf(slice, GALLERY_DIV), extract: extractGallery },
+    {
+      type: 'youtube',
+      idx: indexOrInf(slice, YOUTUBE_FIGURE_OPEN),
+      extract: extractYouTubeFigure,
+    },
+    {
+      type: 'youtube',
+      idx: indexOrInf(slice, YOUTUBE_IFRAME),
+      extract: extractYouTubeIframe,
+    },
   ];
   candidates.sort((a, b) => a.idx - b.idx);
   for (const c of candidates) {
@@ -156,6 +169,18 @@ function extractBrightcove(slice: string, start: number): Match | null {
   if (!account || !player) return null;
   const videoId = BRIGHTCOVE_VIDEO_ID.exec(stripped)?.[1];
   return { start, end: totalEnd, type: 'brightcove', html: stripped, account, player, videoId };
+}
+
+function extractYouTubeFigure(slice: string, start: number): Match | null {
+  const close = findMatchingClose(slice, start, 'figure');
+  if (close === -1) return null;
+  return { start, end: close, type: 'youtube', html: slice.slice(start, close) };
+}
+
+function extractYouTubeIframe(slice: string, start: number): Match | null {
+  const close = findMatchingClose(slice, start, 'iframe');
+  if (close === -1) return null;
+  return { start, end: close, type: 'youtube', html: slice.slice(start, close) };
 }
 
 function findMatchingClose(slice: string, start: number, tag: string): number {
