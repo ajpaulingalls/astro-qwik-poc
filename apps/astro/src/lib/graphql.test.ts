@@ -1,36 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { graphqlFetch, GraphqlHttpError } from './graphql';
-
-interface Captured {
-  url: string;
-  init: RequestInit | undefined;
-}
-
-interface MockFetchOptions {
-  body?: unknown;
-  status?: number;
-  rawBody?: string;
-}
-
-function mockFetchOnce(options: MockFetchOptions = {}): { calls: Captured[]; restore: () => void } {
-  const { body, status = 200, rawBody } = options;
-  const calls: Captured[] = [];
-  const original = globalThis.fetch;
-  const responseBody = rawBody ?? JSON.stringify(body ?? { data: {} });
-  globalThis.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    calls.push({ url: String(input), init });
-    return new Response(responseBody, {
-      status,
-      headers: { 'content-type': 'application/json' },
-    });
-  }) as unknown as typeof fetch;
-  return {
-    calls,
-    restore: () => {
-      globalThis.fetch = original;
-    },
-  };
-}
+import { mockFetchOnce } from './test-helpers/mock-fetch';
 
 describe('graphqlFetch', () => {
   let mock: ReturnType<typeof mockFetchOnce>;
