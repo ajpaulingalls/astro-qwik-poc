@@ -1,24 +1,13 @@
 import { formatDate } from '../lib/format-date';
 import { LeadImage } from './LeadImage';
-import type { ArticleAuthor, ArticleCategory, HomepageImage } from '@aje-poc/shared-types';
+import type { Article } from '@aje-poc/shared-types';
 
 interface Props {
-  title: string;
-  subheading?: string;
-  authors: ArticleAuthor[];
-  date: string;
-  categories: ArticleCategory[];
-  featuredImage?: HomepageImage | null;
+  article: Article;
 }
 
-export function ArticleHeader({
-  title,
-  subheading,
-  authors,
-  date,
-  categories,
-  featuredImage,
-}: Props) {
+export function ArticleHeader({ article }: Props) {
+  const { title, subheading, author, date, categories, featuredImage } = article;
   return (
     <header class="article-header mb-6">
       {categories.length > 0 && (
@@ -44,9 +33,9 @@ export function ArticleHeader({
       )}
       <div class="byline mt-4 text-sm text-neutral-600 flex flex-wrap gap-x-2">
         <span>By </span>
-        {authors.map((a, i) => (
+        {author.map((a, i) => (
           <span key={a.link ?? a.name}>
-            {i > 0 && <span class="mr-1">,</span>}
+            {i > 0 && ', '}
             {a.link ? (
               <a href={a.link} class="hover:text-aj-orange font-medium">
                 {a.name}

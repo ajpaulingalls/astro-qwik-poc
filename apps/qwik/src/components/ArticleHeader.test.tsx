@@ -3,13 +3,17 @@ import { createDOM } from '@qwik.dev/core/testing';
 import { ArticleHeader } from './ArticleHeader';
 import { resolveImageUrl } from '../lib/image-url';
 import { getByHeading } from '../test-utils/dom';
+import type { Article } from '@aje-poc/shared-types';
 
-const props = {
+const baseArticle: Article = {
+  id: '1',
   title: 'Russian oil exports slump as Ukraine hammers ports and refineries',
+  link: '/features/2026/4/24/russian-oil-exports-slump',
   subheading:
     'Despite US sanctions waiver, Russian oil exports could fall to lowest levels since 2023.',
-  authors: [{ name: 'John T Psaropoulos', link: '/author/john_psaropoulos' }],
   date: '2026-04-24T16:52:48',
+  content: '<p>Body content omitted in header tests.</p>',
+  author: [{ name: 'John T Psaropoulos', link: '/author/john_psaropoulos' }],
   categories: [
     { name: 'Features', link: '/features/', slug: 'features' },
     { name: 'News', link: '/news/', slug: 'news' },
@@ -19,43 +23,63 @@ const props = {
 describe('ArticleHeader', () => {
   it('renders the article title as h1 (mutation-detected via getByHeading)', async () => {
     const { screen, render } = await createDOM();
-    await render(<ArticleHeader {...props} />);
+    await render(<ArticleHeader article={baseArticle} />);
     expect(getByHeading(screen, 1, /Russian oil exports slump/i)).toBeTruthy();
   });
 
   it('renders the subheading when present and omits the element when missing', async () => {
     const { screen, render } = await createDOM();
-    await render(<ArticleHeader {...props} />);
+    await render(<ArticleHeader article={baseArticle} />);
     const sub = screen.querySelector('p.subheading');
     expect(sub?.textContent).toContain('US sanctions waiver');
 
     const { screen: screen2, render: render2 } = await createDOM();
-    await render2(<ArticleHeader {...props} subheading={undefined} />);
+    await render2(<ArticleHeader article={{ ...baseArticle, subheading: undefined }} />);
     expect(screen2.querySelector('p.subheading')).toBeFalsy();
   });
 
-  it('renders each author as a link when href present and as plain text otherwise', async () => {
+  it('renders unlinked authors as plain text spans (mirror of Astro contract)', async () => {
     const { screen, render } = await createDOM();
     await render(
       <ArticleHeader
-        {...props}
-        authors={[
-          { name: 'John T Psaropoulos', link: '/author/john_psaropoulos' },
-          { name: 'Anonymous Wire' },
-        ]}
+        article={{
+          ...baseArticle,
+          author: [
+            { name: 'John T Psaropoulos', link: '/author/john_psaropoulos' },
+            { name: 'Anonymous Wire' },
+          ],
+        }}
       />,
     );
     const byline = screen.querySelector('.byline')!;
     expect(byline).toBeTruthy();
-    const link = byline.querySelector('a')!;
-    expect(link.getAttribute('href')).toBe('/author/john_psaropoulos');
-    expect(link.textContent).toBe('John T Psaropoulos');
+    const links = byline.querySelectorAll('a');
+    expect(links.length).toBe(1);
+    expect(links[0].getAttribute('href')).toBe('/author/john_psaropoulos');
     expect(byline.textContent).toContain('Anonymous Wire');
+  });
+
+  it('uses plain ", " text between authors (no wrapper <span class="mr-1">)', async () => {
+    const { screen, render } = await createDOM();
+    await render(
+      <ArticleHeader
+        article={{
+          ...baseArticle,
+          author: [
+            { name: 'John T Psaropoulos', link: '/author/john_psaropoulos' },
+            { name: 'Jane Doe', link: '/author/jane_doe' },
+          ],
+        }}
+      />,
+    );
+    const byline = screen.querySelector('.byline')!;
+    expect(byline.querySelectorAll('span.mr-1').length).toBe(0);
+    expect(byline.textContent).toContain('John T Psaropoulos, Jane Doe');
   });
 
   it('formats the date as "DD Month YYYY" inside a <time> with ISO datetime attr', async () => {
     const { screen, render } = await createDOM();
-    await render(<ArticleHeader {...props} />);
+    await render(<ArticleHeader article={baseArticle} />);
     const time = screen.querySelector('time')!;
     expect(time).toBeTruthy();
     expect(time.getAttribute('datetime')).toBe('2026-04-24T16:52:48');
@@ -66,13 +90,11 @@ describe('ArticleHeader', () => {
 
   it('renders categories as a semantic ul with li children (mirror Astro markup)', async () => {
     const { screen, render } = await createDOM();
-    await render(<ArticleHeader {...props} />);
+    await render(<ArticleHeader article={baseArticle} />);
     const ul = screen.querySelector('ul.categories');
     expect(ul).toBeTruthy();
     const items = ul!.querySelectorAll('li');
     expect(items.length).toBe(2);
-    // Old nav/span markup had a `·` separator span between siblings; verify
-    // the gap-2 + ul/li replacement leaves none behind.
     expect(ul!.querySelectorAll('span').length).toBe(0);
     const catLinks = screen.querySelectorAll('ul.categories li a');
     expect(catLinks.length).toBe(2);
@@ -84,7 +106,7 @@ describe('ArticleHeader', () => {
 
   it('renders no .categories element when categories is empty', async () => {
     const { screen, render } = await createDOM();
-    await render(<ArticleHeader {...props} categories={[]} />);
+    await render(<ArticleHeader article={{ ...baseArticle, categories: [] }} />);
     expect(screen.querySelector('.categories')).toBeFalsy();
   });
 
@@ -92,12 +114,14 @@ describe('ArticleHeader', () => {
     const { screen, render } = await createDOM();
     await render(
       <ArticleHeader
-        {...props}
-        featuredImage={{
-          sourceUrl: '/wp-content/uploads/2026/04/oil.jpg',
-          alt: 'Oil spill at Tuapse',
-          width: 1200,
-          height: 800,
+        article={{
+          ...baseArticle,
+          featuredImage: {
+            sourceUrl: '/wp-content/uploads/2026/04/oil.jpg',
+            alt: 'Oil spill at Tuapse',
+            width: 1200,
+            height: 800,
+          },
         }}
       />,
     );
@@ -112,7 +136,7 @@ describe('ArticleHeader', () => {
 
   it('omits the lead image cleanly when featuredImage is missing', async () => {
     const { screen, render } = await createDOM();
-    await render(<ArticleHeader {...props} />);
+    await render(<ArticleHeader article={baseArticle} />);
     expect(screen.querySelector('img.lead-image')).toBeFalsy();
   });
 });
