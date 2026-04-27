@@ -86,3 +86,27 @@ Validation commit hashes from this branch (`main`):
 - **Should block under desired rule:** `fd57978` (sprint-003 qwik web-vitals shim; staged files overlapped open concerns at the time but body lacks any `Resolves-Event` trailer).
 
 Reproduce the metric: `git log --since="2026-04-19" --pretty=format:"%H%x00%s%x00%b%x01" | python3 -c "..."` (script in the SMM event log if needed).
+
+---
+
+## Status update — 2026-04-27 (sprint-007 retro, plugin v2.30.7)
+
+**Still warn-only after 5 minor plugin releases (v2.25.0 → v2.30.7).** The trailer-adoption rate has stopped getting worse but plateaued well below the 80% threshold the retro analyzer uses as a health bar:
+
+| Sprint     | Trailer rate (all commits) |
+| ---------- | -------------------------: |
+| sprint-001 |                        50% |
+| sprint-002 |                        33% |
+| sprint-003 |                        20% |
+| sprint-004 |                        17% |
+| sprint-007 |          **78.5% (11/14)** |
+
+Sprint-007 climbed because shared-csp story-009 explicitly used `Resolves-Event:` in 4 commits. The improvement was driven by a human-authored story with the trailer in the AC, not by the warn-mode hook.
+
+**Probe-adoption rate (probe = retro nudge to add trailer): 0%.** The retro fired probes on 1 escape + 1 divert candidate; neither was adopted. Tied diagnostic of BOTH the nudge ergonomics AND the candidate quality (both buckets resolve to 0 — not enough signal to choose). At zero adoption, warn-mode has no measurable behavioral effect.
+
+**This Try has now been formally dropped (sprint-008 kickoff, event `d65bee7ec7cb`)** because it has been deferred 13 consecutive sprints without shipping. The kickoff explicitly accepted "78.5% trailer rate + 0% probe-adoption as the design ceiling" under warn-mode.
+
+That decision is the customer side accepting the cost of NOT shipping the gate. **Until the gate ships, the retro analyzer's "unresolved concern" counts will continue to read high because most resolutions are silent (no trailer → no structural link → analyzer relies on heuristics).** This is the trade the customer has now formally accepted; the feature request remains open for the plugin developer's roadmap consideration but is no longer being actively championed from this project.
+
+**Reaffirmed acceptance criteria — same as original.** No design changes; the ask is unchanged. The status update is to record that the customer has stopped self-flagging this each sprint.

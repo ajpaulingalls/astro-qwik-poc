@@ -82,3 +82,26 @@ SMM dir: `/Users/paulingalls/.claude/plugins/data/xp-agents-xp-agents/bce1d9c114
 Validation event ID: `5e03a0099fa9` (must be counted as a QR by any fixed analyzer).
 
 Sprint range to test against: sprint-003, between commits `1384cfb` (initial) and `3657095` (HEAD before sprint-004 work). Expect at least 1, probably several QRs. Sprint-004 should report ≥5 (one per story-003 step).
+
+---
+
+## Status update — 2026-04-27 (sprint-007 retro, plugin v2.30.7)
+
+**Bug still present after 5 minor plugin releases (v2.25.0 → v2.30.7) and 13 consecutive sprints.**
+
+Sprint-007 retrospective output included this line verbatim:
+
+> "13th consecutive sprint with quality-review counter mismatch: status_summary.quality_reviews=0 but per_agent.xp-quality-review.status_count=28 (12 review-required commits)."
+
+Evidence the metric is internally inconsistent within a single retro run:
+
+- `status_summary.quality_reviews` = **0**
+- `per_agent.xp-quality-review.status_count` = **28**
+
+Both numbers come from the same `events.jsonl` scan, in the same retro invocation. The summary aggregator and the per-agent rollup disagree by 28 events. The summary aggregator is the value used to gate the "0% adoption" Fix line.
+
+The 12 review-required commits in sprint-007 each had a corresponding QR session (verified by `xp-quality-review` and `xp-code-reviewer` agent_id status events with `metadata.action: "qr_complete"` markers). The summary continues to read 0.
+
+The fix proposed in the original report (count by `agent_id ∈ {xp-quality-review, xp-code-reviewer}` AND `type=status`) would resolve the mismatch — the per-agent rollup already does this and gets 28; the summary aggregator should reuse the same logic.
+
+**Reaffirmed acceptance criteria (1) — sprint-007 numbers:** Re-run analyzer against current `events.jsonl` for sprint-007 should report `quality_reviews ≥ 12` (one per review-required commit), not 0.
