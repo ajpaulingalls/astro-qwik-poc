@@ -4,6 +4,7 @@ import { graphqlFetch, GraphqlHttpError } from '../../lib/graphql';
 import { ArticleHeader } from '../../components/ArticleHeader';
 import { ArticleBody } from '../../components/ArticleBody';
 import { RelatedStories } from '../../components/RelatedStories';
+import { relatedPostsFrom } from '../../lib/related-posts';
 import type { Article, CuratedCollectionItem } from '@aje-poc/shared-types';
 
 interface ArticlePageData {
@@ -46,9 +47,7 @@ if (!article) {
   return new Response(`Article not found: ${slugLeaf}`, { status: 404 });
 }
 
-const MAX_RELATED = 6;
-const collections = curatedData.homepage.curatedCollection ?? [];
-const relatedPosts = collections.flatMap((c) => c.posts).slice(0, MAX_RELATED);
+const relatedPosts = relatedPostsFrom(curatedData.homepage.curatedCollection ?? []);
 ---
 
 <BaseLayout title={article.title}>

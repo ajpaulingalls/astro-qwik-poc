@@ -2,10 +2,11 @@ import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead } from '@qwik.dev/router';
 import { graphqlFetch, GraphqlHttpError } from '../../../lib/graphql';
 import { getDisplayHeadline } from '../../../lib/headline';
+import { relatedPostsFrom } from '../../../lib/related-posts';
 import { ArticleHeader } from '../../../components/ArticleHeader';
 import { ArticleBody } from '../../../components/ArticleBody';
-import { RelatedStories, MAX_RELATED } from '../../../components/RelatedStories';
-import type { Article, CuratedCollectionItem, HomepagePost } from '@aje-poc/shared-types';
+import { RelatedStories } from '../../../components/RelatedStories';
+import type { Article, CuratedCollectionItem } from '@aje-poc/shared-types';
 
 interface SingleArticleData {
   article: Article;
@@ -50,9 +51,7 @@ export const useArticleData = routeLoader$(async ({ params, fail }) => {
   // Return only what the page renders. Qwik 2 serializes the full loader value
   // into the resume payload, so trimming here directly shrinks what ships to
   // the browser — the in-component slice would not.
-  const relatedPosts: HomepagePost[] = (
-    curatedData.homepage.curatedCollection[0]?.posts ?? []
-  ).slice(0, MAX_RELATED);
+  const relatedPosts = relatedPostsFrom(curatedData.homepage.curatedCollection ?? []);
   return { article: articleData.article, relatedPosts };
 });
 

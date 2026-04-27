@@ -7,6 +7,7 @@ interface Props {
 }
 
 // Trusts producer for cap (matches CuratedCollection / MostPopular sibling convention).
+// MAX_RELATED lives in lib/related-posts.ts — this component just renders what it's given.
 export function RelatedStories({ posts }: Props) {
   if (posts.length === 0) return null;
   return (
