@@ -35,7 +35,12 @@ export function ArticleHeader({
       <h1 class="text-3xl md:text-4xl font-bold leading-tight">{title}</h1>
       {subheading && <p class="subheading mt-3 text-lg text-neutral-700">{subheading}</p>}
       {featuredImage && (
-        <LeadImage image={featuredImage} priority="eager" extraClass="lead-image mt-4" />
+        <LeadImage
+          image={featuredImage}
+          priority="eager"
+          sizes="(min-width: 768px) 768px, 100vw"
+          extraClass="lead-image mt-4"
+        />
       )}
       <div class="byline mt-4 text-sm text-neutral-600 flex flex-wrap gap-x-2">
         <span>By </span>

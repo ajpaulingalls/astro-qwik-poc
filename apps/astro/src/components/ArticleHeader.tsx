@@ -25,7 +25,12 @@ export function ArticleHeader({ article }: Props) {
         <p class="subheading text-lg text-neutral-700 mb-4">{article.subheading}</p>
       )}
       {article.featuredImage && (
-        <LeadImage image={article.featuredImage} priority="eager" extraClass="lead-image my-4" />
+        <LeadImage
+          image={article.featuredImage}
+          priority="eager"
+          sizes="(min-width: 768px) 768px, 100vw"
+          extraClass="lead-image my-4"
+        />
       )}
       <div class="flex flex-wrap items-center gap-x-3 text-sm text-neutral-600">
         {article.author.length > 0 && (

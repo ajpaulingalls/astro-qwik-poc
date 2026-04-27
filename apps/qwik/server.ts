@@ -52,7 +52,12 @@ const MIME: Record<string, string> = {
 // Astro's proxy forwards the entire upstream response via `new Response(body, response)`,
 // and the Deno runtime strips hop-by-hop headers at the wire boundary. We hand-build
 // headers for Node's http server, so we have to do the stripping ourselves. RFC 7230 §6.1.
-const HOP_BY_HOP = new Set([
+//
+// content-encoding + content-length also need stripping: fetch() transparently decodes
+// gzip/br responses and exposes the DECODED bytes via upstream.body. Forwarding the
+// original encoding header would tell the downstream client to decode again →
+// Z_DATA_ERROR. Bytes-after-decode also differ from the upstream-declared length.
+const STRIP_HEADERS = new Set([
   'connection',
   'keep-alive',
   'proxy-authenticate',
@@ -61,6 +66,8 @@ const HOP_BY_HOP = new Set([
   'trailer',
   'transfer-encoding',
   'upgrade',
+  'content-encoding',
+  'content-length',
 ]);
 
 async function tryProxyUploads(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
@@ -71,7 +78,7 @@ async function tryProxyUploads(req: IncomingMessage, res: ServerResponse): Promi
     const headers: Record<string, string> = {};
     // Headers iteration yields lowercased names per WHATWG; no toLowerCase needed.
     upstream.headers.forEach((value, name) => {
-      if (!HOP_BY_HOP.has(name)) headers[name] = value;
+      if (!STRIP_HEADERS.has(name)) headers[name] = value;
     });
     res.writeHead(upstream.status, headers);
     if (!upstream.body) {

@@ -7,8 +7,13 @@ import { resolveApiBase } from '../../../lib/graphql';
 // code; see apps/astro/docs/SECURITY.md for the why.
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
-  const upstream = `${resolveApiBase()}/wp-content/uploads/${params.path}`;
+export const GET: APIRoute = async ({ params, url }) => {
+  // Forward the query string so resize hints (?w=, ?resize=) reach mock-api;
+  // production WordPress uses these for server-side cropping and the new
+  // SVG-placeholder branch in packages/mock-api/lib/handler.ts depends on it.
+  // url.search is "" (not undefined) when the request has no query, so plain
+  // concatenation is safe — no leading "?" is appended for paramless requests.
+  const upstream = `${resolveApiBase()}/wp-content/uploads/${params.path}${url.search}`;
   const response = await fetch(upstream);
   return new Response(response.body, response);
 };

@@ -205,6 +205,59 @@ Deno.test("handler: GET /wp-content/uploads/<any path> returns 200 image/png pla
   assertEquals(bytes[3], 0x47);
 });
 
+Deno.test("handler: /wp-content/uploads/*?w=W&resize=W,H returns image/svg+xml at requested dimensions", async () => {
+  // Production WordPress backend honors ?w=&resize= for server-side cropping.
+  // We mirror that here so the perf-harness sees real pixel dimensions and
+  // M11's switch to live aljazeera.com behaves the same as dev.
+  const req = new Request(
+    "http://localhost:4455/wp-content/uploads/2026/04/foo.jpg?w=400&resize=400%2C267",
+    { method: "GET" },
+  );
+  const res = handle(req, { fixtures });
+  assertEquals(res.status, 200);
+  assertEquals(res.headers.get("content-type"), "image/svg+xml");
+  const body = await res.text();
+  assertStringIncludes(body, 'width="400"');
+  assertStringIncludes(body, 'height="267"');
+});
+
+Deno.test("handler: /wp-content/uploads/*?w=W (no resize) returns square SVG", async () => {
+  const req = new Request(
+    "http://localhost:4455/wp-content/uploads/foo.jpg?w=300",
+    { method: "GET" },
+  );
+  const res = handle(req, { fixtures });
+  assertEquals(res.headers.get("content-type"), "image/svg+xml");
+  const body = await res.text();
+  assertStringIncludes(body, 'width="300"');
+  assertStringIncludes(body, 'height="300"');
+});
+
+Deno.test("handler: /wp-content/uploads/* with malformed w= falls through to PNG", () => {
+  // Defensive: a typo or attacker-supplied bogus value shouldn't 500.
+  const req = new Request(
+    "http://localhost:4455/wp-content/uploads/foo.jpg?w=not-a-number",
+    { method: "GET" },
+  );
+  const res = handle(req, { fixtures });
+  assertEquals(res.status, 200);
+  assertEquals(res.headers.get("content-type"), "image/png");
+});
+
+Deno.test("handler: /wp-content/uploads/* with malformed resize= falls through to PNG (no silent square)", () => {
+  // If resize is provided but unparseable, fall through to PNG instead of
+  // silently downgrading to a square SVG — the caller asked for a specific
+  // aspect; honest move is "we couldn't honor that" rather than "here's a
+  // shape you didn't ask for."
+  const req = new Request(
+    "http://localhost:4455/wp-content/uploads/foo.jpg?w=400&resize=abc%2Cdef",
+    { method: "GET" },
+  );
+  const res = handle(req, { fixtures });
+  assertEquals(res.status, 200);
+  assertEquals(res.headers.get("content-type"), "image/png");
+});
+
 Deno.test("handler: /wp-content/uploads/* placeholder does NOT require wp-site header", () => {
   // Image fetches from the browser don't carry the wp-site header.
   const req = new Request(
