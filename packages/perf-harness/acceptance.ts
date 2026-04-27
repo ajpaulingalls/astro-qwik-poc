@@ -25,6 +25,13 @@ interface Viewport {
 const MOBILE: Viewport = { width: 320, height: 568 };
 const DESKTOP: Viewport = { width: 1280, height: 800 };
 
+// Article-shape acceptance tests below depend on this fixture existing in
+// packages/mock-api/fixtures/ArchipelagoSingleArticleQuery--<last-segment>.json.
+// If the fixture is renamed, both the 404 test and the cap test will start
+// failing — likely the wrong test will fail first; check this constant.
+const KNOWN_ARTICLE_SLUG =
+  'features/2026/4/24/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries';
+
 export function runAcceptanceSuite(target: Target): void {
   const APP_URL = `http://127.0.0.1:${APP_PORT[target]}/`;
 
@@ -163,6 +170,33 @@ export function runAcceptanceSuite(target: Target): void {
       );
       expect(probe.status).toBe(200);
       expect(probe.headers.get('content-type')).toBe('image/png');
+    });
+
+    // Mock-api returns 404 for slugs without a matching fixture. Both apps
+    // must translate that into a real HTTP 404 instead of a 500 — Astro via
+    // GraphqlHttpError.status, Qwik via routeLoader fail(404).
+    it('returns HTTP 404 for an article slug with no matching fixture', async () => {
+      const response = await fetch(
+        `http://127.0.0.1:${APP_PORT[target]}/news/this-slug-has-no-fixture`,
+      );
+      expect(response.status).toBe(404);
+    });
+
+    // Both apps cap related stories at 6: Astro slices in the route loader,
+    // Qwik via MAX_RELATED in both loader + component (defense-in-depth).
+    // Without the cap a future curated-feed expansion could silently render
+    // dozens of related links. SSR-only content, so bare fetch + HTML scan
+    // beats spinning up puppeteer.
+    it('caps related-stories at 6 entries on the article page', async () => {
+      const html = await fetch(
+        `http://127.0.0.1:${APP_PORT[target]}/news/${KNOWN_ARTICLE_SLUG}`,
+      ).then((r) => r.text());
+      const start = html.indexOf('related-stories');
+      expect(start, 'related-stories section missing from SSR HTML').toBeGreaterThan(-1);
+      const section = html.slice(start, html.indexOf('</section>', start));
+      const linkCount = (section.match(/<a\b/g) ?? []).length;
+      expect(linkCount).toBeGreaterThan(0);
+      expect(linkCount).toBeLessThanOrEqual(6);
     });
 
     it('Inter web font is loaded with no CLS-triggering FOIT', async () => {
