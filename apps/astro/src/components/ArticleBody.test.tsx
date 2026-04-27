@@ -68,7 +68,7 @@ describe('ArticleBody', () => {
     expect(article!.textContent).toBe('');
   });
 
-  it('transforms HTML via transformContent when provided', () => {
+  it('transforms HTML via transformContent when provided (applied before segmentation)', () => {
     const transformContent = (html: string) =>
       html.replace('<blockquote>', '<blockquote data-transformed="yes">');
     const { container } = render(
@@ -76,5 +76,33 @@ describe('ArticleBody', () => {
     );
     const blockquote = container.querySelector('article blockquote');
     expect(blockquote?.getAttribute('data-transformed')).toBe('yes');
+  });
+
+  it('dispatches twitter-tweet blockquote to TwitterEmbed wrapper', () => {
+    const html = `<p>Before.</p><blockquote class="twitter-tweet"><p>tweet</p></blockquote><p>After.</p>`;
+    const { container } = render(<ArticleBody content={html} />);
+    expect(container.querySelector('div.embed-twitter blockquote.twitter-tweet')).toBeTruthy();
+    expect(container.textContent).toContain('Before');
+    expect(container.textContent).toContain('After');
+  });
+
+  it('dispatches instagram-media blockquote to InstagramEmbed wrapper', () => {
+    const html = `<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/X/"><a href="https://www.instagram.com/p/X/">View</a></blockquote>`;
+    const { container } = render(<ArticleBody content={html} />);
+    expect(container.querySelector('div.embed-instagram blockquote.instagram-media')).toBeTruthy();
+  });
+
+  it('dispatches wp-block-gallery div to GalleryEmbed wrapper', () => {
+    const html = `<div class="wp-block-gallery has-nested-images columns-3"><figure class="wp-block-image"><img src="/x.jpg"/></figure></div>`;
+    const { container } = render(<ArticleBody content={html} />);
+    expect(container.querySelector('div.embed-gallery div.wp-block-gallery')).toBeTruthy();
+  });
+
+  it('dispatches Brightcove video-js wrapper to BrightcoveEmbed', () => {
+    const html = `<!-- Start of Brightcove Player --><div><video-js data-account="A" data-player="P" class="video-js"></video-js></div><!-- End of Brightcove Player -->`;
+    const { container } = render(<ArticleBody content={html} />);
+    const embed = container.querySelector('div.embed-brightcove');
+    expect(embed).toBeTruthy();
+    expect(embed?.querySelector('video-js')).toBeTruthy();
   });
 });

@@ -49,7 +49,7 @@ export function LeadImage({
           })
           .join(', ')
       : undefined;
-  return (
+  const img = (
     <img
       src={resolveImageUrl(image.sourceUrl)}
       srcset={srcset}
@@ -62,5 +62,12 @@ export function LeadImage({
       decoding="async"
       class={cls}
     />
+  );
+  if (!image.caption) return img;
+  return (
+    <figure>
+      {img}
+      <figcaption>{image.caption}</figcaption>
+    </figure>
   );
 }

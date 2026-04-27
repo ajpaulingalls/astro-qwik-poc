@@ -2,6 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/preact';
 import { HeroCard } from './HeroCard';
+import { resolveImageUrl } from '../lib/image-url';
 import type { HomepagePost } from '@aje-poc/shared-types';
 
 const post: HomepagePost = {
@@ -34,9 +35,7 @@ describe('HeroCard', () => {
     const { container } = render(<HeroCard post={post} />);
     const img = container.querySelector('img')!;
     expect(img).toBeTruthy();
-    expect(img.getAttribute('src')).toBe(
-      'http://localhost:4455/wp-content/uploads/2026/04/anti-us-mural.jpg',
-    );
+    expect(img.getAttribute('src')).toBe(resolveImageUrl(post.featuredImage!.sourceUrl));
     expect(img.getAttribute('alt')).toBe('People walk past an anti-US mural in Tehran');
     expect(img.getAttribute('loading')).toBe('eager');
     expect(img.getAttribute('fetchpriority')).toBe('high');

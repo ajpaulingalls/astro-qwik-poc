@@ -34,6 +34,14 @@ export default defineConfig({
         "img-src 'self' https: data: http://localhost:4455",
         "font-src 'self' data:",
         "connect-src 'self' http://localhost:4455",
+        // Embed provider scripts (M7 — story-003). Each is loaded by an
+        // embed component on demand via useEmbedScript: Twitter widgets.js,
+        // Instagram embed.js, Brightcove per-account player. 'unsafe-inline'
+        // is intentionally NOT included — provider scripts are added as
+        // external <script src> elements, not inlined.
+        "script-src 'self' https://platform.twitter.com https://www.instagram.com https://players.brightcove.net",
+        // Iframes injected by the provider scripts after they execute.
+        'frame-src https://platform.twitter.com https://www.instagram.com https://players.brightcove.net',
       ],
     },
   },
