@@ -9,9 +9,9 @@
     "build": "bun --bun vite build && bun --bun vite build --ssr ./src/entry.ssr.tsx && bun --bun vite build --ssr ./src/entry.preview.tsx",
     "preview": "bun --bun vite preview",
     "preview:prod": "bun run server.ts",
-    "perf:qwik": "bun run ../../packages/perf-harness/runner.ts --target=qwik",
+    "perf:qwik": "PUBLIC_API_BASE=http://localhost:4456 bun run ../../packages/perf-harness/runner.ts --target=qwik",
     "test": "bun run build && vitest run",
-    "test:acceptance": "bun run build && vitest run tests/acceptance.test.ts"
+    "test:acceptance": "PUBLIC_API_BASE=http://localhost:4456 bun run build && vitest run tests/acceptance.test.ts"
   },
   "dependencies": {
     "@aje-poc/shared-csp": "workspace:*",
