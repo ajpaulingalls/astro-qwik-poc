@@ -10,14 +10,20 @@ export type EmbedType = 'twitter' | 'instagram' | 'gallery' | 'brightcove';
 
 export type Segment =
   | { kind: 'html'; html: string }
-  | { kind: 'embed'; type: EmbedType; html: string };
+  | { kind: 'embed'; type: 'twitter' | 'instagram' | 'gallery'; html: string }
+  | {
+      kind: 'embed';
+      type: 'brightcove';
+      html: string;
+      account: string;
+      player: string;
+      videoId?: string;
+    };
 
-interface Match {
-  start: number;
-  end: number;
-  type: EmbedType;
-  html: string;
-}
+type Match = { start: number; end: number } & (
+  | { type: 'twitter' | 'instagram' | 'gallery'; html: string }
+  | { type: 'brightcove'; html: string; account: string; player: string; videoId?: string }
+);
 
 const TWITTER_BLOCKQUOTE = /<blockquote\b[^>]*\bclass="[^"]*\btwitter-tweet\b[^"]*"[^>]*>/i;
 const INSTAGRAM_BLOCKQUOTE = /<blockquote\b[^>]*\bclass="[^"]*\binstagram-media\b[^"]*"[^>]*>/i;
@@ -44,7 +50,18 @@ export function parseEmbeds(html: string): Segment[] {
       const before = html.slice(pos, match.start);
       if (before.trim()) segments.push({ kind: 'html', html: before });
     }
-    segments.push({ kind: 'embed', type: match.type, html: match.html });
+    if (match.type === 'brightcove') {
+      segments.push({
+        kind: 'embed',
+        type: 'brightcove',
+        html: match.html,
+        account: match.account,
+        player: match.player,
+        videoId: match.videoId,
+      });
+    } else {
+      segments.push({ kind: 'embed', type: match.type, html: match.html });
+    }
     pos = match.end;
   }
   return segments;
@@ -91,7 +108,7 @@ function indexOrInf(slice: string, re: RegExp): number {
 function extractBlockquote(
   slice: string,
   start: number,
-  type: EmbedType,
+  type: 'twitter' | 'instagram',
   trailRe: RegExp,
 ): Match | null {
   const close = findMatchingClose(slice, start, 'blockquote');
@@ -108,19 +125,25 @@ function extractGallery(slice: string, start: number): Match | null {
   return { start, end: close, type: 'gallery', html: slice.slice(start, close) };
 }
 
+const BRIGHTCOVE_ACCOUNT = /\bdata-account="([^"]+)"/;
+const BRIGHTCOVE_PLAYER = /\bdata-player="([^"]+)"/;
+const BRIGHTCOVE_VIDEO_ID = /\bdata-video-id="([^"]+)"/;
+
 function extractBrightcove(slice: string, start: number): Match | null {
   const after = slice.slice(start);
   const endComment = BRIGHTCOVE_COMMENT_END.exec(after);
   if (!endComment) return null;
   const totalEnd = start + endComment.index + endComment[0].length;
   const block = slice.slice(start, totalEnd);
-  // Strip the provider script — the BrightcoveEmbed component injects it at
-  // mount time using the per-video data-account / data-player attrs.
   const stripped = block.replace(
     /<script\b[^>]*src="[^"]*players\.brightcove\.net[^"]*"[^>]*><\/script>/i,
     '',
   );
-  return { start, end: totalEnd, type: 'brightcove', html: stripped };
+  const account = BRIGHTCOVE_ACCOUNT.exec(stripped)?.[1];
+  const player = BRIGHTCOVE_PLAYER.exec(stripped)?.[1];
+  if (!account || !player) return null;
+  const videoId = BRIGHTCOVE_VIDEO_ID.exec(stripped)?.[1];
+  return { start, end: totalEnd, type: 'brightcove', html: stripped, account, player, videoId };
 }
 
 function findMatchingClose(slice: string, start: number, tag: string): number {

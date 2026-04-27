@@ -72,6 +72,22 @@ describe('parseEmbeds', () => {
     }
   });
 
+  it('extracts brightcove account/player/videoId as segment props (no html re-parse needed)', () => {
+    const html = `<!-- Start of Brightcove Player -->
+<div><video-js id="6393574500112" data-video-id="6393574500112" data-account="665003303001" data-player="6tKQRAx7lu" class="video-js"></video-js></div>
+<!-- End of Brightcove Player -->`;
+    const segments = parseEmbeds(html);
+    expect(segments).toHaveLength(1);
+    const seg = segments[0];
+    if (seg.kind === 'embed' && seg.type === 'brightcove') {
+      expect(seg.account).toBe('665003303001');
+      expect(seg.player).toBe('6tKQRAx7lu');
+      expect(seg.videoId).toBe('6393574500112');
+    } else {
+      throw new Error('expected brightcove embed segment');
+    }
+  });
+
   it('preserves html before and after an embed in order', () => {
     const html = `<p>Intro.</p><blockquote class="twitter-tweet"><p>tweet</p></blockquote><p>Outro.</p>`;
     const segments = parseEmbeds(html);
