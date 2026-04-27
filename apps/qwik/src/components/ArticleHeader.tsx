@@ -69,6 +69,7 @@ export function ArticleHeader({
           height={featuredImage.height}
           loading="eager"
           fetchPriority="high"
+          decoding="async"
         />
       )}
       <div class="byline mt-4 text-sm text-neutral-600 flex flex-wrap gap-x-2">

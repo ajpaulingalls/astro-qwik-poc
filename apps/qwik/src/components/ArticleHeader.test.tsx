@@ -100,6 +100,7 @@ describe('ArticleHeader', () => {
     expect(img.getAttribute('alt')).toBe('Oil spill at Tuapse');
     expect(img.getAttribute('loading')).toBe('eager');
     expect(img.getAttribute('fetchpriority')).toBe('high');
+    expect(img.getAttribute('decoding')).toBe('async');
   });
 
   it('omits the lead image cleanly when featuredImage is missing', async () => {

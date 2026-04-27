@@ -1,4 +1,5 @@
 import type { Article } from '@aje-poc/shared-types';
+import { resolveImageUrl } from '../lib/image-url';
 
 interface Props {
   article: Article;
@@ -27,6 +28,18 @@ export function ArticleHeader({ article }: Props) {
       <h1 class="text-3xl font-bold leading-tight mb-3">{article.title}</h1>
       {article.subheading && (
         <p class="subheading text-lg text-neutral-700 mb-4">{article.subheading}</p>
+      )}
+      {article.featuredImage && (
+        <img
+          class="lead-image my-4 w-full h-auto rounded aspect-[3/2] object-cover"
+          src={resolveImageUrl(article.featuredImage.sourceUrl)}
+          alt={article.featuredImage.alt ?? ''}
+          width={article.featuredImage.width}
+          height={article.featuredImage.height}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
       )}
       <div class="flex flex-wrap items-center gap-x-3 text-sm text-neutral-600">
         {article.author.length > 0 && (

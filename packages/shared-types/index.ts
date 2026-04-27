@@ -64,4 +64,5 @@ export interface Article {
   content: string;
   author: ArticleAuthor[];
   categories: ArticleCategory[];
+  featuredImage?: HomepageImage | null;
 }
