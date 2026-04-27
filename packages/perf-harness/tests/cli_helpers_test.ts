@@ -85,6 +85,37 @@ describe('buildPageList', () => {
     const qwikIndex = buildPageList('qwik').find((p) => p.name === 'index')!;
     expect(qwikIndex.budgets!.jsBytes).toBe(165 * 1024);
   });
+
+  it('exposes section-geo and section-topic pages for both targets', () => {
+    for (const target of ['astro', 'qwik'] as const) {
+      const pages = buildPageList(target);
+      const geo = pages.find((p) => p.name === 'section-geo');
+      const topic = pages.find((p) => p.name === 'section-topic');
+      expect(geo, `${target} section-geo`).toBeDefined();
+      expect(topic, `${target} section-topic`).toBeDefined();
+      // Geographic vs topic distinction comes from the per-app section-type
+      // allowlist (apps/*/src/lib/section-type.ts). middle-east is geographic;
+      // opinion is topic. Hardcoding here keeps perf-harness independent of
+      // the apps' allowlists — a drift will fail the section-type tests, not
+      // this gate.
+      expect(geo!.path).toBe('/middle-east');
+      expect(topic!.path).toBe('/opinion');
+    }
+  });
+
+  it('astro section pages declare a 45KB jsBytes budget', () => {
+    for (const name of ['section-geo', 'section-topic'] as const) {
+      const page = buildPageList('astro').find((p) => p.name === name)!;
+      expect(page.budgets!.jsBytes).toBe(45 * 1024);
+    }
+  });
+
+  it('qwik section pages share the homepage 165KB jsBytes ceiling', () => {
+    for (const name of ['section-geo', 'section-topic'] as const) {
+      const page = buildPageList('qwik').find((p) => p.name === name)!;
+      expect(page.budgets!.jsBytes).toBe(165 * 1024);
+    }
+  });
 });
 
 describe('waitForPort', () => {
