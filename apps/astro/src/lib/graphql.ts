@@ -6,6 +6,19 @@ export interface GraphqlFetchOptions {
   wpSite?: WpSite;
 }
 
+// Carries the upstream HTTP status so callers (e.g. news/[...slug] route)
+// can branch on .status === 404 without string-matching the error message.
+export class GraphqlHttpError extends Error {
+  override readonly name = 'GraphqlHttpError';
+  constructor(
+    readonly operationName: string,
+    readonly status: number,
+    readonly statusText: string,
+  ) {
+    super(`graphqlFetch ${operationName} failed: ${status} ${statusText}`);
+  }
+}
+
 const DEFAULT_API_BASE = 'http://localhost:4455';
 
 export function resolveApiBase(): string {
@@ -34,9 +47,7 @@ export async function graphqlFetch<T>({
   });
 
   if (!response.ok) {
-    throw new Error(
-      `graphqlFetch ${operationName} failed: ${response.status} ${response.statusText}`,
-    );
+    throw new GraphqlHttpError(operationName, response.status, response.statusText);
   }
 
   const json = (await response.json()) as { data: T };

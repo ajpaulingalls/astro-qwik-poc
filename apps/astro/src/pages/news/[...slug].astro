@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { graphqlFetch } from '../../lib/graphql';
+import { graphqlFetch, GraphqlHttpError } from '../../lib/graphql';
 import { ArticleHeader } from '../../components/ArticleHeader';
 import { ArticleBody } from '../../components/ArticleBody';
 import { RelatedStories } from '../../components/RelatedStories';
@@ -35,7 +35,7 @@ try {
     }),
   ]);
 } catch (err) {
-  if (err instanceof Error && err.message.includes('404')) {
+  if (err instanceof GraphqlHttpError && err.status === 404) {
     return new Response(`Article not found: ${slugLeaf}`, { status: 404 });
   }
   throw err;
