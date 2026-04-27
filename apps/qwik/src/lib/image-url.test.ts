@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resizedImageUrl, resolveImageUrl } from './image-url';
+import {
+  LCP_PRELOAD_WIDTH,
+  proportionalHeight,
+  resizedImageUrl,
+  resolveImageUrl,
+} from './image-url';
 
 describe('resolveImageUrl', () => {
   beforeEach(() => {
@@ -76,5 +81,33 @@ describe('resizedImageUrl', () => {
         { width: 400 },
       ),
     ).toBe('https://www.aljazeera.com/wp-content/uploads/foo.jpg?w=770&resize=770%2C770');
+  });
+});
+
+describe('proportionalHeight', () => {
+  it('returns null when image.width is missing (preload caller must skip the resize hint)', () => {
+    expect(proportionalHeight(800, { height: 600 })).toBeNull();
+  });
+
+  it('returns null when image.height is missing', () => {
+    expect(proportionalHeight(800, { width: 1200 })).toBeNull();
+  });
+
+  it('returns null when both natural dims are missing', () => {
+    expect(proportionalHeight(800, {})).toBeNull();
+  });
+
+  it('returns width when image is square (1:1 aspect)', () => {
+    expect(proportionalHeight(400, { width: 1000, height: 1000 })).toBe(400);
+  });
+
+  it('rounds the typical 3:2 article ratio (1200x800) at LCP_PRELOAD_WIDTH → 533', () => {
+    // Anchored to LCP_PRELOAD_WIDTH (800) so a future preload-width change
+    // surfaces the test name as well as the asserted value.
+    expect(proportionalHeight(LCP_PRELOAD_WIDTH, { width: 1200, height: 800 })).toBe(533);
+  });
+
+  it('rounds 16:9 (1920x1080) at 800w → 450', () => {
+    expect(proportionalHeight(800, { width: 1920, height: 1080 })).toBe(450);
   });
 });
