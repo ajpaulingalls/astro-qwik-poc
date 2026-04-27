@@ -44,6 +44,7 @@
       "name": "aje-poc-qwik",
       "version": "0.0.0",
       "dependencies": {
+        "@aje-poc/shared-csp": "workspace:*",
         "@aje-poc/shared-types": "workspace:*",
         "web-vitals": "^4.2.4",
       },
