@@ -1,6 +1,6 @@
 import type { HomepagePost } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
-import { resolveImageUrl } from '../lib/image-url';
+import { LeadImage } from './LeadImage';
 import { LiveBadge } from './LiveBadge';
 
 interface Props {
@@ -12,17 +12,7 @@ export function HeroCard({ post }: Props) {
   return (
     <article>
       <a href={post.link} class="block">
-        {img && (
-          <img
-            src={resolveImageUrl(img.sourceUrl)}
-            alt={img.alt ?? ''}
-            width={img.width}
-            height={img.height}
-            loading="eager"
-            fetchpriority="high"
-            class="w-full h-auto rounded aspect-[3/2] object-cover"
-          />
-        )}
+        {img && <LeadImage image={img} priority="eager" />}
         <div class="px-4 py-3">
           <LiveBadge isLive={post.isLive} />
           <h2 class="text-2xl font-bold mt-1">{getDisplayHeadline(post)}</h2>

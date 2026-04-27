@@ -1,6 +1,6 @@
 import type { Article } from '@aje-poc/shared-types';
-import { resolveImageUrl } from '../lib/image-url';
 import { formatDate } from '../lib/format-date';
+import { LeadImage } from './LeadImage';
 
 interface Props {
   article: Article;
@@ -25,16 +25,7 @@ export function ArticleHeader({ article }: Props) {
         <p class="subheading text-lg text-neutral-700 mb-4">{article.subheading}</p>
       )}
       {article.featuredImage && (
-        <img
-          class="lead-image my-4 w-full h-auto rounded aspect-[3/2] object-cover"
-          src={resolveImageUrl(article.featuredImage.sourceUrl)}
-          alt={article.featuredImage.alt ?? ''}
-          width={article.featuredImage.width}
-          height={article.featuredImage.height}
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-        />
+        <LeadImage image={article.featuredImage} priority="eager" extraClass="lead-image my-4" />
       )}
       <div class="flex flex-wrap items-center gap-x-3 text-sm text-neutral-600">
         {article.author.length > 0 && (
