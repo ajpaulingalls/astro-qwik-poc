@@ -18,3 +18,7 @@ export type SectionType = 'geographic' | 'topic';
 export function getSectionType(slug: string): SectionType {
   return (GEOGRAPHIC_SECTIONS as readonly string[]).includes(slug) ? 'geographic' : 'topic';
 }
+
+// Production page-size for section feeds (initial render and each LoadMore
+// click). Mirrored in mock-api fixtures and tests.
+export const SECTION_PAGE_SIZE = 9;
