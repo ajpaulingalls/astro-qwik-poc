@@ -11,6 +11,7 @@ import {
   type AggregatedReport,
 } from './reporter.ts';
 import { buildPageList, parseArgs, waitForPort, type Target } from './cli_helpers.ts';
+import { checkBudgets } from './budgets.ts';
 import { collectWebVitals, type EnrichedMetric } from './web_vitals_collector.ts';
 import { APP_PORT, MOCK_API_PORT, killService, spawnApp, spawnMockApi } from './spawn.ts';
 
@@ -61,6 +62,7 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
   }
 
   const services = [spawnMockApi(args.target), spawnApp(args.target)];
+  const allViolations: string[] = [];
 
   try {
     await Promise.all([
@@ -96,9 +98,21 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
       const formatted = formatReport(report);
       writeReports(args.target, page.name, formatted);
       process.stdout.write(formatted.markdown);
+
+      const violations = checkBudgets(report, page.budgets, args.target, page.name);
+      if (violations.length > 0) {
+        for (const v of violations) process.stderr.write(`${v}\n`);
+        allViolations.push(...violations);
+      }
     }
   } finally {
     await Promise.all(services.map(killService));
+  }
+
+  // Throw AFTER reports are written and services are killed, so CI artifacts
+  // are preserved even when the budget gate fails.
+  if (allViolations.length > 0) {
+    throw new Error(`Budget violations:\n${allViolations.join('\n')}`);
   }
 }
 
