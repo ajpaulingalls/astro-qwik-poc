@@ -1,4 +1,5 @@
 import { connect } from 'node:net';
+import type { PageBudgets } from './budgets.ts';
 
 export type Target = 'astro' | 'qwik';
 
@@ -11,6 +12,7 @@ export interface ParsedArgs {
 export interface Page {
   name: string;
   path: string;
+  budgets?: PageBudgets;
 }
 
 const PAGES: Record<Target, Page[]> = {
