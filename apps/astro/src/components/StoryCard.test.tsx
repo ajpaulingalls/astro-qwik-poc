@@ -2,6 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/preact';
 import { StoryCard } from './StoryCard';
+import { resolveImageUrl } from '../lib/image-url';
 import type { HomepagePost } from '@aje-poc/shared-types';
 
 const post: HomepagePost = {
@@ -33,9 +34,7 @@ describe('StoryCard', () => {
   it('renders the featuredImage with lazy loading (not LCP)', () => {
     const { container } = render(<StoryCard post={post} />);
     const img = container.querySelector('img')!;
-    expect(img.getAttribute('src')).toBe(
-      'http://localhost:4455/wp-content/uploads/2026/04/lebanon.jpg',
-    );
+    expect(img.getAttribute('src')).toBe(resolveImageUrl(post.featuredImage!.sourceUrl));
     expect(img.getAttribute('alt')).toBe('Aftermath of attack in Lebanon');
     expect(img.getAttribute('loading')).toBe('lazy');
     expect(img.hasAttribute('fetchpriority')).toBe(false);
