@@ -40,8 +40,12 @@ export default defineConfig({
         // is intentionally NOT included — provider scripts are added as
         // external <script src> elements, not inlined.
         "script-src 'self' https://platform.twitter.com https://www.instagram.com https://players.brightcove.net",
-        // Iframes injected by the provider scripts after they execute.
-        'frame-src https://platform.twitter.com https://www.instagram.com https://players.brightcove.net',
+        // Iframes injected by the provider scripts after they execute, plus
+        // YouTube (figure or bare-iframe extracted by parse-embeds; no provider
+        // script needed). syndication.twitter.com is required because Twitter
+        // widgets render their embed iframe to that origin too — without it,
+        // some browsers silently leave the embed blank with no console error.
+        'frame-src https://platform.twitter.com https://syndication.twitter.com https://www.instagram.com https://players.brightcove.net https://www.youtube.com https://www.youtube-nocookie.com',
       ],
     },
   },
