@@ -141,6 +141,13 @@
             "npm:web-vitals@^4.2.4"
           ]
         }
+      },
+      "packages/shared-csp": {
+        "packageJson": {
+          "dependencies": [
+            "npm:vitest@^2.1.0"
+          ]
+        }
       }
     }
   }

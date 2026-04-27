@@ -2,6 +2,14 @@
 
 Live log of beta-specific workarounds, missing features, and divergences from the architecture doc. Updated as items are encountered.
 
+## post-sprint-007 — vite.config.ts can't import .ts workspace packages (2026-04-27)
+
+`apps/qwik/vite.config.ts` cannot `import { ... } from '@aje-poc/shared-csp'` (or any other workspace package whose entry is a `.ts` file). Vite's config loader uses esbuild to compile vite.config.ts to JS, then dynamic-imports it via Node's ESM loader; that loader does not handle `.ts` and bombs with `ERR_UNKNOWN_FILE_EXTENSION`. Wrapping the vite invocation with `bun --bun vite ...` (which `apps/qwik/package.json` does for dev/build/preview) doesn't help — vite's internal config-load path still bottoms out at Node's loader.
+
+**Workaround**: keep CSP setting in `apps/qwik/server.ts` (which IS run under bun and CAN load shared-csp). Drop CSP from `vite.config.ts` server/preview headers — dev/preview run unprotected, but acceptance tests use the production server via `packages/perf-harness/spawn.ts` so the real CSP path stays covered. M11 prod also sets CSP via server.ts.
+
+**Open question**: revisit when shared-csp ships a `.js` entry (precompile) or when bun gains the ability to substitute itself for Node inside vite's internal loader.
+
 ## story-008 — CSP `'unsafe-inline'` requirement (2026-04-27)
 
 Qwik 2 beta.32 emits both inline `<style>` blocks (Tailwind 4's CSS-first pipeline + Qwik's resumability container) AND inline resumability bootstrap scripts. There is no equivalent of Astro's `security.csp.scriptDirective`/`styleDirective` auto-hash generation in Qwik 2 yet, so the only way to keep the page functional under any non-trivial CSP is to allow `'unsafe-inline'` on both `script-src` and `style-src` (`apps/qwik/src/lib/csp.ts`).
