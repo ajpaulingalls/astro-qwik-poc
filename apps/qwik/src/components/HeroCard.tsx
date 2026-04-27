@@ -13,7 +13,9 @@ export const HeroCard = component$<Props>(({ post }) => {
   return (
     <article>
       <a href={post.link} class="block">
-        {img && <LeadImage image={img} priority="eager" />}
+        {img && (
+          <LeadImage image={img} priority="eager" sizes="(min-width: 1024px) 1024px, 100vw" />
+        )}
         <div class="px-4 py-3">
           <LiveBadge isLive={post.isLive} />
           <h2 class="text-2xl font-bold mt-1">{getDisplayHeadline(post)}</h2>

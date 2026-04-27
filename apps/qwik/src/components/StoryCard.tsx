@@ -13,7 +13,13 @@ export const StoryCard = component$<Props>(({ post }) => {
   return (
     <article>
       <a href={post.link} class="block">
-        {img && <LeadImage image={img} priority="lazy" />}
+        {img && (
+          <LeadImage
+            image={img}
+            priority="lazy"
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          />
+        )}
         <div class="px-3 py-2">
           <LiveBadge isLive={post.isLive} />
           <h3 class="text-base font-bold mt-1">{getDisplayHeadline(post)}</h3>
