@@ -14,6 +14,16 @@ export function resolveImageUrl(sourceUrl: string | null | undefined): string {
 // /wp-content/uploads/[...path] proxy stays in the request path (story-010
 // invariant). Absolute URLs pass through unchanged — production fixtures
 // already carry resize hints; re-stamping would clobber them.
+//
+// Caller contract: `width` (and `height` when supplied) MUST be positive
+// integers. The helper does not validate — it is consumed only by LeadImage
+// today, which passes integer literals from a constant array. If a future
+// caller threads in user input, validate before calling.
+//
+// Not safe for building a srcset over a mix of relative and absolute sources:
+// absolute URLs pass through unchanged regardless of `width`, so all srcset
+// candidates over the same absolute source would yield the same URL — invalid
+// srcset semantics. Relative-only is the supported path.
 export function resizedImageUrl(
   sourceUrl: string | null | undefined,
   opts: { width: number; height?: number },

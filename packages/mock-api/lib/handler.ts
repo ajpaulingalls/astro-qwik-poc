@@ -182,6 +182,10 @@ function parseResizeParams(
   const resize = params.get("resize");
   if (!wRaw && !resize) return null;
 
+  // `resize` takes precedence when present. If it's malformed we DON'T silently
+  // fall through to a square — that would lie about the requested aspect.
+  // Returning null routes to the PNG branch instead, which is honest about
+  // "we couldn't honor your resize request."
   if (resize) {
     const [wStr, hStr] = resize.split(",");
     const w = Number(wStr);
@@ -189,6 +193,7 @@ function parseResizeParams(
     if (Number.isInteger(w) && w > 0 && Number.isInteger(h) && h > 0) {
       return { width: w, height: h };
     }
+    return null;
   }
 
   if (wRaw) {
