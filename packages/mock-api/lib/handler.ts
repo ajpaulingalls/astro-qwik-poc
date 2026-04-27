@@ -99,6 +99,16 @@ export function handle(req: Request, deps: HandlerDeps): Response {
   const url = new URL(req.url);
 
   if (url.pathname.startsWith("/wp-content/uploads/")) {
+    const dims = parseResizeParams(url.searchParams);
+    if (dims) {
+      const { width, height } = dims;
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#ccc"/></svg>`;
+      return new Response(svg, {
+        status: 200,
+        headers: { ...CORS_HEADERS, "content-type": "image/svg+xml" },
+      });
+    }
     return new Response(PLACEHOLDER_PNG, {
       status: 200,
       headers: { ...CORS_HEADERS, "content-type": "image/png" },
@@ -157,4 +167,36 @@ function text(status: number, body: string): Response {
     status,
     headers: { ...CORS_HEADERS, "content-type": "text/plain" },
   });
+}
+
+// Production WordPress backend serves /wp-content/uploads/* with optional
+// ?w=N (target width) and ?resize=W,H (cropped output dimensions). When the
+// caller asks for a specific size we honor it with an SVG placeholder so
+// LeadImage's srcset emits resolvable URLs and dev preview matches the
+// production layout. Bare requests (no params) keep the 1x1 PNG path so
+// existing acceptance probes that assert image/png continue to pass.
+function parseResizeParams(
+  params: URLSearchParams,
+): { width: number; height: number } | null {
+  const wRaw = params.get("w");
+  const resize = params.get("resize");
+  if (!wRaw && !resize) return null;
+
+  if (resize) {
+    const [wStr, hStr] = resize.split(",");
+    const w = Number(wStr);
+    const h = Number(hStr);
+    if (Number.isInteger(w) && w > 0 && Number.isInteger(h) && h > 0) {
+      return { width: w, height: h };
+    }
+  }
+
+  if (wRaw) {
+    const w = Number(wRaw);
+    if (Number.isInteger(w) && w > 0) {
+      return { width: w, height: w };
+    }
+  }
+
+  return null;
 }
