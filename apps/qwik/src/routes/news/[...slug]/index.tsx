@@ -3,6 +3,7 @@ import { routeLoader$, type DocumentHead } from '@qwik.dev/router';
 import { graphqlFetch, GraphqlHttpError } from '../../../lib/graphql';
 import { getDisplayHeadline } from '../../../lib/headline';
 import { relatedPostsFrom } from '../../../lib/related-posts';
+import { LCP_PRELOAD_WIDTH, proportionalHeight, resizedImageUrl } from '../../../lib/image-url';
 import { ArticleHeader } from '../../../components/ArticleHeader';
 import { ArticleBody } from '../../../components/ArticleBody';
 import { RelatedStories } from '../../../components/RelatedStories';
@@ -83,8 +84,20 @@ export const head: DocumentHead = ({ resolveValue }) => {
   if ('notFound' in data) {
     return { title: 'Article not found' };
   }
+  const featuredImage = data.article.featuredImage;
+  const preloadHeight = featuredImage ? proportionalHeight(LCP_PRELOAD_WIDTH, featuredImage) : null;
+  const preloadHref =
+    featuredImage && preloadHeight !== null
+      ? resizedImageUrl(featuredImage.sourceUrl, {
+          width: LCP_PRELOAD_WIDTH,
+          height: preloadHeight,
+        })
+      : undefined;
   return {
     title: data.article.title,
     meta: [{ name: 'description', content: data.article.excerpt ?? data.article.subheading ?? '' }],
+    ...(preloadHref && {
+      links: [{ rel: 'preload', as: 'image', href: preloadHref, fetchPriority: 'high' }],
+    }),
   };
 };

@@ -34,3 +34,21 @@ export function resizedImageUrl(
   const { width, height = width } = opts;
   return `${sourceUrl}?w=${width}&resize=${width}%2C${height}`;
 }
+
+// Width the article-page <link rel="preload"> targets. Must match a value in
+// LeadImage's DEFAULT_WIDTHS so the browser reuses the preloaded bytes for
+// the matching srcset candidate. 800w covers most viewports without
+// over-fetching on mobile.
+export const LCP_PRELOAD_WIDTH = 800;
+
+// Computes the matched height for a target width given a source image's
+// natural aspect ratio. Returns null when natural dims are missing — caller
+// decides whether to skip the resize hint entirely (honest path) or fall
+// back to a width-only resize.
+export function proportionalHeight(
+  width: number,
+  image: { width?: number; height?: number },
+): number | null {
+  if (!image.width || !image.height) return null;
+  return Math.round((width * image.height) / image.width);
+}

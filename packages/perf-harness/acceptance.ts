@@ -197,6 +197,29 @@ export function runAcceptanceSuite(target: Target): void {
       expect(response.status).toBe(404);
     });
 
+    // The article LCP image must be preloaded so the browser starts the
+    // fetch before parsing reaches the <img>. fetchpriority=high alone
+    // reorders after parser discovery; preload starts it immediately.
+    // Both apps emit `<link rel="preload" as="image" href=".../?w=800&...">`
+    // matching LeadImage's 800w srcset entry so the browser reuses the
+    // preloaded bytes.
+    it('preloads the article LCP image with rel=preload as=image', async () => {
+      const html = await fetch(
+        `http://127.0.0.1:${APP_PORT[target]}/news/${KNOWN_ARTICLE_SLUG}`,
+      ).then((r) => r.text());
+      const headEnd = html.indexOf('</head>');
+      expect(headEnd, 'no </head> in SSR HTML').toBeGreaterThan(-1);
+      const head = html.slice(0, headEnd);
+      // Regex tolerates attribute ordering but assumes the <link ...> tag is
+      // emitted on a single line — both apps' SSR output satisfies that today.
+      // A future minifier/formatter that wraps long tags could break this.
+      expect(head).toMatch(/<link\b[^>]*\brel=["']preload["'][^>]*\bas=["']image["']/);
+      // Must point at a resize URL so the browser reuses the bytes for the
+      // matching srcset entry — bare /wp-content/uploads/foo.jpg would only
+      // be reused if the LeadImage src happened to match.
+      expect(head).toMatch(/<link\b[^>]*\bas=["']image["'][^>]*\?w=800/);
+    });
+
     // Both apps cap related stories at 6: Astro slices in the route loader,
     // Qwik via MAX_RELATED in both loader + component (defense-in-depth).
     // Without the cap a future curated-feed expansion could silently render

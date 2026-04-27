@@ -5,6 +5,7 @@ import { ArticleHeader } from '../../components/ArticleHeader';
 import { ArticleBody } from '../../components/ArticleBody';
 import { RelatedStories } from '../../components/RelatedStories';
 import { relatedPostsFrom } from '../../lib/related-posts';
+import { LCP_PRELOAD_WIDTH, proportionalHeight, resizedImageUrl } from '../../lib/image-url';
 import type { Article, CuratedCollectionItem } from '@aje-poc/shared-types';
 
 interface ArticlePageData {
@@ -48,9 +49,19 @@ if (!article) {
 }
 
 const relatedPosts = relatedPostsFrom(curatedData.homepage.curatedCollection ?? []);
+
+const featuredImage = article.featuredImage;
+const preloadHeight = featuredImage ? proportionalHeight(LCP_PRELOAD_WIDTH, featuredImage) : null;
+const preloadImage =
+  featuredImage && preloadHeight !== null
+    ? resizedImageUrl(featuredImage.sourceUrl, {
+        width: LCP_PRELOAD_WIDTH,
+        height: preloadHeight,
+      })
+    : undefined;
 ---
 
-<BaseLayout title={article.title}>
+<BaseLayout title={article.title} preloadImage={preloadImage}>
   <main class="mx-auto max-w-3xl px-4 py-6">
     <ArticleHeader article={article} />
     <ArticleBody content={article.content} />
