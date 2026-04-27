@@ -7,12 +7,12 @@
     "dev": "bun --bun astro dev",
     "build": "bun --bun astro build && sed -i.bak '/@deno\\/astro-adapter\\/__deno_imports/d' dist/server/entry.mjs && rm dist/server/entry.mjs.bak",
     "preview": "bun --bun astro preview",
-    "astro": "bun --bun astro",
     "perf:astro": "bun run ../../packages/perf-harness/runner.ts --target=astro",
     "test": "bun run build && vitest run",
     "test:acceptance": "bun run build && vitest run tests/acceptance.test.ts"
   },
   "dependencies": {
+    "@aje-poc/shared-csp": "workspace:*",
     "@aje-poc/shared-types": "workspace:*",
     "@astrojs/preact": "^5.0.0",
     "@deno/astro-adapter": "^0.4.0",
