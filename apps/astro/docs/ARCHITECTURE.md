@@ -11,14 +11,14 @@
 
 For a news site, this is ideal: the vast majority of content (articles, story cards, layouts, footers) is static HTML. Only a handful of components need interactivity:
 
-| Component                | Directive        | Why                                       |
-| ------------------------ | ---------------- | ----------------------------------------- |
-| `BreakingTicker`         | `client:idle`    | Needs to poll immediately after page load |
-| `LiveBlogUpdater`        | `client:idle`    | Needs to poll for new entries             |
-| `LoadMoreButton`         | `client:visible` | Only hydrate when scrolled into view      |
-| `VerticalVideoCarousel`  | `client:visible` | Only hydrate when scrolled into view      |
-| `VideoPlayer`            | `client:visible` | Only hydrate when scrolled into view      |
-| `Navigation` (hamburger) | `client:idle`    | Menu toggle needed on mobile              |
+| Component                | Directive        | Why                                                |
+| ------------------------ | ---------------- | -------------------------------------------------- |
+| `BreakingTicker`         | `client:idle`    | Needs to poll immediately after page load          |
+| `LiveBlogUpdater`        | `client:idle`    | Needs to poll for new entries                      |
+| `LoadMoreButton`         | `client:idle`    | Prewarm hydration so first click meets INP <=100ms |
+| `VerticalVideoCarousel`  | `client:visible` | Only hydrate when scrolled into view               |
+| `VideoPlayer`            | `client:visible` | Only hydrate when scrolled into view               |
+| `Navigation` (hamburger) | `client:idle`    | Menu toggle needed on mobile                       |
 
 Each island hydrates independently — a failing video player doesn't block the ticker.
 
@@ -332,7 +332,7 @@ export default function LoadMoreButton({ section, categoryType, initialOffset = 
 | Component                   | Directive        | Description                                          |
 | --------------------------- | ---------------- | ---------------------------------------------------- |
 | `BreakingTicker.tsx`        | `client:idle`    | Polls `ArchipelagoBreakingTickerQuery` every 30s     |
-| `LoadMoreButton.tsx`        | `client:visible` | Triggers offset-based pagination, appends results    |
+| `LoadMoreButton.tsx`        | `client:idle`    | Triggers offset-based pagination; prewarmed for INP  |
 | `LiveBlogUpdater.tsx`       | `client:idle`    | Polls for new live blog entries                      |
 | `VerticalVideoCarousel.tsx` | `client:visible` | Swipeable vertical video shorts carousel             |
 | `VideoPlayer.tsx`           | `client:visible` | Brightcove / YouTube embed                           |

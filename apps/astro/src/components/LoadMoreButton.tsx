@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { graphqlFetch, GraphqlHttpError } from '../lib/graphql';
-import { SECTION_PAGE_SIZE, type SectionType } from '../lib/section-type';
+import { GEO_API_CATEGORY_TYPE, SECTION_PAGE_SIZE, type SectionType } from '../lib/section-type';
 import type { HomepagePost } from '@aje-poc/shared-types';
 import { StoryCard } from './StoryCard';
 
@@ -26,7 +26,12 @@ async function fetchPage(
   if (categoryType === 'geographic') {
     const data = await graphqlFetch<GeoFeed>({
       operationName: 'ArchipelagoAjeSectionPostsQuery',
-      variables: { category: section, categoryType: 'where', quantity: SECTION_PAGE_SIZE, offset },
+      variables: {
+        category: section,
+        categoryType: GEO_API_CATEGORY_TYPE,
+        quantity: SECTION_PAGE_SIZE,
+        offset,
+      },
     });
     return data.articles ?? [];
   }

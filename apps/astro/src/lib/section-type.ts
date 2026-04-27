@@ -22,3 +22,8 @@ export function getSectionType(slug: string): SectionType {
 // Production page-size for section feeds (initial render and each LoadMore
 // click). Mirrored in mock-api fixtures and tests.
 export const SECTION_PAGE_SIZE = 9;
+
+// API value of `categoryType` for geographic sections. Internal vocabulary
+// is 'geographic'/'topic' (SectionType); production GraphQL expects 'where'.
+// Mapped at the API boundary by [section].astro and LoadMoreButton.
+export const GEO_API_CATEGORY_TYPE = 'where';

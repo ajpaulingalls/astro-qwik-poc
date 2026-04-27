@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { graphqlFetch, GraphqlHttpError } from '../lib/graphql';
+import { StoryCard } from '../components/StoryCard';
+import { LoadMoreButton } from '../components/LoadMoreButton';
+import { GEO_API_CATEGORY_TYPE, getSectionType, SECTION_PAGE_SIZE } from '../lib/section-type';
+import { LCP_PRELOAD_WIDTH, proportionalHeight, resizedImageUrl } from '../lib/image-url';
+import type { HomepagePost } from '@aje-poc/shared-types';
+
+interface SectionMeta {
+  name?: string;
+}
+
+interface GeoSectionData {
+  category: SectionMeta | null;
+  articles: HomepagePost[];
+}
+
+interface TopicPageData {
+  topicsPage: { name?: string; featuredPosts: HomepagePost[] } | null;
+}
+
+const slug = Astro.params.section as string;
+const sectionType = getSectionType(slug);
+
+let title = slug;
+let cards: HomepagePost[] = [];
+
+try {
+  if (sectionType === 'geographic') {
+    const data = await graphqlFetch<GeoSectionData>({
+      operationName: 'ArchipelagoSectionQuery',
+      variables: {
+        name: slug,
+        categoryType: GEO_API_CATEGORY_TYPE,
+        quantity: SECTION_PAGE_SIZE,
+        offset: 0,
+      },
+    });
+    title = data.category?.name ?? slug;
+    cards = data.articles ?? [];
+  } else {
+    const data = await graphqlFetch<TopicPageData>({
+      operationName: 'ArchipelagoTopicsPageQuery',
+      variables: { slug },
+    });
+    title = data.topicsPage?.name ?? slug;
+    cards = data.topicsPage?.featuredPosts ?? [];
+  }
+} catch (err) {
+  if (err instanceof GraphqlHttpError && err.status === 404) {
+    return new Response(`Section not found: ${slug}`, { status: 404 });
+  }
+  throw err;
+}
+
+const lcpImage = cards[0]?.featuredImage;
+const preloadHeight = lcpImage ? proportionalHeight(LCP_PRELOAD_WIDTH, lcpImage) : null;
+const preloadImage =
+  lcpImage && preloadHeight !== null
+    ? resizedImageUrl(lcpImage.sourceUrl, {
+        width: LCP_PRELOAD_WIDTH,
+        height: preloadHeight,
+      })
+    : undefined;
+---
+
+<BaseLayout title={title} preloadImage={preloadImage}>
+  <main class="mx-auto max-w-7xl px-4 py-6">
+    <h1 class="text-2xl font-bold mb-4">{title}</h1>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {cards.map((post) => <StoryCard post={post} />)}
+    </div>
+    <LoadMoreButton
+      client:idle
+      section={slug}
+      categoryType={sectionType}
+      initialOffset={SECTION_PAGE_SIZE}
+    />
+  </main>
+</BaseLayout>
