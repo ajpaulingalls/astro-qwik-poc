@@ -29,17 +29,28 @@ export default defineConfig({
   ],
   security: {
     csp: {
+      // Embed provider scripts (M7 — story-003). Each is loaded by an embed
+      // component on demand via useEmbedScript: Twitter widgets.js, Instagram
+      // embed.js, Brightcove per-account player. scriptDirective.resources
+      // OVERRIDES the default sources, so 'self' must be re-included
+      // explicitly — without it, Astro's bundled scripts would only be
+      // allowed via hash and dynamic chunk loads (e.g. Preact island
+      // hydration follow-ups) would be blocked. 'unsafe-inline' is
+      // intentionally NOT used — provider scripts are added as external
+      // <script src> elements.
+      scriptDirective: {
+        resources: [
+          "'self'",
+          'https://platform.twitter.com',
+          'https://www.instagram.com',
+          'https://players.brightcove.net',
+        ],
+      },
       directives: [
         "default-src 'self'",
         "img-src 'self' https: data: http://localhost:4455",
         "font-src 'self' data:",
         "connect-src 'self' http://localhost:4455",
-        // Embed provider scripts (M7 — story-003). Each is loaded by an
-        // embed component on demand via useEmbedScript: Twitter widgets.js,
-        // Instagram embed.js, Brightcove per-account player. 'unsafe-inline'
-        // is intentionally NOT included — provider scripts are added as
-        // external <script src> elements, not inlined.
-        "script-src 'self' https://platform.twitter.com https://www.instagram.com https://players.brightcove.net",
         // Iframes injected by the provider scripts after they execute, plus
         // YouTube (figure or bare-iframe extracted by parse-embeds; no provider
         // script needed). syndication.twitter.com is required because Twitter

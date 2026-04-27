@@ -4,16 +4,14 @@
   "version": "0.0.0",
   "description": "Al Jazeera English PoC — Qwik 2 (beta) implementation",
   "type": "module",
-  "engines": {
-    "node": ">=22.15.0"
-  },
   "scripts": {
     "dev": "vite --mode ssr",
     "build": "vite build && vite build --ssr ./src/entry.ssr.tsx && vite build --ssr ./src/entry.preview.tsx",
     "preview": "vite preview",
-    "preview:prod": "node --experimental-strip-types --no-warnings server.ts",
-    "perf:qwik": "node --experimental-strip-types --no-warnings ../../packages/perf-harness/runner.ts --target=qwik",
-    "test": "bun run build && vitest run"
+    "preview:prod": "bun run server.ts",
+    "perf:qwik": "bun run ../../packages/perf-harness/runner.ts --target=qwik",
+    "test": "bun run build && vitest run",
+    "test:acceptance": "bun run build && vitest run tests/acceptance.test.ts"
   },
   "dependencies": {
     "@aje-poc/shared-types": "workspace:*",

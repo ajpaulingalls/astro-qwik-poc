@@ -82,15 +82,12 @@ export function spawnAstro(): ChildProcess {
 }
 
 export function spawnQwik(): ChildProcess {
-  // Spawn the production-bundled handler via a Node http wrapper instead
-  // of `vite preview`, so the methodology matches spawnAstro's `deno run
-  // dist/server/entry.mjs` (raw runtime, no Vite middleware in front).
-  // See apps/qwik/server.ts and QWIK2_NOTES.md for why a wrapper is
-  // required (entry.preview.js exports middleware, not a listener).
-  // PUBLIC_API_BASE injects the Qwik-target mock-api port at runtime so
-  // the source DEFAULT_API_BASE can stay 4455 (standalone dev with
-  // `bun run mock-api` keeps working).
-  return spawn('node', ['--experimental-strip-types', '--no-warnings', 'server.ts'], {
+  // Production-bundled handler via bun wrapper, not `vite preview` —
+  // matches spawnAstro's raw-runtime methodology (no Vite in front).
+  // See apps/qwik/server.ts for why a wrapper is needed (entry.preview.js
+  // exports middleware, not a listener). PUBLIC_API_BASE injects the
+  // Qwik-target mock-api port so source DEFAULT_API_BASE stays 4455.
+  return spawn('bun', ['run', 'server.ts'], {
     cwd: resolve(REPO_ROOT, 'apps/qwik'),
     stdio: 'ignore',
     env: {

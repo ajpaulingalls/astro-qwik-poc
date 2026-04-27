@@ -25,7 +25,6 @@ pre-commit:
 pre-push:
   parallel: true
   commands:
-    # scripts/with-node.sh sources nvm + runs under .nvmrc Node (see script header for why).
     test-astro:
       # Match nested files AND top-level files (apps/astro/server.ts,
       # astro.config.mjs, package.json, etc.) — '**/*' alone misses the latter.
@@ -35,7 +34,7 @@ pre-push:
       exclude:
         - 'apps/astro/docs/*'
         - 'apps/astro/docs/**/*'
-      run: scripts/with-node.sh bun --filter aje-poc-astro test
+      run: bun --filter aje-poc-astro test
       stage_fixed: false
 
     test-qwik:
@@ -45,7 +44,7 @@ pre-push:
       exclude:
         - 'apps/qwik/docs/*'
         - 'apps/qwik/docs/**/*'
-      run: scripts/with-node.sh bun --filter aje-poc-qwik test
+      run: bun --filter aje-poc-qwik test
       stage_fixed: false
 
     test-mock-api:

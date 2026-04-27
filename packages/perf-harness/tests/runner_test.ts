@@ -120,7 +120,7 @@ describe('runner main()', () => {
     expect(collectWebVitalsMock).toHaveBeenCalledTimes(3);
   });
 
-  it('spawns qwik via node + server.ts with HOST/PORT env in apps/qwik cwd', async () => {
+  it('spawns qwik via bun + server.ts with HOST/PORT env in apps/qwik cwd', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 99, jsBytes: 100 });
     collectWebVitalsMock.mockResolvedValue([]);
 
@@ -133,9 +133,8 @@ describe('runner main()', () => {
       readonly string[],
       { cwd?: string; env?: Record<string, string> },
     ];
-    expect(cmd).toBe('node');
-    expect(args).toContain('server.ts');
-    expect(args).toContain('--experimental-strip-types');
+    expect(cmd).toBe('bun');
+    expect(args).toEqual(['run', 'server.ts']);
     expect(opts.env).toMatchObject({ HOST: '127.0.0.1', PORT: '4173' });
     expect(opts.cwd).toMatch(/apps\/qwik$/);
   });

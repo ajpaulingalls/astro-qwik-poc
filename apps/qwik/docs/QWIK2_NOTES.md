@@ -2,6 +2,14 @@
 
 Live log of beta-specific workarounds, missing features, and divergences from the architecture doc. Updated as items are encountered.
 
+## story-008 — CSP `'unsafe-inline'` requirement (2026-04-27)
+
+Qwik 2 beta.32 emits both inline `<style>` blocks (Tailwind 4's CSS-first pipeline + Qwik's resumability container) AND inline resumability bootstrap scripts. There is no equivalent of Astro's `security.csp.scriptDirective`/`styleDirective` auto-hash generation in Qwik 2 yet, so the only way to keep the page functional under any non-trivial CSP is to allow `'unsafe-inline'` on both `script-src` and `style-src` (`apps/qwik/src/lib/csp.ts`).
+
+**Empirical failure mode without `'unsafe-inline'`**: `document.styleSheets` ends up empty, the body falls back to `Times` (the default UA serif, since the `--font-sans` CSS variable never resolves), `document.fonts` never registers `@font-face` declarations, and the `qwikloader` bootstrap throws `this.ot is not a function` when an event is dispatched — onClick$ handlers never bind.
+
+**Comparison cost (M9/M13)**: this is a real per-app security-vs-functionality asymmetry. Astro emits per-bundle script + style hashes so XSS-injected inline content is blocked by CSP; Qwik 2 currently allows any inline content under `'unsafe-inline'`. Revisit when Qwik 2 stable ships an auto-hash story.
+
 ## sprint-007 — M7 embed components + ArticleBody dispatch (2026-04-27)
 
 ### Build verification
@@ -72,7 +80,7 @@ Stateless leaf components (no signals, no `$()`-wrapped handlers, no `Slot`) sho
 
 The shared perf-harness (`packages/perf-harness/runner.ts`) initially spawned the Qwik target via `bun run preview` (vite preview), while it spawns Astro via `deno run dist/server/entry.mjs` directly. This methodology asymmetry made cross-framework CWV comparisons dishonest — vite preview's middleware adds layers Astro doesn't have, and bundles are served differently.
 
-**Decision:** spawn Qwik via `node apps/qwik/server.ts` — a hand-rolled Node http wrapper around `server/entry.preview.js`. This matches Astro's "raw runtime spawning the bundled handler" approach.
+**Decision:** spawn Qwik via `bun run apps/qwik/server.ts` — a hand-rolled `node:http` wrapper around `server/entry.preview.js` (originally launched under `node --experimental-strip-types`; M0 swapped the launcher to bun to drop the nvm/Node toolchain dependency). This matches Astro's "raw runtime spawning the bundled handler" approach.
 
 **Why a wrapper is required.** `apps/qwik/server/entry.preview.js` is one line:
 
@@ -102,7 +110,7 @@ The jsBytes near-tripling is the most informative number. Vite preview was appar
 
 1. The bundled `staticFile` `static.root` resolution bug (above) would almost certainly recur for the Deno middleware too — would need to split `entry.preview.tsx` per runtime to test the hypothesis, and there's no upstream Qwik fix yet.
 2. The Deno middleware is `Request → Response` (Web standard), not the Node `(req, res, next)` model. Reusing the same hand-rolled static handler under Deno means rewriting `tryServeStatic` for the new I/O model.
-3. Node `node:http` + `--experimental-strip-types` was the smaller lift; methodology parity with Astro's "raw runtime hosting the bundled handler" is preserved either way.
+3. `node:http` was the smaller lift (initially launched via `node --experimental-strip-types`, now via `bun run`); methodology parity with Astro's "raw runtime hosting the bundled handler" is preserved either way.
 
 Pivoting to Deno once the upstream `static.root` bug is fixed (and once an M11 demo concern justifies the rewrite) is a defensible follow-up.
 
