@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { graphqlFetch } from './graphql';
+import { graphqlFetch, GraphqlHttpError } from './graphql';
 
 interface Captured {
   url: string;
@@ -135,5 +135,17 @@ describe('graphqlFetch', () => {
     await expect(graphqlFetch({ operationName: 'HomePageQuery' })).rejects.toThrow(
       /HomePageQuery.*400/,
     );
+  });
+
+  it('throws GraphqlHttpError carrying the status code so callers can branch on .status', async () => {
+    mock = mockFetchOnce({ status: 404, rawBody: 'Not found' });
+
+    const promise = graphqlFetch({ operationName: 'ArchipelagoSingleArticleQuery' });
+    await expect(promise).rejects.toBeInstanceOf(GraphqlHttpError);
+    await expect(promise).rejects.toMatchObject({
+      name: 'GraphqlHttpError',
+      status: 404,
+      operationName: 'ArchipelagoSingleArticleQuery',
+    });
   });
 });

@@ -1,6 +1,6 @@
 import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead } from '@qwik.dev/router';
-import { graphqlFetch } from '../../../lib/graphql';
+import { graphqlFetch, GraphqlHttpError } from '../../../lib/graphql';
 import { getDisplayHeadline } from '../../../lib/headline';
 import { ArticleHeader } from '../../../components/ArticleHeader';
 import { ArticleBody } from '../../../components/ArticleBody';
@@ -50,18 +50,30 @@ function lastSegment(slug: string): string {
   return parts[parts.length - 1] ?? '';
 }
 
-export const useArticleData = routeLoader$(async ({ params }) => {
+export const useArticleData = routeLoader$(async ({ params, fail }) => {
   const articleSlug = lastSegment(params.slug ?? '');
-  const [articleData, curatedData] = await Promise.all([
-    graphqlFetch<SingleArticleData>({
-      operationName: 'ArchipelagoSingleArticleQuery',
-      variables: { name: articleSlug, preview: '' },
-    }),
-    graphqlFetch<CuratedFeedData>({
-      operationName: 'HomePageCuratedFeedQuery',
-      variables: { offset: 0 },
-    }),
-  ]);
+  let articleData: SingleArticleData;
+  let curatedData: CuratedFeedData;
+  try {
+    [articleData, curatedData] = await Promise.all([
+      graphqlFetch<SingleArticleData>({
+        operationName: 'ArchipelagoSingleArticleQuery',
+        variables: { name: articleSlug, preview: '' },
+      }),
+      graphqlFetch<CuratedFeedData>({
+        operationName: 'HomePageCuratedFeedQuery',
+        variables: { offset: 0 },
+      }),
+    ]);
+  } catch (err) {
+    // Mock-api returns HTTP 404 when no fixture matches the slug. Translate to
+    // a route 404 via fail() so the response carries the right status instead
+    // of a 500 from an uncaught error.
+    if (err instanceof GraphqlHttpError && err.status === 404) {
+      return fail(404, { notFound: true, slug: articleSlug });
+    }
+    throw err;
+  }
   // Return only what the page renders. Qwik 2 serializes the full loader value
   // into the resume payload, so trimming here directly shrinks what ships to
   // the browser — the in-component slice would not.
@@ -73,6 +85,9 @@ export const useArticleData = routeLoader$(async ({ params }) => {
 
 export default component$(() => {
   const data = useArticleData();
+  if ('notFound' in data.value) {
+    return <main class="mx-auto max-w-3xl px-4 py-6">Article not found: {data.value.slug}</main>;
+  }
   const { article, relatedPosts } = data.value;
 
   return (
@@ -93,6 +108,9 @@ export default component$(() => {
 
 export const head: DocumentHead = ({ resolveValue }) => {
   const data = resolveValue(useArticleData);
+  if ('notFound' in data) {
+    return { title: 'Article not found' };
+  }
   return {
     title: data.article.title,
     meta: [{ name: 'description', content: data.article.excerpt ?? data.article.subheading ?? '' }],

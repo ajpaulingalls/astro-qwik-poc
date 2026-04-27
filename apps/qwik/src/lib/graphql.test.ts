@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { graphqlFetch } from './graphql';
+import { graphqlFetch, GraphqlHttpError } from './graphql';
 
 interface CapturedFetchCall {
   url: string;
@@ -99,5 +99,18 @@ describe('graphqlFetch', () => {
     await expect(graphqlFetch({ operationName: 'HomePageQuery' })).rejects.toThrow(
       /graphqlFetch HomePageQuery failed: 400 Bad Request/,
     );
+  });
+
+  it('throws GraphqlHttpError carrying the status code so callers can branch on .status', async () => {
+    globalThis.fetch = vi.fn(
+      async () => new Response('Not found', { status: 404, statusText: 'Not Found' }),
+    ) as unknown as typeof fetch;
+    const promise = graphqlFetch({ operationName: 'ArchipelagoSingleArticleQuery' });
+    await expect(promise).rejects.toBeInstanceOf(GraphqlHttpError);
+    await expect(promise).rejects.toMatchObject({
+      name: 'GraphqlHttpError',
+      status: 404,
+      operationName: 'ArchipelagoSingleArticleQuery',
+    });
   });
 });

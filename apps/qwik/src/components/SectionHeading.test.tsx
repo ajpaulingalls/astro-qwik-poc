@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { SectionHeading } from './SectionHeading';
-import { getByHeading } from '../test-utils/dom';
+import { getByHeading, queryByHeading } from '../test-utils/dom';
 
 describe('SectionHeading', () => {
   it('renders children inside an h3', async () => {
@@ -34,7 +34,7 @@ describe('SectionHeading', () => {
     const { screen, render } = await createDOM();
     await render(<SectionHeading as="h2">Section</SectionHeading>);
     const h2 = getByHeading(screen, 2, /Section/i);
-    expect(screen.querySelectorAll('h3').length).toBe(0);
+    expect(queryByHeading(screen, 3, /Section/i)).toBeNull();
     expect(h2.className).toContain('text-aj-orange');
   });
 });
