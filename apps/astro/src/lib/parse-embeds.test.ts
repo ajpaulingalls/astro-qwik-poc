@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { parseEmbeds } from './parse-embeds';
 
 describe('parseEmbeds', () => {
@@ -72,6 +72,22 @@ describe('parseEmbeds', () => {
     }
   });
 
+  it('extracts brightcove account/player/videoId as segment props (no html re-parse needed)', () => {
+    const html = `<!-- Start of Brightcove Player -->
+<div><video-js id="6393574500112" data-video-id="6393574500112" data-account="665003303001" data-player="6tKQRAx7lu" class="video-js"></video-js></div>
+<!-- End of Brightcove Player -->`;
+    const segments = parseEmbeds(html);
+    expect(segments).toHaveLength(1);
+    const seg = segments[0];
+    if (seg.kind === 'embed' && seg.type === 'brightcove') {
+      expect(seg.account).toBe('665003303001');
+      expect(seg.player).toBe('6tKQRAx7lu');
+      expect(seg.videoId).toBe('6393574500112');
+    } else {
+      throw new Error('expected brightcove embed segment');
+    }
+  });
+
   it('preserves html before and after an embed in order', () => {
     const html = `<p>Intro.</p><blockquote class="twitter-tweet"><p>tweet</p></blockquote><p>Outro.</p>`;
     const segments = parseEmbeds(html);
@@ -127,5 +143,83 @@ describe('parseEmbeds', () => {
   it('falls back to html segment for an unclosed blockquote (silent skip)', () => {
     const html = '<blockquote class="twitter-tweet"><p>tweet without closing tag';
     expect(parseEmbeds(html)).toEqual([{ kind: 'html', html }]);
+  });
+
+  it('detects a YouTube iframe embed', () => {
+    const html = `<p>Intro.</p><figure class="wp-block-embed is-type-video is-provider-youtube wp-block-embed-youtube wp-embed-aspect-16-9 wp-has-aspect-ratio">
+<div class="wp-block-embed__wrapper">
+<iframe loading="lazy" title="YouTube video player" width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?feature=oembed" frameborder="0" allow="accelerometer" allowfullscreen></iframe>
+</div>
+</figure><p>Outro.</p>`;
+    const segments = parseEmbeds(html);
+    expect(segments.map((s) => s.kind)).toEqual(['html', 'embed', 'html']);
+    const embed = segments[1];
+    if (embed.kind === 'embed') {
+      expect(embed.type).toBe('youtube');
+      expect(embed.html).toContain('youtube.com/embed/dQw4w9WgXcQ');
+      expect(embed.html).toContain('<iframe');
+    } else {
+      throw new Error('expected youtube embed segment');
+    }
+  });
+
+  it('detects a bare YouTube iframe (no wp-block-embed wrapper)', () => {
+    const html = `<p>before</p><iframe src="https://www.youtube.com/embed/abc123XYZ_-" allowfullscreen></iframe><p>after</p>`;
+    const segments = parseEmbeds(html);
+    expect(segments.map((s) => s.kind)).toEqual(['html', 'embed', 'html']);
+    const embed = segments[1];
+    if (embed.kind === 'embed') {
+      expect(embed.type).toBe('youtube');
+      expect(embed.html).toContain('youtube.com/embed/abc123XYZ_-');
+    } else {
+      throw new Error('expected youtube embed segment');
+    }
+  });
+
+  it('detects a youtube-nocookie iframe', () => {
+    const html = `<iframe src="https://www.youtube-nocookie.com/embed/PRIVACY_ID"></iframe>`;
+    const segments = parseEmbeds(html);
+    expect(segments).toHaveLength(1);
+    if (segments[0].kind === 'embed') {
+      expect(segments[0].type).toBe('youtube');
+    } else {
+      throw new Error('expected youtube embed segment');
+    }
+  });
+
+  describe('orphan video-js warnings', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    afterEach(() => {
+      warnSpy.mockClear();
+    });
+
+    it('warns when video-js is present but Brightcove comment markers are missing', () => {
+      const html = `<p>intro</p><div><video-js id="x" data-account="A" data-player="P" class="video-js"></video-js></div><p>outro</p>`;
+      parseEmbeds(html);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      const msg = warnSpy.mock.calls[0]?.[0];
+      expect(msg).toContain('Brightcove');
+      expect(msg).toContain('video-js');
+    });
+
+    it('warns when Brightcove comment markers are present but data-account/data-player are missing', () => {
+      const html = `<!-- Start of Brightcove Player -->
+<div><video-js id="x" class="video-js"></video-js></div>
+<!-- End of Brightcove Player -->`;
+      parseEmbeds(html);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+      const msg = warnSpy.mock.calls[0]?.[0];
+      expect(msg).toContain('Brightcove');
+      expect(msg).toContain('video-js');
+    });
+
+    it('does not warn when a well-formed Brightcove embed parses successfully', () => {
+      const html = `<!-- Start of Brightcove Player -->
+<div><video-js id="x" data-video-id="V" data-account="A" data-player="P" class="video-js"></video-js></div>
+<!-- End of Brightcove Player -->`;
+      parseEmbeds(html);
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
   });
 });

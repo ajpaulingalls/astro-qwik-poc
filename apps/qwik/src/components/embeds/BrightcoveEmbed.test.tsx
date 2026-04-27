@@ -11,7 +11,9 @@ const BRIGHTCOVE_HTML = `<div style="display: block;">
 describe('BrightcoveEmbed', () => {
   it('renders the video-js element', async () => {
     const { screen, render } = await createDOM();
-    await render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} />);
+    await render(
+      <BrightcoveEmbed html={BRIGHTCOVE_HTML} account="665003303001" player="6tKQRAx7lu" />,
+    );
     const video = screen.querySelector('video-js');
     expect(video).toBeTruthy();
     expect(video?.getAttribute('data-account')).toBe('665003303001');
@@ -20,7 +22,9 @@ describe('BrightcoveEmbed', () => {
 
   it('wraps in a class="embed-brightcove" container', async () => {
     const { screen, render } = await createDOM();
-    await render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} />);
+    await render(
+      <BrightcoveEmbed html={BRIGHTCOVE_HTML} account="665003303001" player="6tKQRAx7lu" />,
+    );
     expect(screen.querySelector('div.embed-brightcove')).toBeTruthy();
   });
 });

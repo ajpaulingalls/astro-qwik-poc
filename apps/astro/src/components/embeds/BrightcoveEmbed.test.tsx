@@ -18,30 +18,30 @@ describe('BrightcoveEmbed', () => {
   });
 
   it('renders the video-js element via dangerouslySetInnerHTML', () => {
-    const { container } = render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} />);
+    const { container } = render(
+      <BrightcoveEmbed html={BRIGHTCOVE_HTML} account="665003303001" player="6tKQRAx7lu" />,
+    );
     const video = container.querySelector('video-js');
     expect(video).toBeTruthy();
     expect(video?.getAttribute('data-account')).toBe('665003303001');
     expect(video?.getAttribute('data-player')).toBe('6tKQRAx7lu');
   });
 
-  it('injects the per-account/per-player Brightcove script on mount', () => {
-    render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} />);
-    const expected = `${SCRIPT_PREFIX}665003303001/6tKQRAx7lu_default/index.min.js`;
-    const script = document.querySelector(`script[src="${expected}"]`);
-    expect(script).toBeTruthy();
-  });
-
-  it('does not inject a script when video-js attrs are missing', () => {
-    const malformed = '<div><video-js class="video-js"></video-js></div>';
-    render(<BrightcoveEmbed html={malformed} />);
-    expect(document.querySelectorAll(`script[src^="${SCRIPT_PREFIX}"]`).length).toBe(0);
+  it('injects the per-account/per-player Brightcove script derived from props (not html)', () => {
+    // Props deliberately differ from the data-account/data-player in BRIGHTCOVE_HTML.
+    // Component must use the props (the segmenter is the canonical source) and not
+    // re-parse the html — proves the deriveScriptSrc duplication is gone.
+    render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} account="propAccount" player="propPlayer" />);
+    const propBased = `${SCRIPT_PREFIX}propAccount/propPlayer_default/index.min.js`;
+    const htmlBased = `${SCRIPT_PREFIX}665003303001/6tKQRAx7lu_default/index.min.js`;
+    expect(document.querySelector(`script[src="${propBased}"]`)).toBeTruthy();
+    expect(document.querySelector(`script[src="${htmlBased}"]`)).toBeNull();
   });
 
   it('does not duplicate the script across two BrightcoveEmbeds with the same account/player', () => {
-    render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} />);
+    render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} account="665003303001" player="6tKQRAx7lu" />);
     cleanup();
-    render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} />);
+    render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} account="665003303001" player="6tKQRAx7lu" />);
     expect(document.querySelectorAll(`script[src^="${SCRIPT_PREFIX}"]`).length).toBe(1);
   });
 });

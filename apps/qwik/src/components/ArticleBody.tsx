@@ -1,18 +1,12 @@
 import type { JSXOutput } from '@qwik.dev/core';
-import { parseEmbeds, type EmbedType } from '../lib/parse-embeds';
+import { parseEmbeds } from '../lib/parse-embeds';
 import { TwitterEmbed } from './embeds/TwitterEmbed';
 import { InstagramEmbed } from './embeds/InstagramEmbed';
 import { GalleryEmbed } from './embeds/GalleryEmbed';
 import { BrightcoveEmbed } from './embeds/BrightcoveEmbed';
+import { YouTubeEmbed } from './embeds/YouTubeEmbed';
 
 const WRAPPER_CLASS = 'article-body prose max-w-none';
-
-const EMBED_COMPONENTS: Record<EmbedType, (props: { html: string }) => JSXOutput> = {
-  twitter: TwitterEmbed,
-  instagram: InstagramEmbed,
-  gallery: GalleryEmbed,
-  brightcove: BrightcoveEmbed,
-};
 
 interface Props {
   content: string;
@@ -36,8 +30,24 @@ export function ArticleBody({ content, embedRenderer }: Props) {
         if (seg.kind === 'html') {
           return <div key={i} dangerouslySetInnerHTML={seg.html} />;
         }
-        const Embed = EMBED_COMPONENTS[seg.type];
-        return <Embed key={i} html={seg.html} />;
+        switch (seg.type) {
+          case 'twitter':
+            return <TwitterEmbed key={i} html={seg.html} />;
+          case 'instagram':
+            return <InstagramEmbed key={i} html={seg.html} />;
+          case 'gallery':
+            return <GalleryEmbed key={i} html={seg.html} />;
+          case 'youtube':
+            return <YouTubeEmbed key={i} html={seg.html} />;
+          case 'brightcove':
+            return (
+              <BrightcoveEmbed key={i} html={seg.html} account={seg.account} player={seg.player} />
+            );
+          default: {
+            const _exhaustive: never = seg;
+            return _exhaustive;
+          }
+        }
       })}
     </div>
   );

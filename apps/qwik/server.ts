@@ -23,6 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import middleware from './server/entry.preview.js';
+import { CSP } from './src/lib/csp.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST_ROOT = resolve(__dirname, 'dist');
@@ -133,6 +134,11 @@ function fail(res: ServerResponse, err: unknown): void {
 createServer(async (req: IncomingMessage, res: ServerResponse) => {
   if (await tryProxyUploads(req, res)) return;
   if (tryServeStatic(req, res)) return;
+  // Qwik's middleware writes its response via res.writeHead(status, headers);
+  // Node merges those with prior setHeader values (writeHead wins on conflict),
+  // and Qwik does not emit Content-Security-Policy itself, so this header
+  // survives to the client.
+  res.setHeader('Content-Security-Policy', CSP);
   middleware.router(req, res, (err?: unknown) => {
     if (err) fail(res, err);
   });
