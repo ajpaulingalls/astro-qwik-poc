@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resolveImageUrl } from './image-url';
+import { resizedImageUrl, resolveImageUrl } from './image-url';
 
 describe('resolveImageUrl', () => {
   beforeEach(() => {
@@ -39,5 +39,44 @@ describe('resolveImageUrl', () => {
     expect(resolveImageUrl('/wp-content/uploads/2026/04/foo.jpg')).toBe(
       'https://www.aljazeera.com/wp-content/uploads/2026/04/foo.jpg',
     );
+  });
+});
+
+describe('resizedImageUrl', () => {
+  it('returns "" for null, undefined, or empty input', () => {
+    expect(resizedImageUrl(null, { width: 400 })).toBe('');
+    expect(resizedImageUrl(undefined, { width: 400 })).toBe('');
+    expect(resizedImageUrl('', { width: 400 })).toBe('');
+  });
+
+  it('emits a relative ?w=W&resize=W,H URL for relative input (preserves same-origin proxy)', () => {
+    expect(resizedImageUrl('/wp-content/uploads/foo.jpg', { width: 400, height: 267 })).toBe(
+      '/wp-content/uploads/foo.jpg?w=400&resize=400%2C267',
+    );
+  });
+
+  it('defaults height to width when only width is supplied (square)', () => {
+    expect(resizedImageUrl('/wp-content/uploads/foo.jpg', { width: 300 })).toBe(
+      '/wp-content/uploads/foo.jpg?w=300&resize=300%2C300',
+    );
+  });
+
+  it('passes absolute URLs through unchanged (avoid double-stamp on M11 production URLs)', () => {
+    expect(
+      resizedImageUrl('https://www.aljazeera.com/wp-content/uploads/foo.jpg', { width: 400 }),
+    ).toBe('https://www.aljazeera.com/wp-content/uploads/foo.jpg');
+  });
+
+  it('passes absolute URLs through even when they already carry ?w= params', () => {
+    // Production GraphQL responses already include resize hints in srcset URLs;
+    // helper must not re-stamp or it would clobber the existing query string.
+    expect(
+      resizedImageUrl(
+        'https://www.aljazeera.com/wp-content/uploads/foo.jpg?w=770&resize=770%2C770',
+        {
+          width: 400,
+        },
+      ),
+    ).toBe('https://www.aljazeera.com/wp-content/uploads/foo.jpg?w=770&resize=770%2C770');
   });
 });
