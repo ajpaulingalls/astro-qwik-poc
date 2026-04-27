@@ -2,6 +2,14 @@
 
 Live log of beta-specific workarounds, missing features, and divergences from the architecture doc. Updated as items are encountered.
 
+## story-008 — CSP `'unsafe-inline'` requirement (2026-04-27)
+
+Qwik 2 beta.32 emits both inline `<style>` blocks (Tailwind 4's CSS-first pipeline + Qwik's resumability container) AND inline resumability bootstrap scripts. There is no equivalent of Astro's `security.csp.scriptDirective`/`styleDirective` auto-hash generation in Qwik 2 yet, so the only way to keep the page functional under any non-trivial CSP is to allow `'unsafe-inline'` on both `script-src` and `style-src` (`apps/qwik/src/lib/csp.ts`).
+
+**Empirical failure mode without `'unsafe-inline'`**: `document.styleSheets` ends up empty, the body falls back to `Times` (the default UA serif, since the `--font-sans` CSS variable never resolves), `document.fonts` never registers `@font-face` declarations, and the `qwikloader` bootstrap throws `this.ot is not a function` when an event is dispatched — onClick$ handlers never bind.
+
+**Comparison cost (M9/M13)**: this is a real per-app security-vs-functionality asymmetry. Astro emits per-bundle script + style hashes so XSS-injected inline content is blocked by CSP; Qwik 2 currently allows any inline content under `'unsafe-inline'`. Revisit when Qwik 2 stable ships an auto-hash story.
+
 ## sprint-007 — M7 embed components + ArticleBody dispatch (2026-04-27)
 
 ### Build verification

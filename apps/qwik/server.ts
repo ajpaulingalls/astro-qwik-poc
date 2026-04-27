@@ -95,9 +95,15 @@ async function tryProxyUploads(req: IncomingMessage, res: ServerResponse): Promi
   return true;
 }
 
+// Static prefixes served from dist/. /fonts/ ships the self-hosted Inter
+// woff2 (apps/qwik/public/fonts/inter.woff2 → dist/fonts/inter.woff2 via
+// vite static-asset copy); without this the @font-face url() 404s and
+// document.fonts never reports the Inter face as loaded.
+const STATIC_PREFIXES = ['/build/', '/assets/', '/fonts/'];
+
 function tryServeStatic(req: IncomingMessage, res: ServerResponse): boolean {
   const url = req.url ?? '/';
-  if (!url.startsWith('/build/') && !url.startsWith('/assets/')) return false;
+  if (!STATIC_PREFIXES.some((p) => url.startsWith(p))) return false;
   const safe = normalize(url).replace(/^\/+/, '');
   const filePath = join(DIST_ROOT, safe);
   // Containment check defends against ../ traversal even though normalize() handles it.
