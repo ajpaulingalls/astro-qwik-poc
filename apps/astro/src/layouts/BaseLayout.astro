@@ -6,9 +6,16 @@ import Footer from '../components/Footer.astro';
 
 interface Props {
   title: string;
+  /**
+   * Pre-resolved URL of the page's LCP image. When supplied, emits
+   * `<link rel="preload" as="image">` so the browser starts the fetch
+   * before parsing reaches the <img>. fetchpriority=high alone reorders
+   * the request after parser discovery; preload starts it immediately.
+   */
+  preloadImage?: string;
 }
 
-const { title } = Astro.props;
+const { title, preloadImage } = Astro.props;
 ---
 
 <html lang="en">
@@ -17,6 +24,7 @@ const { title } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
     <Font cssVariable="--font-inter" preload />
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     <script>
       // Hoisted by Astro into a deferred module chunk in <head>; runs
       // after HTML parse so doesn't block LCP. Perf-critical: M2/M9 gate
