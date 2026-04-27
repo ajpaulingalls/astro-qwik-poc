@@ -11,6 +11,7 @@
     "build": "astro build && sed -i.bak '/@deno\\/astro-adapter\\/__deno_imports/d' dist/server/entry.mjs && rm dist/server/entry.mjs.bak",
     "preview": "astro preview",
     "astro": "astro",
+    "perf:astro": "node --experimental-strip-types --no-warnings ../../packages/perf-harness/runner.ts --target=astro",
     "test": "bun run build && vitest run"
   },
   "dependencies": {

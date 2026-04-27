@@ -1,4 +1,5 @@
 import { connect } from 'node:net';
+import type { PageBudgets } from './budgets.ts';
 
 export type Target = 'astro' | 'qwik';
 
@@ -11,11 +12,28 @@ export interface ParsedArgs {
 export interface Page {
   name: string;
   path: string;
+  budgets?: PageBudgets;
 }
 
+// Stretch CWV thresholds from SMM constraint and execution_plan.json M7
+// done-state. JS budgets are per-page transfer-size ceilings:
+//   astro/article  <30KB (M7)
+//   qwik/index    <165KB (sprint-006 revision per QWIK2_NOTES)
+//   qwik/article  <155KB (A4 reconciliation per ARCHITECTURE.md)
+// `russian-oil-...` is the article fixture chosen for perf — has a Twitter
+// embed so the run exercises mixed text + provider-script content.
+const STRETCH_CWV = { lcp: 1500, cls: 0.05, lhPerf: 98 } as const;
+const ARTICLE_PATH = '/news/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries';
+
 const PAGES: Record<Target, Page[]> = {
-  astro: [{ name: 'index', path: '/' }],
-  qwik: [{ name: 'index', path: '/' }],
+  astro: [
+    { name: 'index', path: '/', budgets: { ...STRETCH_CWV } },
+    { name: 'article', path: ARTICLE_PATH, budgets: { ...STRETCH_CWV, jsBytes: 30 * 1024 } },
+  ],
+  qwik: [
+    { name: 'index', path: '/', budgets: { ...STRETCH_CWV, jsBytes: 165 * 1024 } },
+    { name: 'article', path: ARTICLE_PATH, budgets: { ...STRETCH_CWV, jsBytes: 155 * 1024 } },
+  ],
 };
 
 export function parseArgs(argv: readonly string[]): ParsedArgs {

@@ -34,9 +34,11 @@ vi.mock('node:child_process', () => ({ spawn: spawnMock }));
 vi.mock('../lighthouse.ts', () => ({ runLighthouseAudit: runLighthouseAuditMock }));
 vi.mock('../chrome.ts', () => ({ withChrome: withChromeMock }));
 vi.mock('../web_vitals_collector.ts', () => ({ collectWebVitals: collectWebVitalsMock }));
+const buildPageListMock = vi.hoisted(() => vi.fn());
 vi.mock('../cli_helpers.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../cli_helpers.ts')>();
-  return { ...actual, waitForPort: waitForPortMock };
+  buildPageListMock.mockImplementation(actual.buildPageList);
+  return { ...actual, waitForPort: waitForPortMock, buildPageList: buildPageListMock };
 });
 
 import { main } from '../runner.ts';
@@ -57,12 +59,16 @@ function spawnedProcs() {
 }
 
 describe('runner main()', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     spawnMock.mockClear();
     runLighthouseAuditMock.mockReset();
     withChromeMock.mockClear();
     collectWebVitalsMock.mockReset();
     waitForPortMock.mockClear();
+    const { buildPageList } =
+      await vi.importActual<typeof import('../cli_helpers.ts')>('../cli_helpers.ts');
+    buildPageListMock.mockReset();
+    buildPageListMock.mockImplementation(buildPageList);
     cleanupAstroReports();
   });
   afterEach(() => {
@@ -132,6 +138,34 @@ describe('runner main()', () => {
     expect(args).toContain('--experimental-strip-types');
     expect(opts.env).toMatchObject({ HOST: '127.0.0.1', PORT: '4173' });
     expect(opts.cwd).toMatch(/apps\/qwik$/);
+  });
+
+  it('throws Budget violations after writing reports when budget is exceeded', async () => {
+    buildPageListMock.mockReturnValue([
+      { name: PAGE, path: '/', budgets: { lcp: 100, lhPerf: 98 } },
+    ]);
+    runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 100, jsBytes: 0 });
+    collectWebVitalsMock.mockResolvedValue([{ name: 'LCP', value: 500, id: 'x' }]);
+
+    await expect(main([`--target=${TARGET}`, '--runs=1', `--page=${PAGE}`])).rejects.toThrow(
+      /Budget violations/,
+    );
+
+    // Reports still landed before the throw — CI artifact preservation.
+    expect(existsSync(ASTRO_REPORT_JSON)).toBe(true);
+    expect(existsSync(ASTRO_REPORT_MD)).toBe(true);
+  });
+
+  it('resolves cleanly when all metrics are within budget', async () => {
+    buildPageListMock.mockReturnValue([
+      { name: PAGE, path: '/', budgets: { lcp: 1500, cls: 0.05, lhPerf: 98, jsBytes: 30 * 1024 } },
+    ]);
+    runLighthouseAuditMock.mockResolvedValue({ lcp: 800, cls: 0.01, lhPerf: 99, jsBytes: 5000 });
+    collectWebVitalsMock.mockResolvedValue([{ name: 'LCP', value: 1200, id: 'x' }]);
+
+    await expect(
+      main([`--target=${TARGET}`, '--runs=1', `--page=${PAGE}`]),
+    ).resolves.toBeUndefined();
   });
 
   it('kills both spawned services when the page loop throws', async () => {

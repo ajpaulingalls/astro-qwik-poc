@@ -54,6 +54,37 @@ describe('buildPageList', () => {
       }
     }
   });
+
+  it('exposes an article page for both targets at /news/<slug>', () => {
+    for (const target of ['astro', 'qwik'] as const) {
+      const article = buildPageList(target).find((p) => p.name === 'article');
+      expect(article).toBeDefined();
+      expect(article!.path.startsWith('/news/')).toBe(true);
+    }
+  });
+
+  it('every page declares stretch-CWV budgets (lcp + cls + lhPerf)', () => {
+    for (const target of ['astro', 'qwik'] as const) {
+      for (const page of buildPageList(target)) {
+        expect(page.budgets).toBeDefined();
+        expect(page.budgets!.lcp).toBe(1500);
+        expect(page.budgets!.cls).toBe(0.05);
+        expect(page.budgets!.lhPerf).toBe(98);
+      }
+    }
+  });
+
+  it('article pages declare a per-app jsBytes budget', () => {
+    const astroArticle = buildPageList('astro').find((p) => p.name === 'article')!;
+    expect(astroArticle.budgets!.jsBytes).toBe(30 * 1024);
+    const qwikArticle = buildPageList('qwik').find((p) => p.name === 'article')!;
+    expect(qwikArticle.budgets!.jsBytes).toBe(155 * 1024);
+  });
+
+  it('qwik index declares a 165KB jsBytes budget (sprint-006 revision)', () => {
+    const qwikIndex = buildPageList('qwik').find((p) => p.name === 'index')!;
+    expect(qwikIndex.budgets!.jsBytes).toBe(165 * 1024);
+  });
 });
 
 describe('waitForPort', () => {
