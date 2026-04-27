@@ -25,10 +25,46 @@ interface Viewport {
 const MOBILE: Viewport = { width: 320, height: 568 };
 const DESKTOP: Viewport = { width: 1280, height: 800 };
 
-// Article-shape acceptance tests below depend on this fixture existing in
-// packages/mock-api/fixtures/ArchipelagoSingleArticleQuery--<last-segment>.json.
-// If the fixture is renamed, both the 404 test and the cap test will start
-// failing — likely the wrong test will fail first; check this constant.
+// Each variant requires the matching ArchipelagoSingleArticleQuery--<last
+// segment of slug>.json fixture. The gallery/instagram fixtures' article.link
+// fields claim a `-for-m7-fixture` suffix that does NOT exist in the actual
+// filename — the mock-api resolves on filename, so use the filename here.
+interface ArticleVariant {
+  name: string;
+  slug: string;
+  signature: string;
+}
+const ARTICLE_VARIANTS: ArticleVariant[] = [
+  {
+    name: 'twitter',
+    slug: 'features/2026/4/24/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries',
+    signature: 'blockquote.twitter-tweet',
+  },
+  {
+    name: 'gallery',
+    slug: '2026/4/25/sample-article-with-gallery-embed',
+    signature: '.wp-block-gallery',
+  },
+  {
+    name: 'instagram',
+    slug: '2026/4/25/sample-article-with-instagram-embed',
+    signature: 'blockquote.instagram-media',
+  },
+  {
+    name: 'youtube',
+    slug: '2026/4/27/sample-article-with-youtube-embed',
+    signature: 'iframe[src*="youtube.com/embed"]',
+  },
+  {
+    name: 'brightcove',
+    slug: '2026/4/21/trump-announces-extending-iran-ceasefire-but-says-blockade-remains',
+    signature: 'video-js',
+  },
+];
+const MIN_RELATED = 4;
+const MAX_RELATED = 6;
+// Stand-alone constant — independent of ARTICLE_VARIANTS so reordering the
+// variants doesn't silently retarget the 404 / preload / cap tests.
 const KNOWN_ARTICLE_SLUG =
   'features/2026/4/24/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries';
 
@@ -43,14 +79,19 @@ export function runAcceptanceSuite(target: Target): void {
     let setupMs = 0;
     let testsStart = 0;
 
-    // Open a page at the given viewport, run fn, always close. Without the
-    // finally a failed assertion leaks pages into the shared Browser and
-    // can hold the chrome process open across tests.
-    async function withPage<T>(viewport: Viewport, fn: (page: Page) => Promise<T>): Promise<T> {
+    // Open a page at the given viewport, navigate to url (defaults to APP_URL
+    // homepage), run fn, always close. Without the finally a failed assertion
+    // leaks pages into the shared Browser and can hold the chrome process
+    // open across tests.
+    async function withPage<T>(
+      viewport: Viewport,
+      fn: (page: Page) => Promise<T>,
+      url: string = APP_URL,
+    ): Promise<T> {
       const page = await browser.newPage();
       try {
         await page.setViewport(viewport);
-        await page.goto(APP_URL, { waitUntil: 'networkidle2', timeout: 30_000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
         return await fn(page);
       } finally {
         await page.close();
@@ -225,7 +266,7 @@ export function runAcceptanceSuite(target: Target): void {
     // Without the cap a future curated-feed expansion could silently render
     // dozens of related links. SSR-only content, so bare fetch + HTML scan
     // beats spinning up puppeteer.
-    it('caps related-stories at 6 entries on the article page', async () => {
+    it(`caps related-stories at ${MAX_RELATED} entries on the article page`, async () => {
       const html = await fetch(
         `http://127.0.0.1:${APP_PORT[target]}/news/${KNOWN_ARTICLE_SLUG}`,
       ).then((r) => r.text());
@@ -234,7 +275,7 @@ export function runAcceptanceSuite(target: Target): void {
       const section = html.slice(start, html.indexOf('</section>', start));
       const linkCount = (section.match(/<a\b/g) ?? []).length;
       expect(linkCount).toBeGreaterThan(0);
-      expect(linkCount).toBeLessThanOrEqual(6);
+      expect(linkCount).toBeLessThanOrEqual(MAX_RELATED);
     });
 
     it('Inter web font is loaded with no CLS-triggering FOIT', async () => {
@@ -253,5 +294,36 @@ export function runAcceptanceSuite(target: Target): void {
       expect(fontInfo.loaded.some((f) => /Inter/i.test(f))).toBe(true);
       expect(fontInfo.computed).toMatch(/Inter|--font-inter/);
     });
+
+    // Capstone article suite (story-008): one navigated DOM probe per
+    // fixture variant, asserting the article shell, the embed-specific DOM
+    // signature, and the related-stories module. Cross-app divergence here
+    // is the fairness signal — both apps must render the same set of
+    // structural elements from identical fixture data.
+    for (const variant of ARTICLE_VARIANTS) {
+      it(`renders ${variant.name} embed + related-stories at /news/${variant.slug}`, async () => {
+        const url = `http://127.0.0.1:${APP_PORT[target]}/news/${variant.slug}`;
+        const result = await withPage(
+          DESKTOP,
+          (page) =>
+            page.evaluate(
+              (sig) => ({
+                article: !!document.querySelector('article'),
+                embed: !!document.querySelector(sig),
+                relatedCount: document.querySelectorAll('section.related-stories a').length,
+              }),
+              variant.signature,
+            ),
+          url,
+        );
+        expect(result.article, `${variant.name}: <article> missing`).toBe(true);
+        expect(result.embed, `${variant.name}: ${variant.signature} missing`).toBe(true);
+        expect(
+          result.relatedCount,
+          `${variant.name}: related-stories link count out of bounds`,
+        ).toBeGreaterThanOrEqual(MIN_RELATED);
+        expect(result.relatedCount).toBeLessThanOrEqual(MAX_RELATED);
+      });
+    }
   });
 }
