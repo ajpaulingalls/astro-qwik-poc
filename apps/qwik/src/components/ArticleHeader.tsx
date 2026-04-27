@@ -1,4 +1,5 @@
 import { resolveImageUrl } from '../lib/image-url';
+import { formatDate } from '../lib/format-date';
 
 export interface ArticleAuthor {
   name: string;
@@ -24,16 +25,6 @@ interface Props {
   date: string;
   categories: ArticleCategory[];
   featuredImage?: ArticleLeadImage | null;
-}
-
-const DATE_FORMAT: Intl.DateTimeFormatOptions = {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-};
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-GB', DATE_FORMAT);
 }
 
 export function ArticleHeader({

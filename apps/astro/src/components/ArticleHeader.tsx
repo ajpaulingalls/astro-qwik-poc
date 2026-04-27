@@ -1,15 +1,10 @@
 import type { Article } from '@aje-poc/shared-types';
 import { resolveImageUrl } from '../lib/image-url';
+import { formatDate } from '../lib/format-date';
 
 interface Props {
   article: Article;
 }
-
-const DATE_FMT = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-});
 
 export function ArticleHeader({ article }: Props) {
   return (
@@ -55,7 +50,7 @@ export function ArticleHeader({ article }: Props) {
             ))}
           </span>
         )}
-        <time datetime={article.date}>{DATE_FMT.format(new Date(article.date))}</time>
+        <time datetime={article.date}>{formatDate(article.date)}</time>
       </div>
     </header>
   );
