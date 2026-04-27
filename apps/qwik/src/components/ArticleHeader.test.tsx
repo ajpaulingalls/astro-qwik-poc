@@ -11,8 +11,8 @@ const props = {
   authors: [{ name: 'John T Psaropoulos', link: '/author/john_psaropoulos' }],
   date: '2026-04-24T16:52:48',
   categories: [
-    { name: 'Features', link: '/features/' },
-    { name: 'News', link: '/news/' },
+    { name: 'Features', link: '/features/', slug: 'features' },
+    { name: 'News', link: '/news/', slug: 'news' },
   ],
 };
 
@@ -64,10 +64,17 @@ describe('ArticleHeader', () => {
     expect(time.textContent).toContain('2026');
   });
 
-  it('renders each category as an anchor with the category link', async () => {
+  it('renders categories as a semantic ul with li children (mirror Astro markup)', async () => {
     const { screen, render } = await createDOM();
     await render(<ArticleHeader {...props} />);
-    const catLinks = screen.querySelectorAll('.categories a');
+    const ul = screen.querySelector('ul.categories');
+    expect(ul).toBeTruthy();
+    const items = ul!.querySelectorAll('li');
+    expect(items.length).toBe(2);
+    // Old nav/span markup had a `·` separator span between siblings; verify
+    // the gap-2 + ul/li replacement leaves none behind.
+    expect(ul!.querySelectorAll('span').length).toBe(0);
+    const catLinks = screen.querySelectorAll('ul.categories li a');
     expect(catLinks.length).toBe(2);
     expect(catLinks[0].getAttribute('href')).toBe('/features/');
     expect(catLinks[0].textContent).toBe('Features');

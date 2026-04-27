@@ -22,16 +22,15 @@ export function ArticleHeader({
   return (
     <header class="article-header mb-6">
       {categories.length > 0 && (
-        <nav class="categories text-aj-orange text-sm font-bold tracking-wider uppercase mb-2">
-          {categories.map((cat, i) => (
-            <span key={cat.link}>
-              {i > 0 && <span class="mx-1">·</span>}
+        <ul class="categories flex gap-2 text-sm uppercase tracking-wider text-aj-orange mb-2">
+          {categories.map((cat) => (
+            <li key={cat.slug}>
               <a href={cat.link} class="hover:underline">
                 {cat.name}
               </a>
-            </span>
+            </li>
           ))}
-        </nav>
+        </ul>
       )}
       <h1 class="text-3xl md:text-4xl font-bold leading-tight">{title}</h1>
       {subheading && <p class="subheading mt-3 text-lg text-neutral-700">{subheading}</p>}
