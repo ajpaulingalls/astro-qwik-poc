@@ -172,6 +172,21 @@ export function runAcceptanceSuite(target: Target): void {
       expect(probe.headers.get('content-type')).toBe('image/png');
     });
 
+    // The /wp-content/uploads/* proxy must forward the query string so the
+    // ?w=&resize= resize hints reach mock-api. LeadImage emits srcset URLs
+    // carrying these params; if the proxy strips them, every srcset entry
+    // would resolve to the same fallback PNG.
+    it('forwards ?w= and ?resize= through the uploads proxy (returns SVG at requested dims)', async () => {
+      const probe = await fetch(
+        `http://127.0.0.1:${APP_PORT[target]}/wp-content/uploads/probe.png?w=400&resize=400%2C267`,
+      );
+      expect(probe.status).toBe(200);
+      expect(probe.headers.get('content-type')).toBe('image/svg+xml');
+      const body = await probe.text();
+      expect(body).toContain('width="400"');
+      expect(body).toContain('height="267"');
+    });
+
     // Mock-api returns 404 for slugs without a matching fixture. Both apps
     // must translate that into a real HTTP 404 instead of a 500 — Astro via
     // GraphqlHttpError.status, Qwik via routeLoader fail(404).
