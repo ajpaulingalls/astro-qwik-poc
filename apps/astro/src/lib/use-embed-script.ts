@@ -12,9 +12,10 @@ interface Options {
   onload?: () => void;
 }
 
-export function useEmbedScript(src: string, opts: Options = {}): void {
+export function useEmbedScript(src: string | null | undefined, opts: Options = {}): void {
   const { onload } = opts;
   useEffect(() => {
+    if (!src) return;
     const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`);
     if (existing) {
       if (existing.dataset.loaded === 'true') {
