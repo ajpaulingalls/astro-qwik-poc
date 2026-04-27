@@ -1,7 +1,6 @@
 import { onCLS, onINP, onLCP, type Metric } from 'web-vitals';
 
 declare global {
-  // eslint-disable-next-line no-var
   var __webVitals: Metric[];
 }
 
