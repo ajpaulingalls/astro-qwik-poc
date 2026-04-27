@@ -2,6 +2,25 @@
 
 Live log of beta-specific workarounds, missing features, and divergences from the architecture doc. Updated as items are encountered.
 
+## sprint-007 — M7 embed components + ArticleBody dispatch (2026-04-27)
+
+### Build verification
+
+`bun run build:qwik` produces ZERO HTML-validation warnings on the segmented ArticleBody output for all four embed-bearing fixture variants (russian-oil/Twitter, instagram, gallery, trump/Brightcove). Story-005 acceptance bullet on validation cleared.
+
+### Beta friction encountered
+
+1. **`useVisibleTask$` hangs in `createDOM` tests** — first attempt at the embed components used `useVisibleTask$(() => injectEmbedScript(SRC))`. Tests timed out after 5s with no DOM output. Switched to `useOnDocument('qvisible', $(() => …))` mirroring `LivestreamPlayer.tsx`, which renders cleanly. The `useVisibleTask$` family appears to register but never settle in createDOM (no qwikLoader bootstrap — same root cause as the existing testing-library blocker). Per-component decision tree: prefer `useOnDocument('qvisible', $())` over `useVisibleTask$` for unit-testable client init.
+
+2. **`createDOM`'s `screen.querySelector` returns `undefined`, not `null`, when no match** — Qwik 2 beta.32 divergence from happy-dom (which returns `null`). Tests must use `expect(...).toBeFalsy()` rather than `toBeNull()`. The Astro mirror of the same LeadImage caption test uses `toBeNull` because Astro tests run in happy-dom directly. Documented divergence.
+
+3. **`useOnDocument('qvisible', $())` does not fire in `createDOM`** — known limitation (no qwikLoader bootstrap, per the M3 scaffolding entries). Component-level tests verify only the rendered markup; the client-side script-injection side effect is verified at preview/e2e via the Brightcove/Twitter/Instagram networks loading their respective player JS. The `injectEmbedScript` helper is a plain function and unit-tests directly with happy-dom — see `src/lib/inject-embed-script.test.ts`.
+
+### Embed dispatch decisions (D1, D2)
+
+- **D1: parallel `parse-embeds.ts` segmenter in each app, not shared package** — per CLAUDE.md framework-isolation principle. A 4-pattern parser (twitter-tweet/instagram-media blockquotes + wp-block-gallery div + brightcove `<!-- Start/End -->` comment markers) does not justify cross-app coupling. If the parser grows past ~150 lines or we fix the same bug twice, lift to `packages/article-content`.
+- **D2: embed components own their provider-script injection** — each component calls `injectEmbedScript(src)` from `useOnDocument('qvisible', $())`. The helper guards against duplicate scripts via `data-loaded="true"` sentinel + `querySelector` check, so multiple embeds of the same kind on one page load the script exactly once.
+
 ## M7 article shell — 2026-04-25
 
 ### Divergences from `apps/qwik/docs/ARCHITECTURE.md`

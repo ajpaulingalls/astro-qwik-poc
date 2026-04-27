@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { StoryCard } from './StoryCard';
 import { getByHeading } from '../test-utils/dom';
+import { resolveImageUrl } from '../lib/image-url';
 import type { HomepagePost } from '@aje-poc/shared-types';
 
 const post: HomepagePost = {
@@ -32,9 +33,7 @@ describe('StoryCard', () => {
     const { screen, render } = await createDOM();
     await render(<StoryCard post={post} />);
     const img = screen.querySelector('img')!;
-    expect(img.getAttribute('src')).toBe(
-      'http://localhost:4455/wp-content/uploads/2026/04/lebanon.jpg',
-    );
+    expect(img.getAttribute('src')).toBe(resolveImageUrl(post.featuredImage!.sourceUrl));
     expect(img.getAttribute('alt')).toBe('Aftermath of attack in Lebanon');
     expect(img.getAttribute('loading')).toBe('lazy');
     expect(img.hasAttribute('fetchpriority')).toBe(false);

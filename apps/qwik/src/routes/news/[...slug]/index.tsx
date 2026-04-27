@@ -66,12 +66,11 @@ export default component$(() => {
   return (
     <article class="mx-auto max-w-3xl px-4 py-6">
       <ArticleHeader
-        title={getDisplayHeadline(article)}
-        subheading={article.subheading || article.excerpt}
-        authors={article.author}
-        date={article.date}
-        categories={article.categories}
-        featuredImage={article.featuredImage}
+        article={{
+          ...article,
+          title: getDisplayHeadline(article),
+          subheading: article.subheading || article.excerpt,
+        }}
       />
       <ArticleBody content={article.content} />
       <RelatedStories posts={relatedPosts} />

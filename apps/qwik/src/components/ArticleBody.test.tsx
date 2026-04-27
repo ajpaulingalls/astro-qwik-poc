@@ -30,7 +30,7 @@ describe('ArticleBody', () => {
     expect(screen.querySelector('em')?.textContent).toBe('italic');
   });
 
-  it('uses custom embedRenderer when provided (extension seam for story-005)', async () => {
+  it('uses custom embedRenderer when provided (escape hatch applied before segmentation)', async () => {
     let received: string | undefined;
     const { screen, render } = await createDOM();
     await render(
@@ -46,5 +46,37 @@ describe('ArticleBody', () => {
     const custom = screen.querySelector('[data-test="custom-renderer"]')!;
     expect(custom.textContent).toBe('replaced');
     expect(screen.querySelector('p')).toBeFalsy();
+  });
+
+  it('dispatches twitter-tweet blockquote to TwitterEmbed wrapper', async () => {
+    const html = `<p>Before.</p><blockquote class="twitter-tweet"><p>tweet</p></blockquote><p>After.</p>`;
+    const { screen, render } = await createDOM();
+    await render(<ArticleBody content={html} />);
+    expect(screen.querySelector('div.embed-twitter blockquote.twitter-tweet')).toBeTruthy();
+    expect(screen.textContent).toContain('Before');
+    expect(screen.textContent).toContain('After');
+  });
+
+  it('dispatches instagram-media blockquote to InstagramEmbed wrapper', async () => {
+    const html = `<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/X/"><a href="https://www.instagram.com/p/X/">View</a></blockquote>`;
+    const { screen, render } = await createDOM();
+    await render(<ArticleBody content={html} />);
+    expect(screen.querySelector('div.embed-instagram blockquote.instagram-media')).toBeTruthy();
+  });
+
+  it('dispatches wp-block-gallery div to GalleryEmbed wrapper', async () => {
+    const html = `<div class="wp-block-gallery has-nested-images columns-3"><figure class="wp-block-image"><img src="/x.jpg"/></figure></div>`;
+    const { screen, render } = await createDOM();
+    await render(<ArticleBody content={html} />);
+    expect(screen.querySelector('div.embed-gallery div.wp-block-gallery')).toBeTruthy();
+  });
+
+  it('dispatches Brightcove video-js wrapper to BrightcoveEmbed', async () => {
+    const html = `<!-- Start of Brightcove Player --><div><video-js data-account="A" data-player="P" class="video-js"></video-js></div><!-- End of Brightcove Player -->`;
+    const { screen, render } = await createDOM();
+    await render(<ArticleBody content={html} />);
+    const embed = screen.querySelector('div.embed-brightcove');
+    expect(embed).toBeTruthy();
+    expect(embed?.querySelector('video-js')).toBeTruthy();
   });
 });

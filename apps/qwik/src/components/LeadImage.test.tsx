@@ -85,6 +85,26 @@ describe('LeadImage', () => {
     expect(img.hasAttribute('srcset')).toBe(false);
   });
 
+  it('renders a <figcaption> with the caption text when image.caption is present', async () => {
+    const captioned: HomepageImage = { ...image, caption: 'Tuapse refinery on fire [Reuters]' };
+    const { screen, render } = await createDOM();
+    await render(<LeadImage image={captioned} priority="eager" />);
+    const figure = screen.querySelector('figure');
+    expect(figure).toBeTruthy();
+    const caption = figure!.querySelector('figcaption');
+    expect(caption).toBeTruthy();
+    expect(caption!.textContent).toBe('Tuapse refinery on fire [Reuters]');
+    expect(figure!.querySelector('img')).toBeTruthy();
+  });
+
+  it('does NOT wrap in a <figure> when image.caption is absent (no DOM regression)', async () => {
+    const { screen, render } = await createDOM();
+    await render(<LeadImage image={image} priority="eager" />);
+    expect(screen.querySelector('figure')).toBeFalsy();
+    expect(screen.querySelector('figcaption')).toBeFalsy();
+    expect(screen.querySelector('img')).toBeTruthy();
+  });
+
   it('extraClass is prepended to the canonical class set', async () => {
     const img = await renderImg(
       <LeadImage image={image} priority="eager" extraClass="lead-image my-4" />,
