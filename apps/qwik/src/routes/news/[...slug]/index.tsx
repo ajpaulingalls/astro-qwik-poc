@@ -5,34 +5,7 @@ import { getDisplayHeadline } from '../../../lib/headline';
 import { ArticleHeader } from '../../../components/ArticleHeader';
 import { ArticleBody } from '../../../components/ArticleBody';
 import { RelatedStories, MAX_RELATED } from '../../../components/RelatedStories';
-import type { HomepagePost, CuratedCollectionItem } from '@aje-poc/shared-types';
-
-interface ArticleAuthor {
-  id: string;
-  name: string;
-  link: string;
-}
-
-interface ArticleCategory {
-  id: string;
-  name: string;
-  slug: string;
-  link: string;
-}
-
-interface Article {
-  id: string;
-  title: string;
-  subheading?: string;
-  excerpt?: string;
-  content: string;
-  date: string;
-  link: string;
-  replacementHeadline?: string;
-  featuredImage?: { sourceUrl: string; alt?: string; width?: number; height?: number } | null;
-  author: ArticleAuthor[];
-  categories: ArticleCategory[];
-}
+import type { Article, CuratedCollectionItem, HomepagePost } from '@aje-poc/shared-types';
 
 interface SingleArticleData {
   article: Article;
@@ -95,9 +68,9 @@ export default component$(() => {
       <ArticleHeader
         title={getDisplayHeadline(article)}
         subheading={article.subheading || article.excerpt}
-        authors={article.author.map((a) => ({ name: a.name, link: a.link }))}
+        authors={article.author}
         date={article.date}
-        categories={article.categories.map((c) => ({ name: c.name, link: c.link }))}
+        categories={article.categories}
         featuredImage={article.featuredImage}
       />
       <ArticleBody content={article.content} />

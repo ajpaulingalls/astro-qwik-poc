@@ -41,11 +41,15 @@ export function ArticleHeader({ article }: Props) {
           <span class="byline">
             By{' '}
             {article.author.map((a, i) => (
-              <span key={a.link}>
+              <span key={a.link ?? a.name}>
                 {i > 0 && ', '}
-                <a href={a.link} class="hover:text-aj-orange font-medium">
-                  {a.name}
-                </a>
+                {a.link ? (
+                  <a href={a.link} class="hover:text-aj-orange font-medium">
+                    {a.name}
+                  </a>
+                ) : (
+                  <span class="font-medium">{a.name}</span>
+                )}
               </span>
             ))}
           </span>

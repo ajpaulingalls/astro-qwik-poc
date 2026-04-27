@@ -1,22 +1,6 @@
 import { resolveImageUrl } from '../lib/image-url';
 import { formatDate } from '../lib/format-date';
-
-export interface ArticleAuthor {
-  name: string;
-  link?: string;
-}
-
-export interface ArticleCategory {
-  name: string;
-  link: string;
-}
-
-export interface ArticleLeadImage {
-  sourceUrl: string;
-  alt?: string;
-  width?: number;
-  height?: number;
-}
+import type { ArticleAuthor, ArticleCategory, HomepageImage } from '@aje-poc/shared-types';
 
 interface Props {
   title: string;
@@ -24,7 +8,7 @@ interface Props {
   authors: ArticleAuthor[];
   date: string;
   categories: ArticleCategory[];
-  featuredImage?: ArticleLeadImage | null;
+  featuredImage?: HomepageImage | null;
 }
 
 export function ArticleHeader({
