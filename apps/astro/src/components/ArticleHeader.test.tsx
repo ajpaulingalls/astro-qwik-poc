@@ -2,6 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/preact';
 import { ArticleHeader } from './ArticleHeader';
+import { resolveImageUrl } from '../lib/image-url';
 
 const baseArticle = {
   title: 'Russian oil exports slump as Ukraine hammers ports',
@@ -74,5 +75,49 @@ describe('ArticleHeader', () => {
   it('omits the categories list when empty', () => {
     const { container } = render(<ArticleHeader article={{ ...baseArticle, categories: [] }} />);
     expect(container.querySelector('.categories')).toBeNull();
+  });
+
+  it('renders featuredImage with eager loading + fetchpriority high (article LCP)', () => {
+    const { container } = render(
+      <ArticleHeader
+        article={{
+          ...baseArticle,
+          featuredImage: {
+            sourceUrl: '/wp-content/uploads/2026/04/oil.jpg',
+            alt: 'Oil spill at Tuapse',
+            width: 1200,
+            height: 800,
+          },
+        }}
+      />,
+    );
+    const img = container.querySelector('img.lead-image');
+    expect(img).toBeTruthy();
+    expect(img!.getAttribute('src')).toBe(resolveImageUrl('/wp-content/uploads/2026/04/oil.jpg'));
+    expect(img!.getAttribute('alt')).toBe('Oil spill at Tuapse');
+    expect(img!.getAttribute('loading')).toBe('eager');
+    expect(img!.getAttribute('fetchpriority')).toBe('high');
+    expect(img!.getAttribute('decoding')).toBe('async');
+    expect(img!.getAttribute('width')).toBe('1200');
+    expect(img!.getAttribute('height')).toBe('800');
+  });
+
+  it('renders featuredImage with empty alt when alt is omitted', () => {
+    const { container } = render(
+      <ArticleHeader
+        article={{
+          ...baseArticle,
+          featuredImage: { sourceUrl: '/wp-content/uploads/x.jpg' },
+        }}
+      />,
+    );
+    const img = container.querySelector('img.lead-image');
+    expect(img).toBeTruthy();
+    expect(img!.getAttribute('alt')).toBe('');
+  });
+
+  it('omits the lead image cleanly when featuredImage is missing', () => {
+    const { container } = render(<ArticleHeader article={baseArticle} />);
+    expect(container.querySelector('img.lead-image')).toBeNull();
   });
 });
