@@ -1,5 +1,5 @@
 import { component$ } from '@qwik.dev/core';
-import { routeLoader$, type DocumentHead } from '@qwik.dev/router';
+import { routeLoader$, type DocumentHead, type RequestEventLoader } from '@qwik.dev/router';
 import { graphqlFetch, GraphqlHttpError } from '../../../lib/graphql';
 import { getDisplayHeadline } from '../../../lib/headline';
 import { relatedPostsFrom } from '../../../lib/related-posts';
@@ -7,7 +7,7 @@ import { computeLcpPreloadLink } from '../../../lib/lcp-preload';
 import { ArticleHeader } from '../../../components/ArticleHeader';
 import { ArticleBody } from '../../../components/ArticleBody';
 import { RelatedStories } from '../../../components/RelatedStories';
-import type { Article, CuratedCollectionItem } from '@aje-poc/shared-types';
+import type { Article, CuratedCollectionItem, HomepagePost } from '@aje-poc/shared-types';
 
 interface SingleArticleData {
   article: Article;
@@ -15,6 +15,11 @@ interface SingleArticleData {
 
 interface CuratedFeedData {
   homepage: { curatedCollection: CuratedCollectionItem[] };
+}
+
+export interface ArticleLoaderResult {
+  article: Article;
+  relatedPosts: HomepagePost[];
 }
 
 // Production aljazeera.com slugs are the last segment of a nested URL like
@@ -25,7 +30,12 @@ function lastSegment(slug: string): string {
   return parts[parts.length - 1] ?? '';
 }
 
-export const useArticleData = routeLoader$(async ({ params, fail }) => {
+// Exported for unit tests — `routeLoader$` wraps this directly. Behavior is
+// the same; naming the body lets vitest call it without a Qwik runtime.
+export async function loadArticleData(
+  ctx: Pick<RequestEventLoader, 'params' | 'fail'>,
+): Promise<ArticleLoaderResult | { notFound: true; slug: string }> {
+  const { params, fail } = ctx;
   const articleSlug = lastSegment(params.slug ?? '');
   let articleData: SingleArticleData;
   let curatedData: CuratedFeedData;
@@ -54,7 +64,9 @@ export const useArticleData = routeLoader$(async ({ params, fail }) => {
   // the browser — the in-component slice would not.
   const relatedPosts = relatedPostsFrom(curatedData.homepage.curatedCollection ?? []);
   return { article: articleData.article, relatedPosts };
-});
+}
+
+export const useArticleData = routeLoader$((ctx) => loadArticleData(ctx));
 
 export default component$(() => {
   const data = useArticleData();

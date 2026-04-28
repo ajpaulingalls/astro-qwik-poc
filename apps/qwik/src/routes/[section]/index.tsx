@@ -25,7 +25,7 @@ interface TopicPageData {
   topicsPage: { name?: string; featuredPosts: HomepagePost[] } | null;
 }
 
-interface SectionLoaderResult {
+export interface SectionLoaderResult {
   slug: string;
   sectionType: SectionType;
   title: string;
