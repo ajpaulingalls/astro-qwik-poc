@@ -1,4 +1,5 @@
 import { type FixtureMap } from "./fixtures.ts";
+import { resolveSnapshotIndex } from "./snapshot.ts";
 import {
   MissingVariableError,
   resolveFixtureKey,
@@ -11,7 +12,15 @@ export interface HandlerDeps {
 
 const CORS_HEADERS: HeadersInit = {
   "access-control-allow-origin": "*",
-  "access-control-allow-headers": "wp-site, content-type",
+  "access-control-allow-headers": "wp-site, content-type, x-liveblog-snapshot",
+};
+
+// Snapshot env vars are read once at startup; the dev/spawn env-allow lists
+// pin them to process lifetime, and re-reading per request would only return
+// the same captured values.
+const SNAPSHOT_ENV = {
+  index: Deno.env.get("LIVEBLOG_SNAPSHOT_INDEX") ?? null,
+  interval: Deno.env.get("LIVEBLOG_SNAPSHOT_INTERVAL_MS") ?? null,
 };
 
 // 1x1 transparent PNG (67 bytes). Served for any /wp-content/uploads/* request so
@@ -138,9 +147,20 @@ export function handle(req: Request, deps: HandlerDeps): Response {
     }
   }
 
+  const snapshotHeader = req.headers.get("x-liveblog-snapshot");
+
   let key: string;
   try {
-    key = resolveFixtureKey(operationName, variables);
+    key = resolveFixtureKey(operationName, variables, {
+      hasFixture: (k) => deps.fixtures.has(k),
+      snapshotIndex: (maxN) =>
+        resolveSnapshotIndex({
+          headerValue: snapshotHeader,
+          maxN,
+          envIndex: SNAPSHOT_ENV.index,
+          envInterval: SNAPSHOT_ENV.interval,
+        }),
+    });
   } catch (err) {
     if (err instanceof MissingVariableError) {
       return text(400, err.message);

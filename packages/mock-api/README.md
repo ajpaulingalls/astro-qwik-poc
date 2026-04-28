@@ -34,19 +34,22 @@ deno task test   # run the full test suite
 ```
 
 The dev task uses the narrowest viable permission set:
-`--allow-net=0.0.0.0:4455 --allow-read=./fixtures --allow-env=PORT,FIXTURE_DIR`.
+`--allow-net=0.0.0.0:4455 --allow-read=./fixtures --allow-env=PORT,FIXTURE_DIR,LIVEBLOG_SNAPSHOT_INDEX,LIVEBLOG_SNAPSHOT_INTERVAL_MS`.
 
 ## Environment variables
 
-| Variable      | Default      | Purpose                                                                                                | Read by                           |
-| ------------- | ------------ | ------------------------------------------------------------------------------------------------------ | --------------------------------- |
-| `PORT`        | `4455`       | Server port. Fails loud on non-integer or out-of-range values.                                         | server                            |
-| `FIXTURE_DIR` | `./fixtures` | Directory the loader scans for `*.json` at startup.                                                    | server                            |
-| `WP_SITE`     | `aje`        | `wp-site` header value used when recording new fixtures from production (`aje` English, `aja` Arabic). | `scripts/record-fixtures.sh` only |
+| Variable                        | Default      | Purpose                                                                                                                                                                | Read by                           |
+| ------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| `PORT`                          | `4455`       | Server port. Fails loud on non-integer or out-of-range values.                                                                                                         | server                            |
+| `FIXTURE_DIR`                   | `./fixtures` | Directory the loader scans for `*.json` at startup.                                                                                                                    | server                            |
+| `LIVEBLOG_SNAPSHOT_INDEX`       | (unset)      | Pin live-blog `--snapshot-N` selection for the lifetime of the process. Per-request `x-liveblog-snapshot` header overrides this. Captured once at handler module load. | handler                           |
+| `LIVEBLOG_SNAPSHOT_INTERVAL_MS` | `30000`      | Wall-clock auto-rotation interval for live-blog snapshots when neither header nor `LIVEBLOG_SNAPSHOT_INDEX` is set. Captured once at handler module load.              | handler                           |
+| `WP_SITE`                       | `aje`        | `wp-site` header value used when recording new fixtures from production (`aje` English, `aja` Arabic).                                                                 | `scripts/record-fixtures.sh` only |
 
-The server itself reads only `PORT` and `FIXTURE_DIR`. The per-request `wp-site`
-header is required on every request (missing → 400) and validated by the
-handler.
+The per-request `wp-site` header is required on every request (missing → 400)
+and validated by the handler. The optional per-request `x-liveblog-snapshot: N`
+header pins live-blog snapshot selection for that request only (used by the
+perf-harness and deterministic tests).
 
 ## Fixture layout
 
@@ -74,26 +77,27 @@ Most fixtures are recorded verbatim from production via
 `scripts/record-fixtures.sh`. A few are hand-crafted to cover embed types
 production doesn't expose in our scouted query surface:
 
-| Fixture                                                                  | Origin                                                                          |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| `ArchipelagoSingleArticleQuery--sample-article-with-instagram-embed`     | Hand-crafted. Production news articles don't carry Instagram embeds in scouting | 
-| `ArchipelagoSingleArticleQuery--sample-article-with-gallery-embed`       | Hand-crafted. Production `/gallery/*` uses a different `operationName` (out of M7 scope) |
+| Fixture                                                              | Origin                                                                                   |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `ArchipelagoSingleArticleQuery--sample-article-with-instagram-embed` | Hand-crafted. Production news articles don't carry Instagram embeds in scouting          |
+| `ArchipelagoSingleArticleQuery--sample-article-with-gallery-embed`   | Hand-crafted. Production `/gallery/*` uses a different `operationName` (out of M7 scope) |
 
 Synthetic fixtures are flagged in-band: `title` ends with `(sample)`, `id` uses
 the 9000000-block (e.g. `9001001`, `9002001`), and `socialMediaSummary` /
-`excerpt` / `subheading` start with `Sample fixture:`. Don't strip these
-markers — they're how renderers and screenshots stay honest about provenance.
+`excerpt` / `subheading` start with `Sample fixture:`. Don't strip these markers
+— they're how renderers and screenshots stay honest about provenance.
 
 ## Architecture
 
-| File                         | Role                                                                                                                                                                         |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `server.ts`                  | Bootstrap: env validation, fixture preload, `Deno.serve`. Exports `startServer({port, fixtureDir})` for tests.                                                               |
-| `lib/handler.ts`             | Pure `handle(req, {fixtures}) → Response`. Enforces GET-only, `wp-site` header, `/graphql` path, OPTIONS preflight.                                                          |
-| `lib/variants.ts`            | `resolveFixtureKey(operationName, variables) → string`. Throws `MissingVariableError` (handler converts to 400) when a known operation is called without required variables. |
-| `lib/fixtures.ts`            | `loadFixtures(dir) → Map<string, string>`. Validates each fixture via `JSON.parse` at startup; stores raw text for fast response.                                            |
-| `tests/_helpers.ts`          | `withTempDir`, `withRunningServer`.                                                                                                                                          |
-| `scripts/record-fixtures.sh` | Re-runnable production capture (curl + jq). See [scripts/README.md](./scripts/README.md).                                                                                    |
+| File                         | Role                                                                                                                                                                                                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `server.ts`                  | Bootstrap: env validation, fixture preload, `Deno.serve`. Exports `startServer({port, fixtureDir})` for tests.                                                                                                                                                                              |
+| `lib/handler.ts`             | Pure `handle(req, {fixtures}) → Response`. Enforces GET-only, `wp-site` header, `/graphql` path, OPTIONS preflight.                                                                                                                                                                         |
+| `lib/variants.ts`            | `resolveFixtureKey(operationName, variables, deps?) → string`. Throws `MissingVariableError` (handler converts to 400) when a known operation is called without required variables. When `deps` is supplied and the rule is `snapshotted`, appends `--snapshot-N` for live-blog operations. |
+| `lib/snapshot.ts`            | Pure `resolveSnapshotIndex({headerValue, maxN, envIndex, envInterval}) → number`. Three-tier precedence: `x-liveblog-snapshot` header > `LIVEBLOG_SNAPSHOT_INDEX` env > wall-clock auto-rotate every `LIVEBLOG_SNAPSHOT_INTERVAL_MS` (default 30000ms).                                     |
+| `lib/fixtures.ts`            | `loadFixtures(dir) → Map<string, string>`. Validates each fixture via `JSON.parse` at startup; stores raw text for fast response.                                                                                                                                                           |
+| `tests/_helpers.ts`          | `withTempDir`, `withRunningServer`.                                                                                                                                                                                                                                                         |
+| `scripts/record-fixtures.sh` | Re-runnable production capture (curl + jq). See [scripts/README.md](./scripts/README.md).                                                                                                                                                                                                   |
 
 ## Adding a new operation
 

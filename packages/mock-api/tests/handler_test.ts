@@ -27,6 +27,7 @@ function buildRequest(opts: {
   operationName?: string;
   variables?: unknown;
   wpSite?: string | null;
+  snapshotHeader?: string;
 }): Request {
   const path = opts.path ?? "/graphql";
   const params = new URLSearchParams();
@@ -44,6 +45,9 @@ function buildRequest(opts: {
   }`;
   const headers = new Headers();
   if (opts.wpSite !== null) headers.set("wp-site", opts.wpSite ?? "aje");
+  if (opts.snapshotHeader !== undefined) {
+    headers.set("x-liveblog-snapshot", opts.snapshotHeader);
+  }
   return new Request(url, { method: opts.method ?? "GET", headers });
 }
 
@@ -265,6 +269,67 @@ Deno.test("handler: /wp-content/uploads/* placeholder does NOT require wp-site h
     { method: "GET" },
   );
   const res = handle(req, { fixtures });
+  assertEquals(res.status, 200);
+});
+
+Deno.test("handler: x-liveblog-snapshot header pins live-blog shell to the requested snapshot", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const slug =
+    "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoSingleLiveBlogQuery",
+      variables: { name: slug, postType: "liveblog", preview: "" },
+      snapshotHeader: "0",
+    }),
+    { fixtures: realFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data.article.slug, slug);
+});
+
+Deno.test("handler: x-liveblog-snapshot header also pins SingleLiveBlogChildrensQuery", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const slug =
+    "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+  const res = handle(
+    buildRequest({
+      operationName: "SingleLiveBlogChildrensQuery",
+      variables: { postName: slug },
+      snapshotHeader: "0",
+    }),
+    { fixtures: realFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(Array.isArray(body.data.article.children), true);
+});
+
+Deno.test("handler: live-blog ops without snapshot header still resolve via wall-clock fallback (snapshot-0 with single variant)", async () => {
+  // With only snapshot-0 on disk, every wall-clock tick lands on snapshot-0.
+  const realFixtures = await loadFixtures("./fixtures");
+  const slug =
+    "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoSingleLiveBlogQuery",
+      variables: { name: slug, postType: "liveblog", preview: "" },
+    }),
+    { fixtures: realFixtures },
+  );
+  assertEquals(res.status, 200);
+});
+
+Deno.test("handler: non-live-blog operations are unaffected by x-liveblog-snapshot header (HomePageQuery)", () => {
+  const res = handle(
+    buildRequest({
+      operationName: "HomePageQuery",
+      variables: {},
+      snapshotHeader: "2",
+    }),
+    { fixtures },
+  );
   assertEquals(res.status, 200);
 });
 

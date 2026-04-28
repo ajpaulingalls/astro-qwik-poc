@@ -157,3 +157,58 @@ Deno.test("resolveFixtureKey: strips leading/trailing dashes after slugify", () 
     "ArchipelagoSingleArticleQuery--foo-bar",
   );
 });
+
+Deno.test("resolveFixtureKey: deps + ArchipelagoSingleLiveBlogQuery appends --snapshot-N when fixtures are present", () => {
+  const present = new Set([
+    "ArchipelagoSingleLiveBlogQuery--foo--snapshot-0",
+    "ArchipelagoSingleLiveBlogQuery--foo--snapshot-1",
+    "ArchipelagoSingleLiveBlogQuery--foo--snapshot-2",
+  ]);
+  const key = resolveFixtureKey(
+    "ArchipelagoSingleLiveBlogQuery",
+    { name: "foo" },
+    {
+      hasFixture: (k) => present.has(k),
+      snapshotIndex: (maxN) => {
+        // Verify deps received the actual variant count (3).
+        if (maxN !== 3) throw new Error(`expected maxN=3, got ${maxN}`);
+        return 1;
+      },
+    },
+  );
+  assertEquals(key, "ArchipelagoSingleLiveBlogQuery--foo--snapshot-1");
+});
+
+Deno.test("resolveFixtureKey: deps + live-blog op falls back to bare key when no --snapshot-N variants exist", () => {
+  const key = resolveFixtureKey(
+    "ArchipelagoSingleLiveBlogQuery",
+    { name: "foo" },
+    {
+      hasFixture: () => false,
+      snapshotIndex: () => {
+        throw new Error("snapshotIndex must not be called when maxN=0");
+      },
+    },
+  );
+  assertEquals(key, "ArchipelagoSingleLiveBlogQuery--foo");
+});
+
+Deno.test("resolveFixtureKey: deps + non-snapshotted op (HomePageQuery) bypasses snapshot resolution", () => {
+  const key = resolveFixtureKey(
+    "HomePageQuery",
+    {},
+    {
+      hasFixture: () => {
+        throw new Error(
+          "hasFixture must not be called for non-snapshotted ops",
+        );
+      },
+      snapshotIndex: () => {
+        throw new Error(
+          "snapshotIndex must not be called for non-snapshotted ops",
+        );
+      },
+    },
+  );
+  assertEquals(key, "HomePageQuery");
+});
