@@ -58,6 +58,8 @@ try {
   throw err;
 }
 
+// LCP assumption: cards[0] is the visual LCP candidate for the 3-col grid.
+// A future redesign that adds a hero above the grid would shift this target.
 const lcpImage = cards[0]?.featuredImage;
 const preloadHeight = lcpImage ? proportionalHeight(LCP_PRELOAD_WIDTH, lcpImage) : null;
 const preloadImage =
