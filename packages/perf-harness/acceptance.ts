@@ -97,6 +97,15 @@ const SECTION_LOADMORE_LATENCY_BUDGET_MS = 500;
 // chained character classes.
 const LCP_IMAGE_PRELOAD_RE = /<link\b[^>]*\brel=["']preload["'][^>]*\bas=["']image["']/;
 
+// HTML5 forbids nested <main> landmarks. Qwik's layout wraps every route in
+// <main>; per-route components must NOT add another (use <div> with the
+// content-width classes instead). Astro's BaseLayout doesn't add <main>, so
+// the per-page <main> is the only landmark. Either way: exactly 1.
+function expectSingleMain(html: string, label: string): void {
+  const mainCount = (html.match(/<main\b/g) ?? []).length;
+  expect(mainCount, `${label} should have exactly 1 <main> landmark`).toBe(1);
+}
+
 export function runAcceptanceSuite(target: Target): void {
   const APP_URL = `http://127.0.0.1:${APP_PORT[target]}/`;
 
@@ -332,6 +341,7 @@ export function runAcceptanceSuite(target: Target): void {
       // matching srcset entry — bare /wp-content/uploads/foo.jpg would only
       // be reused if the LeadImage src happened to match.
       expect(head).toMatch(/<link\b[^>]*\bas=["']image["'][^>]*\?w=800/);
+      expectSingleMain(html, 'article page');
     });
 
     // Both apps cap related stories at 6: Astro slices in the route loader,
@@ -394,6 +404,7 @@ export function runAcceptanceSuite(target: Target): void {
         // grid layout — both apps' [section] route emits a <link rel=preload
         // as=image> for it. Mirrors the article-page assertion above.
         expect(html).toMatch(LCP_IMAGE_PRELOAD_RE);
+        expectSingleMain(html, `${variant.name} section page`);
       });
 
       it(

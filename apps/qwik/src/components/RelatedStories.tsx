@@ -1,10 +1,10 @@
-import type { HomepagePost } from '@aje-poc/shared-types';
+import type { StoryCardData } from '@aje-poc/shared-types';
 import { MAX_RELATED } from '../lib/related-posts';
 import { SectionHeading } from './SectionHeading';
 import { StoryCard } from './StoryCard';
 
 interface Props {
-  posts: HomepagePost[];
+  posts: StoryCardData[];
   title?: string;
 }
 

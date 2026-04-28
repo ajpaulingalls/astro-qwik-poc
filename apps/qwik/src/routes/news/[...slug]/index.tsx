@@ -71,7 +71,9 @@ export const useArticleData = routeLoader$((ctx) => loadArticleData(ctx));
 export default component$(() => {
   const data = useArticleData();
   if ('notFound' in data.value) {
-    return <main class="mx-auto max-w-3xl px-4 py-6">Article not found: {data.value.slug}</main>;
+    // Layout owns the <main> landmark — content wrapper stays a <div> to
+    // avoid nested-main (HTML5 forbids; perf-harness asserts exactly 1).
+    return <div class="mx-auto max-w-3xl px-4 py-6">Article not found: {data.value.slug}</div>;
   }
   const { article, relatedPosts } = data.value;
 

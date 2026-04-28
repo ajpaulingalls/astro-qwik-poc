@@ -22,6 +22,18 @@ export interface HomepagePost {
   replacementHeadline?: string;
 }
 
+// The fields a card component (StoryCard, HeroCard, MostPopular,
+// CuratedCollection) actually reads. Used as Props.post type so the
+// component's read contract is documented at the boundary; routeLoaders
+// today still return full HomepagePost arrays (assignable to this type
+// because every required field of StoryCardData is present on
+// HomepagePost). If a future routeLoader optimization wants to project
+// down to this shape at the data boundary, the target type already exists.
+export type StoryCardData = Pick<
+  HomepagePost,
+  'id' | 'title' | 'excerpt' | 'link' | 'isLive' | 'featuredImage' | 'replacementHeadline'
+>;
+
 export interface CuratedCollectionItem {
   title: string;
   overrideLink?: string;

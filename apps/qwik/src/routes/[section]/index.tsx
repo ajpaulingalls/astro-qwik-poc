@@ -86,11 +86,14 @@ export const useSectionData = routeLoader$<SectionLoaderResult | { notFound: tru
 export default component$(() => {
   const data = useSectionData();
   if ('notFound' in data.value) {
-    return <main class="mx-auto max-w-7xl px-4 py-6">Section not found: {data.value.slug}</main>;
+    // Layout owns the <main> landmark — content wrapper stays a <div> to
+    // avoid nested-main (HTML5 forbids; perf-harness asserts exactly 1).
+    return <div class="mx-auto max-w-7xl px-4 py-6">Section not found: {data.value.slug}</div>;
   }
   const { slug, sectionType, title, cards } = data.value;
   return (
-    <main class="mx-auto max-w-7xl px-4 py-6">
+    // Layout owns the <main> landmark — content wrapper stays a <div>.
+    <div class="mx-auto max-w-7xl px-4 py-6">
       <h1 class="text-2xl font-bold mb-4">{title}</h1>
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((post) => (
@@ -98,7 +101,7 @@ export default component$(() => {
         ))}
       </div>
       <LoadMoreButton section={slug} categoryType={sectionType} initialOffset={SECTION_PAGE_SIZE} />
-    </main>
+    </div>
   );
 });
 
