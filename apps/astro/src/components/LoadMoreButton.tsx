@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import {
   GEO_API_CATEGORY_TYPE,
   type HomepagePost,
@@ -51,6 +51,16 @@ export function LoadMoreButton({ section, categoryType, initialOffset }: Props) 
   const [offset, setOffset] = useState(initialOffset);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  // Hydration marker for the perf-harness acceptance suite. Preact attaches
+  // onClick during the same commit phase that schedules effects, so by the
+  // time this useEffect runs the click handler is bound. The acceptance suite
+  // waits for `data-hydrated="true"` before timing the click, so we don't
+  // measure idle-callback or QRL-download latency.
+  useEffect(() => {
+    btnRef.current?.setAttribute('data-hydrated', 'true');
+  }, []);
 
   async function handleLoad() {
     setLoading(true);
@@ -82,10 +92,12 @@ export function LoadMoreButton({ section, categoryType, initialOffset }: Props) 
       )}
       <div class="mt-6 flex flex-col items-center gap-2">
         <button
+          ref={btnRef}
           type="button"
           onClick={handleLoad}
           disabled={loading}
           aria-busy={loading}
+          data-hydrated="false"
           class="px-4 py-2 border border-neutral-400 rounded hover:bg-neutral-100 disabled:opacity-60"
         >
           {loading ? 'Loading…' : 'Load more'}
