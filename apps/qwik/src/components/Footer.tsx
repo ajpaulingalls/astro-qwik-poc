@@ -1,4 +1,3 @@
-import { component$ } from '@qwik.dev/core';
 import { SectionHeading } from './SectionHeading';
 
 interface Link {
@@ -38,7 +37,7 @@ const COLUMNS: readonly Column[] = [
   },
 ];
 
-export const Footer = component$(() => {
+export function Footer() {
   return (
     <footer class="mt-16 bg-neutral-900 text-neutral-100">
       <div class="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-8 md:grid-cols-3">
@@ -62,4 +61,4 @@ export const Footer = component$(() => {
       </div>
     </footer>
   );
-});
+}

@@ -1,4 +1,3 @@
-import { component$ } from '@qwik.dev/core';
 import type { StoryCardData } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
 import { SectionHeading } from './SectionHeading';
@@ -7,7 +6,7 @@ interface Props {
   items: StoryCardData[];
 }
 
-export const MostPopular = component$<Props>(({ items }) => {
+export function MostPopular({ items }: Props) {
   if (items.length === 0) return null;
   return (
     <section class="most-popular">
@@ -23,4 +22,4 @@ export const MostPopular = component$<Props>(({ items }) => {
       </ol>
     </section>
   );
-});
+}

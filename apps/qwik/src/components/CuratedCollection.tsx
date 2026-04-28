@@ -1,4 +1,3 @@
-import { component$ } from '@qwik.dev/core';
 import type { CuratedCollectionItem } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
 import { SectionHeading } from './SectionHeading';
@@ -7,7 +6,7 @@ interface Props {
   collection: CuratedCollectionItem;
 }
 
-export const CuratedCollection = component$<Props>(({ collection }) => {
+export function CuratedCollection({ collection }: Props) {
   if (collection.posts.length === 0) return null;
   return (
     <section class="curated-collection">
@@ -31,4 +30,4 @@ export const CuratedCollection = component$<Props>(({ collection }) => {
       </ul>
     </section>
   );
-});
+}
