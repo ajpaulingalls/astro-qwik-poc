@@ -3,16 +3,11 @@
 // What's actually enforced where:
 //   - Runtime shape: this test's `expect(...)` calls fail loudly if the
 //     builder ever stops emitting { scriptDirective: { resources }, directives }.
-//   - Type-shape against Astro: enforced by astro.config.mjs (which has
-//     `// @ts-check` and assigns `csp: buildAstroCspConfig(...)` directly).
-//     Astro's build runs tsc against config files, so a drift in Astro's
-//     `security.csp` shape vs our builder's return type fails the build.
-//
-// The `_astroAssignable` line below is documentation, NOT enforcement.
-// Vitest doesn't run tsc by default (no typecheck config), so it would
-// pass even if the type assignment were wrong. Its job is to make the
-// contract visible at the test boundary and give the next dev a single
-// place to update the type expectation when bumping Astro.
+//   - Type-shape against Astro: enforced at three layers — (1) astro.config.mjs
+//     `// @ts-check` assigns `csp: buildAstroCspConfig(...)` directly, (2) the
+//     repo's pre-commit `bun run typecheck` runs `astro check` which sees this
+//     file, (3) the `_astroAssignable` line below is now type-checked at gate
+//     time (not just runtime).
 //
 // Companion to packages/shared-csp/index.test.ts which does the cross-app
 // shape-parity tests but cannot type-import Astro without pulling astro

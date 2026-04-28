@@ -4,7 +4,12 @@ import { render, cleanup } from '@testing-library/preact';
 import { ArticleHeader } from './ArticleHeader';
 import { resolveImageUrl } from '../lib/image-url';
 
-const baseArticle = {
+import type { Article } from '@aje-poc/shared-types';
+
+const baseArticle: Article = {
+  id: 'art-russian-oil',
+  link: '/news/2026/4/24/russian-oil-exports-slump',
+  content: '<p>Article body.</p>',
   title: 'Russian oil exports slump as Ukraine hammers ports',
   subheading: 'Despite US sanctions waiver, exports could fall to lowest since 2023.',
   date: '2026-04-24T16:52:48',

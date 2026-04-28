@@ -91,6 +91,7 @@
       "apps/astro": {
         "packageJson": {
           "dependencies": [
+            "npm:@astrojs/check@~0.9.9",
             "npm:@astrojs/preact@5",
             "npm:@deno/astro-adapter@0.4",
             "npm:@tailwindcss/vite@4",

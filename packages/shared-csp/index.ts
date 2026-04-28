@@ -50,9 +50,23 @@ function assertSafeApiBase(apiBase: string): void {
   }
 }
 
+// Astro's `security.csp.directives` field is a template-literal union (each
+// entry must start with a known CSP directive name). Defined inline here so
+// shared-csp stays framework-agnostic — we don't want a runtime dep on astro
+// just to satisfy build-time typing. Keep this list aligned with the keys the
+// builder actually emits below; if a new directive is added (e.g. media-src)
+// it must be added here too or the literal will fall back to `string` and
+// break Astro's typecheck.
+type CspDirectivePrefix =
+  | `default-src${string}`
+  | `img-src${string}`
+  | `font-src${string}`
+  | `connect-src${string}`
+  | `frame-src${string}`;
+
 export function buildAstroCspConfig(apiBase: string): {
   scriptDirective: { resources: string[] };
-  directives: string[];
+  directives: CspDirectivePrefix[];
 } {
   assertSafeApiBase(apiBase);
   return {

@@ -11,7 +11,8 @@
     "preview:prod": "bun run server.ts",
     "perf:qwik": "PUBLIC_API_BASE=http://localhost:4456 bun run ../../packages/perf-harness/runner.ts --target=qwik",
     "test": "PUBLIC_API_BASE=http://localhost:4456 bun run build && vitest run",
-    "test:acceptance": "PUBLIC_API_BASE=http://localhost:4456 bun run build && vitest run tests/acceptance.test.ts"
+    "test:acceptance": "PUBLIC_API_BASE=http://localhost:4456 bun run build && vitest run tests/acceptance.test.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aje-poc/shared-csp": "workspace:*",

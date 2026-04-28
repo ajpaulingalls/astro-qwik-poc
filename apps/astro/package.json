@@ -9,7 +9,8 @@
     "preview": "bun --bun astro preview",
     "perf:astro": "PUBLIC_API_BASE=http://localhost:4455 bun run ../../packages/perf-harness/runner.ts --target=astro",
     "test": "PUBLIC_API_BASE=http://localhost:4455 bun run build && vitest run",
-    "test:acceptance": "PUBLIC_API_BASE=http://localhost:4455 bun run build && vitest run tests/acceptance.test.ts"
+    "test:acceptance": "PUBLIC_API_BASE=http://localhost:4455 bun run build && vitest run tests/acceptance.test.ts",
+    "typecheck": "bun --bun astro check"
   },
   "dependencies": {
     "@aje-poc/shared-csp": "workspace:*",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@aje-poc/perf-harness": "workspace:*",
     "@aje-poc/shared-test-helpers": "workspace:*",
+    "@astrojs/check": "^0.9.9",
     "@tailwindcss/vite": "^4.0.0",
     "@testing-library/preact": "^3.2.4",
     "chrome-launcher": "^1.1.2",

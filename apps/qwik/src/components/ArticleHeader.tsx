@@ -46,7 +46,7 @@ export function ArticleHeader({ article }: Props) {
           </span>
         ))}
         <span class="mx-1">·</span>
-        <time datetime={date}>{formatDate(date)}</time>
+        <time dateTime={date}>{formatDate(date)}</time>
       </div>
     </header>
   );
