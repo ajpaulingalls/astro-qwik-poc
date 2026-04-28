@@ -94,13 +94,12 @@ record "SingleLiveBlogChildrensQuery--$(slugify "$LIVEBLOG_SLUG")" \
   SingleLiveBlogChildrensQuery \
   "$(jq -nc --arg postName "$LIVEBLOG_SLUG" '{postName:$postName}')"
 
-# LiveBlogUpdateQuery: production returns "no_posts_found" for child IDs from
-# SingleLiveBlogChildrensQuery — children appear to be embedded entries, not
-# standalone posts. Capturing the actual error response as the fixture is
-# faithful to production behavior; M7 will resolve the real semantics.
+# Production resolves child entries only when postType is the hyphenated
+# "liveblog-update" and the request carries preview + isAmp; sending bare
+# "liveblog" yields no_posts_found. Verified against aljazeera.com/graphql.
 record "LiveBlogUpdateQuery--${LIVEBLOG_UPDATE_POST_ID}" \
   LiveBlogUpdateQuery \
-  "$(jq -nc --argjson postID "$LIVEBLOG_UPDATE_POST_ID" '{postID:$postID,postType:"liveblog"}')"
+  "$(jq -nc --argjson postID "$LIVEBLOG_UPDATE_POST_ID" '{postID:$postID,postType:"liveblog-update",preview:"",isAmp:false}')"
 
 # --- Geographic section (initial + 2 pages) ---
 record ArchipelagoSectionQuery--middle-east \

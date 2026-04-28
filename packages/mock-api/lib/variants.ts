@@ -12,7 +12,10 @@ const VARIANT_RULES: Record<string, SuffixBuilder> = {
   SingleLiveBlogChildrensQuery: (v) =>
     typeof v.postName === "string" ? `--${slugify(v.postName)}` : null,
 
-  // Production signature verified by live probe 2026-04: (postID: Int!, postType: String!).
+  // Production signature verified by live probe 2026-04:
+  // (postID: Int!, postType: String! = "liveblog-update", preview: String!, isAmp: Boolean!).
+  // Only postID drives the fixture filename — the others are required by the
+  // upstream resolver but don't fan out fixtures.
   LiveBlogUpdateQuery: (v) =>
     typeof v.postID === "number" ? `--${v.postID}` : null,
 

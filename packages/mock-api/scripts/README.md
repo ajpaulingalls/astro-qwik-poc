@@ -93,16 +93,13 @@ Filenames follow `{operationName}.json` or
 `lib/variants.ts:resolveFixtureKey`. Slug values are slugified to `[a-z0-9-]` to
 keep filenames safe.
 
-## Known fixture gaps (story-003b discoveries)
+## Operation-specific recording notes
 
-- **`LiveBlogUpdateQuery--{postID}.json`** captures the live API's
-  `no_posts_found` response. The bare numeric IDs from
-  `SingleLiveBlogChildrensQuery` are NOT addressable via `postByID`; live blog
-  updates appear to be embedded in the parent shell rather than standalone
-  posts. M7 implementation will resolve the actual update-fetch pattern
-  (possibly via `LiveBlogSubscription($postID: Int!)` websocket, or by
-  extracting from the shell content). The error fixture is honest representation
-  of current API behavior.
+- **`LiveBlogUpdateQuery--{postID}.json`** — production resolves child entries
+  only when `postType` is the hyphenated `"liveblog-update"` and the request
+  carries `preview` and `isAmp`; sending bare `"liveblog"` yields
+  `no_posts_found`. The recorder uses the verified shape; do not change it
+  without re-probing aljazeera.com/graphql.
 
 ## Re-recording
 
