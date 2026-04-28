@@ -31,7 +31,14 @@ interface CuratedFeedData {
   };
 }
 
-export const useHomepageData = routeLoader$(async () => {
+export interface HomepageLoaderResult {
+  page: HomePageData;
+  curated: CuratedFeedData;
+}
+
+// Exported for unit tests — `routeLoader$` wraps this directly. Behavior is
+// the same; naming the body lets vitest call it without a Qwik runtime.
+export async function loadHomepageData(): Promise<HomepageLoaderResult> {
   const [pageData, curatedData] = await Promise.all([
     graphqlFetch<HomePageData>({
       operationName: 'HomePageQuery',
@@ -43,7 +50,9 @@ export const useHomepageData = routeLoader$(async () => {
     }),
   ]);
   return { page: pageData, curated: curatedData };
-});
+}
+
+export const useHomepageData = routeLoader$(() => loadHomepageData());
 
 export default component$(() => {
   const data = useHomepageData();
