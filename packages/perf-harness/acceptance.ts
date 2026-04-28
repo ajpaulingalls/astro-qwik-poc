@@ -14,6 +14,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { type ChildProcess } from 'node:child_process';
 import * as chromeLauncher from 'chrome-launcher';
 import puppeteer, { type Browser, type Page } from 'puppeteer-core';
+import { SECTION_PAGE_SIZE } from '@aje-poc/shared-types';
 import { waitForPort, type Target } from './cli_helpers.ts';
 import { APP_PORT, MOCK_API_PORT, killService, spawnApp, spawnMockApi } from './spawn.ts';
 
@@ -80,7 +81,6 @@ const SECTION_VARIANTS: SectionVariant[] = [
   { name: 'geographic', slug: 'middle-east', expectedTitle: 'Middle East' },
   { name: 'topic', slug: 'opinion', expectedTitle: 'Opinion' },
 ];
-const SECTION_PAGE_SIZE = 9;
 // Click → DOM-mutation budget. Pragmatic INP proxy: measures the same UX
 // semantic (user clicks → user sees the result) rather than relying on
 // PerformanceObserver event-timing entries, which fire unreliably for
