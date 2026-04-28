@@ -35,3 +35,31 @@ export function mockFetchOnce(options: MockFetchOptions = {}): MockedFetch {
     },
   };
 }
+
+// Multi-call variant for routeLoader tests that fan out via Promise.all.
+// Pops one MockFetchOptions per fetch call; throws if exhausted, so a missing
+// queue entry is loud rather than silently re-using the last response.
+export function mockFetchSequence(responses: MockFetchOptions[]): MockedFetch {
+  const queue = [...responses];
+  const calls: CapturedFetchCall[] = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    calls.push({ url: String(input), init });
+    const next = queue.shift();
+    if (!next) {
+      throw new Error(`mockFetchSequence exhausted after ${calls.length} call(s)`);
+    }
+    const { body, status = 200, rawBody } = next;
+    const responseBody = rawBody ?? JSON.stringify(body ?? { data: {} });
+    return new Response(responseBody, {
+      status,
+      headers: { 'content-type': 'application/json' },
+    });
+  }) as unknown as typeof fetch;
+  return {
+    calls,
+    restore: () => {
+      globalThis.fetch = original;
+    },
+  };
+}
