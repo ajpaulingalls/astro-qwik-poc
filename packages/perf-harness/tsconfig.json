@@ -1,16 +1,7 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "es2022",
-    "module": "esnext",
     "lib": ["es2022", "DOM", "DOM.Iterable"],
-    "strict": true,
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "incremental": true,
-    "isolatedModules": true,
     "types": ["node"]
   },
   "include": ["**/*.ts"]
