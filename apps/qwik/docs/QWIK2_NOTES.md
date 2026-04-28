@@ -244,6 +244,53 @@ When Qwik 2 stable ships, re-measure and re-budget. If the stable core is ~50-60
 
 Concern `63bb15262674` (Qwik LCP 2410ms / 144 KB jsBytes) is resolved by this characterization — the cost is the framework, the levers are limited, and the budget is now honest.
 
+## sprint-008 — story-005 — Article JS budget audit + framework-graph regression (2026-04-27)
+
+### Baseline shift since story write-up
+
+The story was scoped against sprint-007 measurements (article 165470 jsBytes / LH 87). At story-005 kickoff (2026-04-27), the actual baseline was:
+
+| page          | jsBytes    | LH Perf | budget                   | gap                                                                 |
+| ------------- | ---------- | ------- | ------------------------ | ------------------------------------------------------------------- |
+| article       | 159312     | 89      | 158720 (155KB)           | +592 bytes; LH −9                                                   |
+| **index**     | **171419** | **85**  | **168960 (165KB)**       | **+2459 bytes; LH −13 (REGRESSION vs sprint-006's 156367 → +15KB)** |
+| section-geo   | ~162KB     | ~91     | (shared homepage budget) | over                                                                |
+| section-topic | ~162KB     | ~93     | (shared homepage budget) | over                                                                |
+
+Article had drifted closer to budget (some commit between sprint-007 and now shaved ~6KB), but **homepage regressed ~15KB** vs the sprint-006 baseline (`reports/qwik-index.baseline.json`, n=10). That regression was outside the story's original scope and surfaced fresh during baseline measurement.
+
+### Lever attempted
+
+Per the codified leaf-component convention, converted `YouTubeEmbed.tsx` and `GalleryEmbed.tsx` from `component$` to plain functions. Both files are pure `<div ... dangerouslySetInnerHTML={html} />` wrappers — no signals, no `$()`-handlers, no `Slot` — so they fit the convention exactly.
+
+**Verified in `dist/q-manifest.json`:** post-refactor, the `s_…YouTubeEmbed_component` and `s_…GalleryEmbed_component` symbols are absent (the QRL chunks are no longer emitted).
+
+### After (n=5)
+
+| page          | jsBytes (delta)                       | LH Perf (delta) |
+| ------------- | ------------------------------------- | --------------- |
+| article       | 162731 (**+3419 — small regression**) | 90 (+1)         |
+| index         | 171061 (−358, essentially unchanged)  | 83 (−2)         |
+| section-geo   | 162731                                | 91              |
+| section-topic | 162731                                | 93              |
+
+**The convention didn't deliver the budget for this shape — it regressed article jsBytes by ~3KB.** Hypothesis: the convention is right for _frequently-rendered_ leaves (e.g. `LiveBadge`, which appears once per `StoryCard` × 8+ cards), where eliminating per-call-site QRL boundaries and inlining a small JSX expression compounds. The article embeds appear at most once per page — moving the JSX into the parent chunk net-grew that chunk by more than the bytes saved by removing the standalone chunks.
+
+### Decision: keep the refactor, defer the story
+
+The refactor regressed article jsBytes by ~3KB. We keep it anyway because the convention is correct guidance for the leaf shape and the byte cost is small (vs the larger framework-graph regression below); the structural cleanliness has long-term value as more leaves accumulate. We do _not_ keep it because byte-count was neutral.
+
+**Story-005 deferred.** The article-side gap (592 bytes pre-refactor) is small enough to drift back under budget on a later commit, and the homepage regression is the larger problem.
+
+### Follow-up for next sprint
+
+1. **Bisect the homepage 15KB regression.** Compare `q-manifest.json` chunk inventory at the sprint-006 commit (`reports/qwik-index.baseline.json` was n=10 at jsBytes 156367) vs HEAD. Likely culprits, in priority order:
+   - `useVisibleTask$` runtime cost (story-008 sub-fix added a second use of this hook — the first was already in `routes/layout.tsx` for web-vitals lazy-load, so the runtime support was already loaded; but verify chunk-graph empirically).
+   - `@qwik.dev/router` infrastructure growing as more routes/loaders ship (`s_xLIuvaqxjXk` root.tsx component is 12.5KB; `s_0UhDFwlxeFQ` useQwikRouter_getScroller bundle is 7.4KB shared with 4 other router symbols).
+   - Section route chunks shipping with the homepage bundle per `cli_helpers.ts` comment ("Section pages currently ship the same bundle as homepage").
+2. **Try the 5 additional leaf candidates** flagged by the simplify code-reuse agent: `HeroCard`, `MostPopular`, `StoryCard`, `CuratedCollection`, `Footer`. These appear multiple times per homepage render so the inline-vs-chunk math is more favorable than for the embeds. The disqualified candidates (`SectionHeading` uses `Slot`, `VerticalVideoCarousel` has `onClick$`) stay as `component$`.
+3. **Re-baseline budgets if sprint-008 levers are insufficient.** Sprint-006 already once revised aspirational `<15KB` → realistic `<150KB → <165KB` for Qwik 2 beta. If the framework graph keeps growing as routes accumulate, another revision may be honest.
+
 ## sprint-006 — Image-serving lever + LCP measurement honesty (2026-04-25)
 
 ### The lever
