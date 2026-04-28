@@ -1,5 +1,5 @@
 import { component$ } from '@qwik.dev/core';
-import { routeLoader$, type DocumentHead } from '@qwik.dev/router';
+import { routeLoader$, type DocumentHead, type RequestEventLoader } from '@qwik.dev/router';
 import {
   GEO_API_CATEGORY_TYPE,
   getSectionType,
@@ -32,48 +32,55 @@ interface SectionLoaderResult {
   cards: HomepagePost[];
 }
 
-export const useSectionData = routeLoader$<SectionLoaderResult | { notFound: true; slug: string }>(
-  async ({ params, fail }) => {
-    const slug = params.section ?? '';
-    const sectionType = getSectionType(slug);
-    try {
-      if (sectionType === 'geographic') {
-        const data = await graphqlFetch<GeoSectionData>({
-          operationName: 'ArchipelagoSectionQuery',
-          variables: {
-            name: slug,
-            categoryType: GEO_API_CATEGORY_TYPE,
-            quantity: SECTION_PAGE_SIZE,
-            offset: 0,
-          },
-        });
-        // Trim the loader payload — Qwik 2 serializes the full return value into
-        // the resume payload, so trimming here directly shrinks what ships to
-        // the browser (matches news/[...slug]/index.tsx pattern).
-        return {
-          slug,
-          sectionType,
-          title: data.category?.name ?? slug,
-          cards: data.articles ?? [],
-        };
-      }
-      const data = await graphqlFetch<TopicPageData>({
-        operationName: 'ArchipelagoTopicsPageQuery',
-        variables: { slug },
+// Exported for unit tests — `routeLoader$` wraps this directly. Behavior is
+// the same; naming the body lets vitest call it without a Qwik runtime.
+export async function loadSectionData(
+  ctx: Pick<RequestEventLoader, 'params' | 'fail'>,
+): Promise<SectionLoaderResult | { notFound: true; slug: string }> {
+  const { params, fail } = ctx;
+  const slug = params.section ?? '';
+  const sectionType = getSectionType(slug);
+  try {
+    if (sectionType === 'geographic') {
+      const data = await graphqlFetch<GeoSectionData>({
+        operationName: 'ArchipelagoSectionQuery',
+        variables: {
+          name: slug,
+          categoryType: GEO_API_CATEGORY_TYPE,
+          quantity: SECTION_PAGE_SIZE,
+          offset: 0,
+        },
       });
+      // Trim the loader payload — Qwik 2 serializes the full return value into
+      // the resume payload, so trimming here directly shrinks what ships to
+      // the browser (matches news/[...slug]/index.tsx pattern).
       return {
         slug,
         sectionType,
-        title: data.topicsPage?.name ?? slug,
-        cards: data.topicsPage?.featuredPosts ?? [],
+        title: data.category?.name ?? slug,
+        cards: data.articles ?? [],
       };
-    } catch (err) {
-      if (err instanceof GraphqlHttpError && err.status === 404) {
-        return fail(404, { notFound: true, slug });
-      }
-      throw err;
     }
-  },
+    const data = await graphqlFetch<TopicPageData>({
+      operationName: 'ArchipelagoTopicsPageQuery',
+      variables: { slug },
+    });
+    return {
+      slug,
+      sectionType,
+      title: data.topicsPage?.name ?? slug,
+      cards: data.topicsPage?.featuredPosts ?? [],
+    };
+  } catch (err) {
+    if (err instanceof GraphqlHttpError && err.status === 404) {
+      return fail(404, { notFound: true, slug });
+    }
+    throw err;
+  }
+}
+
+export const useSectionData = routeLoader$<SectionLoaderResult | { notFound: true; slug: string }>(
+  (ctx) => loadSectionData(ctx),
 );
 
 export default component$(() => {
