@@ -1,16 +1,16 @@
 import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead } from '@qwik.dev/router';
-import { graphqlFetch, GraphqlHttpError } from '../../lib/graphql';
 import {
   GEO_API_CATEGORY_TYPE,
   getSectionType,
+  type HomepagePost,
   SECTION_PAGE_SIZE,
   type SectionType,
-} from '../../lib/section-type';
+} from '@aje-poc/shared-types';
+import { graphqlFetch, GraphqlHttpError } from '../../lib/graphql';
 import { computeLcpPreloadLink } from '../../lib/lcp-preload';
 import { LoadMoreButton } from '../../components/LoadMoreButton';
 import { StoryCard } from '../../components/StoryCard';
-import type { HomepagePost } from '@aje-poc/shared-types';
 
 interface SectionMeta {
   name?: string;
