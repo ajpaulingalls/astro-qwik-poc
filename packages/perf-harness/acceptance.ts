@@ -90,6 +90,13 @@ const SECTION_VARIANTS: SectionVariant[] = [
 // will need to enforce separately when it grows onINP capture (deferred).
 const SECTION_LOADMORE_LATENCY_BUDGET_MS = 500;
 
+// Asserted on both /news/[slug] and /{section} HTML responses. Both apps
+// emit `<link rel="preload" as="image" href=".../?w=800&...">` for the LCP
+// image — a single tag where rel and as appear in this order. If either app
+// ever reorders the attributes, relax the regex to use lookahead instead of
+// chained character classes.
+const LCP_IMAGE_PRELOAD_RE = /<link\b[^>]*\brel=["']preload["'][^>]*\bas=["']image["']/;
+
 export function runAcceptanceSuite(target: Target): void {
   const APP_URL = `http://127.0.0.1:${APP_PORT[target]}/`;
 
@@ -320,7 +327,7 @@ export function runAcceptanceSuite(target: Target): void {
       // Regex tolerates attribute ordering but assumes the <link ...> tag is
       // emitted on a single line — both apps' SSR output satisfies that today.
       // A future minifier/formatter that wraps long tags could break this.
-      expect(head).toMatch(/<link\b[^>]*\brel=["']preload["'][^>]*\bas=["']image["']/);
+      expect(head).toMatch(LCP_IMAGE_PRELOAD_RE);
       // Must point at a resize URL so the browser reuses the bytes for the
       // matching srcset entry — bare /wp-content/uploads/foo.jpg would only
       // be reused if the LeadImage src happened to match.
@@ -371,14 +378,22 @@ export function runAcceptanceSuite(target: Target): void {
     });
 
     for (const variant of SECTION_VARIANTS) {
-      it(`renders ${SECTION_PAGE_SIZE} cards + section heading at /${variant.slug} (${variant.name})`, async () => {
-        const html = await fetch(`http://127.0.0.1:${APP_PORT[target]}/${variant.slug}`).then((r) =>
-          r.text(),
-        );
+      it(`returns HTTP 200 + renders ${SECTION_PAGE_SIZE} cards + section heading at /${variant.slug} (${variant.name})`, async () => {
+        const response = await fetch(`http://127.0.0.1:${APP_PORT[target]}/${variant.slug}`);
+        // Pin the status explicitly — the body assertions below would also
+        // catch a 4xx (since the title/article markers wouldn't render), but
+        // an explicit 200 check fails closer to the actual problem when the
+        // response shape changes for any other reason.
+        expect(response.status).toBe(200);
+        const html = await response.text();
         expect(html).toContain('<h1');
         expect(html).toContain(variant.expectedTitle);
         const articleCount = (html.match(/<article\b/g) ?? []).length;
         expect(articleCount).toBe(SECTION_PAGE_SIZE);
+        // The first card's featured image is the LCP candidate for the 3-col
+        // grid layout — both apps' [section] route emits a <link rel=preload
+        // as=image> for it. Mirrors the article-page assertion above.
+        expect(html).toMatch(LCP_IMAGE_PRELOAD_RE);
       });
 
       it(
