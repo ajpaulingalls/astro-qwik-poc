@@ -331,22 +331,9 @@ Sprint-009 re-budget rationale: the +10–13 KB Homepage/Article gap to the prio
 
 Re-budget when Qwik 2 stable ships — likely ~75–100 KB for Homepage if the v2 stable core matches v1's 54 KB. See [`QWIK2_NOTES.md` § sprint-006 — JS budget revision](QWIK2_NOTES.md#sprint-006--js-budget-revision-150kb--165kb) for the prior revision rationale.
 
-### SSR Performance
+### SSR Performance & Lighthouse Scores
 
-| Metric             | Target                                 |
-| ------------------ | -------------------------------------- |
-| **Homepage TTFB**  | < 200ms (from mock API)                |
-| **Article TTFB**   | < 150ms                                |
-| **SSR throughput** | > 50 req/s per page type (single core) |
-
-### Lighthouse Scores
-
-| Category       | "Good" floor | **Stretch (target)** |
-| -------------- | ------------ | -------------------- |
-| Performance    | ≥ 95         | **≥ 98**             |
-| Accessibility  | ≥ 90         | ≥ 95                 |
-| Best Practices | ≥ 95         | ≥ 98                 |
-| SEO            | ≥ 95         | ≥ 98                 |
+> **SSR throughput targets and Lighthouse category scores** (Performance / Accessibility / Best Practices / SEO) are framework-agnostic. Full table — including the per-target Performance split (Astro ≥ 98, Qwik ≥ 85 floor) — at [docs/PERFORMANCE_TARGETS.md](../../../docs/PERFORMANCE_TARGETS.md). Applies identically to both apps.
 
 ---
 

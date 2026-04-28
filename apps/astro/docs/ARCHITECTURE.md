@@ -305,22 +305,9 @@ The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page 
 | **Live Blog**     | < 60 KB   | Polling + dynamic updates + Preact runtime      |
 | **Section Front** | < 45 KB   | Load More button + ticker                       |
 
-### SSR Performance
+### SSR Performance & Lighthouse Scores
 
-| Metric             | Target                                 |
-| ------------------ | -------------------------------------- |
-| **Homepage TTFB**  | < 200ms (from mock API)                |
-| **Article TTFB**   | < 150ms                                |
-| **SSR throughput** | > 50 req/s per page type (single core) |
-
-### Lighthouse Scores
-
-| Category       | "Good" floor | **Stretch (target)** |
-| -------------- | ------------ | -------------------- |
-| Performance    | ≥ 95         | **≥ 98**             |
-| Accessibility  | ≥ 90         | ≥ 95                 |
-| Best Practices | ≥ 95         | ≥ 98                 |
-| SEO            | ≥ 95         | ≥ 98                 |
+> **SSR throughput targets and Lighthouse category scores** (Performance / Accessibility / Best Practices / SEO) are framework-agnostic. Full table — including the per-target Performance split (Astro ≥ 98, Qwik ≥ 85 floor) — at [docs/PERFORMANCE_TARGETS.md](../../../docs/PERFORMANCE_TARGETS.md). Applies identically to both apps.
 
 ---
 
