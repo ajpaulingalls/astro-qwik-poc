@@ -1,6 +1,7 @@
 # Production Research Findings
 
-> All findings below were verified against live production network traffic from aljazeera.com in April 2026.
+> All findings below were verified against live production network traffic from
+> aljazeera.com in April 2026.
 
 ## GraphQL API Overview
 
@@ -15,13 +16,17 @@ GET /graphql?wp-site=aje&operationName={name}&variables={json}&extensions={}
 Key details:
 
 - **Method:** GET only (not POST)
-- **`wp-site` header:** Required on every request — `aje` for English, `aja` for Arabic
-- **Operation IDs:** Each query has a numeric ID (1–101) in the internal query map; the API resolves by `operationName`
+- **`wp-site` header:** Required on every request — `aje` for English, `aja` for
+  Arabic
+- **Operation IDs:** Each query has a numeric ID (1–101) in the internal query
+  map; the API resolves by `operationName`
 - **Variables:** URL-encoded JSON in the `variables` query parameter
 
 ### Arabic Site
 
-The Arabic site (`aljazeera.net`) uses the **same GraphQL endpoint and queries** with only the `wp-site` header changed to `aja`. Minor response differences exist but can be ignored for the PoC.
+The Arabic site (`aljazeera.net`) uses the **same GraphQL endpoint and queries**
+with only the `wp-site` header changed to `aja`. Minor response differences
+exist but can be ignored for the PoC.
 
 ---
 
@@ -47,12 +52,43 @@ The Arabic site (`aljazeera.net`) uses the **same GraphQL endpoint and queries**
 
 ### Live Blog
 
-| Query                                    | Variables                                               | Purpose                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ---------------------------------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ArchipelagoSingleLiveBlogQuery`         | `{ name: "{slug}", postType: "liveblog", preview: "" }` | Blog shell — metadata, header, initial content. **postType MUST be "liveblog" not "post"** — the latter returns `no_posts_found`.                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `SingleLiveBlogChildrensQuery`           | `{ postName: "{slug}" }`                                | Child entries / updates list                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `LiveBlogUpdateQuery`                    | `{ postID: <int>, postType: "liveblog" }`               | Intended for individual update content. **Open question:** the bare numeric IDs returned by `SingleLiveBlogChildrensQuery` (e.g. `4512107`, `4512131`) all return `no_posts_found` from `postByID`, regardless of postType. Live blog updates appear to be embedded entries within the parent post rather than standalone posts. M7 implementation must verify how production actually fetches individual updates (the live blog frontend may extract them from the shell content directly, or use the websocket subscription `LiveBlogSubscription($postID: Int!)`). |
-| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                    | Breaking news ticker                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Query                                    | Variables                                                                   | Purpose                                                                                                                                                                                         |
+| ---------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ArchipelagoSingleLiveBlogQuery`         | `{ name: "{slug}", postType: "liveblog", preview: "" }`                     | Blog shell — metadata, header, initial content, plus `childrenMeta[]` listing each update's id + publishedTime. **postType MUST be "liveblog"** — `"post"` returns `no_posts_found`.            |
+| `SingleLiveBlogChildrensQuery`           | `{ postName: "{slug}" }`                                                    | Child entry id list — bare numeric ids ordered newest-first, mirroring `childrenMeta`.                                                                                                          |
+| `LiveBlogUpdateQuery`                    | `{ postID: <int>, postType: "liveblog-update", preview: "", isAmp: false }` | Individual update content (title, HTML body, author, date). **`postType` must be `"liveblog-update"`** (hyphenated); omitting `preview`/`isAmp` or using `"liveblog"` returns `no_posts_found`. |
+| `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                                        | Breaking news ticker                                                                                                                                                                            |
+
+#### Polling decision
+
+Three-query design from the M9 spec. 30s cadence is the M9 spec target — each
+query was verified individually with `curl`, no browser-session capture of
+production polling.
+
+1. **`ArchipelagoSingleLiveBlogQuery`** — re-fetched every 30s.
+2. **`SingleLiveBlogChildrensQuery`** — fetched once at SSR; the shell's
+   `childrenMeta` is the source of truth for "new updates" diffing thereafter.
+3. **`LiveBlogUpdateQuery`** — fetched once per newly-discovered child id in
+   parallel after the diff identifies new ids.
+
+PoC implementation requirement (not a production-observed behavior): each
+prepended entry must reserve space (min-height / skeleton) so existing entries
+below don't shift. This is the M9 acceptance gate for both apps.
+
+#### Snapshot rotation in the mock-api
+
+So polling sees real deltas, the mock-api serves different fixture snapshots
+over time. Three precedence tiers, header > env > wall-clock:
+
+| Tier        | Where                                                               | Use                                                       |
+| ----------- | ------------------------------------------------------------------- | --------------------------------------------------------- |
+| Per-request | `x-liveblog-snapshot: N` request header                             | Perf-harness pinning, deterministic acceptance tests      |
+| Per-process | `LIVEBLOG_SNAPSHOT_INDEX=N` env                                     | Single-snapshot test runs                                 |
+| Wall-clock  | auto-rotate every `LIVEBLOG_SNAPSHOT_INTERVAL_MS` (default 30000ms) | Dev/demo so live polling visibly advances without tooling |
+
+`apps/{astro,qwik}/src/lib/graphql.ts:graphqlFetch` accepts an optional
+`headers` field forwarded into the fetch request — the live-blog updater uses it
+to send `x-liveblog-snapshot` from the browser.
 
 ### Section Front — Geographic (e.g., `/middle-east`)
 
@@ -75,7 +111,8 @@ The Arabic site (`aljazeera.net`) uses the **same GraphQL endpoint and queries**
 
 ## Homepage Response Structure
 
-The response lives under `data.homepage` and contains **21 fields** — all content, **zero navigation**:
+The response lives under `data.homepage` and contains **21 fields** — all
+content, **zero navigation**:
 
 | Field                      | Type       | Detail                                                                                                                                                            |
 | -------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -109,11 +146,14 @@ The response lives under `data.homepage` and contains **21 fields** — all cont
 
 Evidence:
 
-- The `data.homepage` response contains **zero navigation fields** — all 21 keys are content-related
-- The `cmsArcSettings` query (ID 21) is **never called** on any production page — not on homepage, article, section, or live blog pages
+- The `data.homepage` response contains **zero navigation fields** — all 21 keys
+  are content-related
+- The `cmsArcSettings` query (ID 21) is **never called** on any production page
+  — not on homepage, article, section, or live blog pages
 - No other GraphQL query returns navigation or menu data
 
-**PoC approach:** Hardcode the navigation. The nav structure changes very rarely and doesn't need to be dynamic for a framework comparison.
+**PoC approach:** Hardcode the navigation. The nav structure changes very rarely
+and doesn't need to be dynamic for a framework comparison.
 
 ---
 
@@ -123,7 +163,8 @@ Evidence:
 
 - No server-side `?page=N` pagination
 - No infinite scroll
-- Section front pages use a "Load More" button that triggers the next offset-based query:
+- Section front pages use a "Load More" button that triggers the next
+  offset-based query:
   - Geographic: `ArchipelagoAjeSectionPostsQuery` with `offset: 0, 9, 18, ...`
   - Topic: `ArchipelagoPaginatedTopicsFeedQuery` with `offset: 0, 9, 18, ...`
 - Homepage has **no pagination at all** — all content from initial queries

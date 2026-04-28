@@ -1,11 +1,43 @@
 {
-  "errors": [
-    {
-      "message": "no_posts_found",
-      "extensions": {}
-    }
-  ],
   "data": {
-    "posts": null
+    "posts": {
+      "id": "4512107",
+      "link": "/news/liveblog/2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo",
+      "postType": "liveblog-update",
+      "content": "<p>We&#8217;ve seen a slew of world leaders travel to Beijing in recent weeks, and Beijing is stepping up diplomacy.</p>\n<p>[China&#8217;s Foreign Minister] Wang Yi travelled to Southeast Asia, and it&#8217;s the latest manoeuvre as the crisis drags on, and as we continue to see pressure on energy security and maritime trade globally.</p>\n<p>Wang Yi will be visiting Cambodia on the first day, and he&#8217;ll then head on to Thailand and then to Myanmar to deepen ties with those countries.</p>\n<p>China wants to present itself as a stable alternative for these countries, as opposed to the US.</p>\n<p>So we&#8217;re going to see a lot of diplomatic efforts go on there.</p>\n<p>These also are countries that have been hit very heavily by the energy supply disruptions. There are also countries that were hit heavily by Washington&#8217;s trade tariffs.</p>\n<p>It&#8217;s a perfect opportunity, in many ways, for China to capitalise on.</p>\n<p>Importantly, one thing to note is that defence chiefs are going to be taking part in the talks in Cambodia, which are very much about security alliances as well.</p>\n<p>We&#8217;re likely to see economic support from China to these countries, and we may also see them deepen the expansion of energy projects, Chinese energy projects, in the coming days as well.</p>\n<figure id=\"attachment_3736957\" aria-describedby=\"caption-attachment-3736957\" style=\"width: 770px\" class=\"wp-caption aligncenter\"><img data-recalc-dims=\"1\" loading=\"lazy\" decoding=\"async\" class=\"wp-image-3736957 size-arc-image-770\" src=\"/wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg?resize=770%2C513\" alt=\"China’s Foreign Minister Wang Yi speaks during a joint briefing with French Foreign Minister Jean-Noel Barrot (not pictured) at the Diaoyutai State Guesthouse in Beijing, China on March 27, 2025\" width=\"770\" height=\"513\" srcset=\"/wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 5320w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 300w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 768w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 1024w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 1536w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 2048w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 1170w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 770w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 670w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 570w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 375w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 270w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 170w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 140w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 120w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg 1568w, /wp-content/uploads/2025/05/2025-03-27T071653Z_1125125651_RC2HLDADM8XR_RTRMADP_3_CHINA-FRANCE-1748411843.jpg?w=2310 2310w\" sizes=\"auto, (max-width: 770px) 100vw, 770px\" /><figcaption id=\"caption-attachment-3736957\" class=\"wp-caption-text\">China’s Foreign Minister Wang Yi speaks during a joint briefing with French Foreign Minister Jean-Noel Barrot in Beijing, China, on March 27, 2025 [Greg Baker/pool via Reuters]</figcaption></figure>\n",
+      "author": [
+        {
+          "id": "4455040",
+          "name": "Patrick Fok",
+          "slug": "patrick-fok",
+          "link": "/author/patrick-fok",
+          "avatars": [],
+          "jobTitle": "",
+          "displayPostCount": 0,
+          "__typename": "User"
+        }
+      ],
+      "showAuthor": true,
+      "writeInAuthor": "",
+      "authorTagline": "Reporting from Hong Kong",
+      "writeInCoAuthor": {
+        "name": "",
+        "order": "1",
+        "__typename": "WriteInAuthor"
+      },
+      "showAuthorTitles": false,
+      "date": "2026-04-22T03:45:00",
+      "modified_gmt": "2026-04-22T03:45:00",
+      "title": "China capitalises on ‘energy security’ crisis as Southeast Asian ties deepen",
+      "shouldDisplayTitle": true,
+      "amp": {
+        "markup": "",
+        "scripts": [],
+        "styles": [],
+        "__typename": "Amp"
+      },
+      "postLabel": [],
+      "__typename": "Post"
+    }
   }
 }

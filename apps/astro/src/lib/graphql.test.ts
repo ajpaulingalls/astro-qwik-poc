@@ -118,4 +118,31 @@ describe('graphqlFetch', () => {
       operationName: 'ArchipelagoSingleArticleQuery',
     });
   });
+
+  it('forwards optional headers (e.g. x-liveblog-snapshot) into the fetch request', async () => {
+    mock = mockFetchOnce({ body: { data: {} } });
+
+    await graphqlFetch({
+      operationName: 'ArchipelagoSingleLiveBlogQuery',
+      variables: { name: 'foo', postType: 'liveblog', preview: '' },
+      headers: { 'x-liveblog-snapshot': '2' },
+    });
+
+    const headers = new Headers(mock.calls[0]!.init?.headers);
+    expect(headers.get('x-liveblog-snapshot')).toBe('2');
+    expect(headers.get('wp-site')).toBe('aje');
+    expect(headers.get('accept')).toBe('application/json');
+  });
+
+  it('does not let caller-supplied headers override wp-site (protected header)', async () => {
+    mock = mockFetchOnce({ body: { data: {} } });
+
+    await graphqlFetch({
+      operationName: 'HomePageQuery',
+      headers: { 'wp-site': 'evil' },
+    });
+
+    const headers = new Headers(mock.calls[0]!.init?.headers);
+    expect(headers.get('wp-site')).toBe('aje');
+  });
 });

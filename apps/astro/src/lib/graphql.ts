@@ -6,6 +6,9 @@ export interface GraphqlFetchOptions {
   operationName: string;
   variables?: Record<string, unknown>;
   wpSite?: WpSite;
+  // wp-site and accept are re-set after this spread, so they cannot be
+  // shadowed by caller mistakes — protected-header invariant.
+  headers?: Record<string, string>;
 }
 
 // Carries the upstream HTTP status so callers (e.g. news/[...slug] route)
@@ -30,6 +33,7 @@ export async function graphqlFetch<T>({
   operationName,
   variables = {},
   wpSite = 'aje',
+  headers,
 }: GraphqlFetchOptions): Promise<T> {
   const params = new URLSearchParams({
     'wp-site': wpSite,
@@ -41,6 +45,7 @@ export async function graphqlFetch<T>({
   const response = await fetch(`${resolveApiBase()}/graphql?${params.toString()}`, {
     method: 'GET',
     headers: {
+      ...headers,
       accept: 'application/json',
       'wp-site': wpSite,
     },

@@ -1,0 +1,32 @@
+{
+  "data": {
+    "posts": {
+      "id": "4514943",
+      "link": "/news/liveblog/2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo",
+      "postType": "liveblog-update",
+      "content": "<p>This live page will be closing soon, but our coverage will continue on a new page.</p>\n<p>Here are some of the day’s top developments:</p>\n<ul class=\"spaced-bullet-spacing\">\n<li>Israeli forces <a href=\"/news/2026/4/22/at-least-four-killed-in-israeli-strikes-on-lebanon-journalists-wounded\">have killed five people in Lebanon</a>, including journalist Amal Khalil.</li>\n<li>Iran&#8217;s top negotiator and parliament Speaker Mohammad Bagher Ghalibaf has said Israel&#8217;s warmongering and &#8220;flagrant&#8221; ceasefire breaches made reopening the Strait of Hormuz &#8220;impossible&#8221;.</li>\n<li>The IRGC said it &#8220;directed to the Iranian coast&#8221; two container ships it accused of seeking to &#8220;covertly exit the Strait of Hormuz&#8221;.</li>\n<li>An Israeli drone attack killed five people in northern Gaza, including three children.</li>\n<li>A French peacekeeper who was injured in an attack on a UNIFIL patrol on Saturday succumbed to his wounds, the UN has said.</li>\n</ul>\n",
+      "author": [],
+      "showAuthor": false,
+      "writeInAuthor": "",
+      "authorTagline": "",
+      "writeInCoAuthor": {
+        "name": "",
+        "order": "1",
+        "__typename": "WriteInAuthor"
+      },
+      "showAuthorTitles": false,
+      "date": "2026-04-22T23:45:00",
+      "modified_gmt": "2026-04-22T23:45:00",
+      "title": "Here’s what happened today",
+      "shouldDisplayTitle": true,
+      "amp": {
+        "markup": "",
+        "scripts": [],
+        "styles": [],
+        "__typename": "Amp"
+      },
+      "postLabel": [],
+      "__typename": "Post"
+    }
+  }
+}
