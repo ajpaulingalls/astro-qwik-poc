@@ -1,11 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { RequestEventLoader } from '@qwik.dev/router';
-import {
-  mockFetchOnce,
-  mockFetchSequence,
-  type MockedFetch,
-} from '../../../lib/test-helpers/mock-fetch';
+import { mockFetchOnce, mockFetchSequence, type MockedFetch } from '@aje-poc/shared-test-helpers';
 import type { Article } from '@aje-poc/shared-types';
 import { GraphqlHttpError } from '../../../lib/graphql';
 import { loadArticleData } from './index';

@@ -36,7 +36,8 @@ export function mockFetchOnce(options: MockFetchOptions = {}): MockedFetch {
   };
 }
 
-// Multi-call variant for routeLoader tests that fan out via Promise.all.
+// Multi-call variant for callers that fan out fetches via Promise.all
+// (e.g. routeLoaders that hydrate multiple sections in parallel).
 // Pops one MockFetchOptions per fetch call; throws if exhausted, so a missing
 // queue entry is loud rather than silently re-using the last response.
 export function mockFetchSequence(responses: MockFetchOptions[]): MockedFetch {

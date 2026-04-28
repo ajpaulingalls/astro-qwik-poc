@@ -30,6 +30,7 @@
       },
       "devDependencies": {
         "@aje-poc/perf-harness": "workspace:*",
+        "@aje-poc/shared-test-helpers": "workspace:*",
         "@tailwindcss/vite": "^4.0.0",
         "@testing-library/preact": "^3.2.4",
         "chrome-launcher": "^1.1.2",
@@ -50,6 +51,7 @@
       },
       "devDependencies": {
         "@aje-poc/perf-harness": "workspace:*",
+        "@aje-poc/shared-test-helpers": "workspace:*",
         "@qwik.dev/core": "~2.0.0-beta.32",
         "@qwik.dev/router": "latest",
         "@tailwindcss/vite": "latest",
@@ -85,6 +87,13 @@
         "vitest": "^2.1.0",
       },
     },
+    "packages/shared-test-helpers": {
+      "name": "@aje-poc/shared-test-helpers",
+      "version": "0.0.0",
+      "devDependencies": {
+        "vitest": "^2.1.0",
+      },
+    },
     "packages/shared-types": {
       "name": "@aje-poc/shared-types",
       "version": "0.0.0",
@@ -97,6 +106,8 @@
     "@aje-poc/perf-harness": ["@aje-poc/perf-harness@workspace:packages/perf-harness"],
 
     "@aje-poc/shared-csp": ["@aje-poc/shared-csp@workspace:packages/shared-csp"],
+
+    "@aje-poc/shared-test-helpers": ["@aje-poc/shared-test-helpers@workspace:packages/shared-test-helpers"],
 
     "@aje-poc/shared-types": ["@aje-poc/shared-types@workspace:packages/shared-types"],
 

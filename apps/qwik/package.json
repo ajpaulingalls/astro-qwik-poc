@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@aje-poc/perf-harness": "workspace:*",
+    "@aje-poc/shared-test-helpers": "workspace:*",
     "@qwik.dev/core": "~2.0.0-beta.32",
     "@qwik.dev/router": "latest",
     "@tailwindcss/vite": "latest",

@@ -149,6 +149,13 @@
           ]
         }
       },
+      "packages/shared-test-helpers": {
+        "packageJson": {
+          "dependencies": [
+            "npm:vitest@^2.1.0"
+          ]
+        }
+      },
       "packages/shared-types": {
         "packageJson": {
           "dependencies": [

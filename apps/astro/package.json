@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@aje-poc/perf-harness": "workspace:*",
+    "@aje-poc/shared-test-helpers": "workspace:*",
     "@tailwindcss/vite": "^4.0.0",
     "@testing-library/preact": "^3.2.4",
     "chrome-launcher": "^1.1.2",

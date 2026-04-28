@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { mockFetchSequence, type MockedFetch } from './mock-fetch';
+import { mockFetchSequence, type MockedFetch } from './mock-fetch.ts';
 
 describe('mockFetchSequence', () => {
   let mock: MockedFetch | undefined;

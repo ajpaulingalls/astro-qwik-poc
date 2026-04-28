@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { RequestEventLoader } from '@qwik.dev/router';
 import { GEO_API_CATEGORY_TYPE, SECTION_PAGE_SIZE } from '@aje-poc/shared-types';
-import { mockFetchOnce, type MockedFetch } from '../../lib/test-helpers/mock-fetch';
+import { mockFetchOnce, type MockedFetch } from '@aje-poc/shared-test-helpers';
 import { GraphqlHttpError } from '../../lib/graphql';
 import { loadSectionData } from './index';
 
