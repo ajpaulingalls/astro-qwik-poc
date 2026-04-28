@@ -2,6 +2,9 @@ import { assert, assertEquals, assertStringIncludes } from "@std/assert";
 import { handle } from "../lib/handler.ts";
 import { loadFixtures } from "../lib/fixtures.ts";
 
+const LIVE_BLOG_SLUG =
+  "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+
 const fixtures = new Map<string, string>([
   [
     "HomePageQuery",
@@ -274,8 +277,7 @@ Deno.test("handler: /wp-content/uploads/* placeholder does NOT require wp-site h
 
 Deno.test("handler: x-liveblog-snapshot header pins live-blog shell to the requested snapshot", async () => {
   const realFixtures = await loadFixtures("./fixtures");
-  const slug =
-    "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+  const slug = LIVE_BLOG_SLUG;
   const res = handle(
     buildRequest({
       operationName: "ArchipelagoSingleLiveBlogQuery",
@@ -291,8 +293,7 @@ Deno.test("handler: x-liveblog-snapshot header pins live-blog shell to the reque
 
 Deno.test("handler: x-liveblog-snapshot header also pins SingleLiveBlogChildrensQuery", async () => {
   const realFixtures = await loadFixtures("./fixtures");
-  const slug =
-    "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+  const slug = LIVE_BLOG_SLUG;
   const res = handle(
     buildRequest({
       operationName: "SingleLiveBlogChildrensQuery",
@@ -306,11 +307,9 @@ Deno.test("handler: x-liveblog-snapshot header also pins SingleLiveBlogChildrens
   assertEquals(Array.isArray(body.data.article.children), true);
 });
 
-Deno.test("handler: live-blog ops without snapshot header still resolve via wall-clock fallback (snapshot-0 with single variant)", async () => {
-  // With only snapshot-0 on disk, every wall-clock tick lands on snapshot-0.
+Deno.test("handler: live-blog ops without snapshot header resolve via wall-clock fallback within available snapshots", async () => {
   const realFixtures = await loadFixtures("./fixtures");
-  const slug =
-    "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+  const slug = LIVE_BLOG_SLUG;
   const res = handle(
     buildRequest({
       operationName: "ArchipelagoSingleLiveBlogQuery",
@@ -319,6 +318,106 @@ Deno.test("handler: live-blog ops without snapshot header still resolve via wall
     { fixtures: realFixtures },
   );
   assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data.article.slug, slug);
+});
+
+Deno.test("handler: snapshot-N children list grows strictly across snapshots (polling-diff substrate)", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const slug = LIVE_BLOG_SLUG;
+  const lengths: number[] = [];
+  for (const snap of ["0", "1", "2"]) {
+    const res = handle(
+      buildRequest({
+        operationName: "SingleLiveBlogChildrensQuery",
+        variables: { postName: slug },
+        snapshotHeader: snap,
+      }),
+      { fixtures: realFixtures },
+    );
+    assertEquals(res.status, 200, `snapshot ${snap} unreachable`);
+    const body = await res.json();
+    lengths.push(body.data.article.children.length);
+  }
+  assert(
+    lengths[0]! < lengths[1]! && lengths[1]! < lengths[2]!,
+    `expected strictly increasing children counts, got ${lengths.join(",")}`,
+  );
+});
+
+Deno.test("handler: snapshot-2 childrenMeta is descending by publishedTime (production invariant)", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoSingleLiveBlogQuery",
+      variables: { name: LIVE_BLOG_SLUG, postType: "liveblog", preview: "" },
+      snapshotHeader: "2",
+    }),
+    { fixtures: realFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  const meta = body.data.article.childrenMeta as Array<
+    { id: string; publishedTime: string }
+  >;
+  // Newest entry (4514963 @ 23:59) leads, then 4514943 (@ 23:45), then snapshot-0's set.
+  assertEquals(meta[0].id, "4514963");
+  assertEquals(meta[1].id, "4514943");
+  for (let i = 0; i < meta.length - 1; i++) {
+    assert(
+      Number(meta[i].publishedTime) >= Number(meta[i + 1].publishedTime),
+      `childrenMeta[${i}] (${meta[i].publishedTime}) should be >= [${i + 1}] (${
+        meta[i + 1].publishedTime
+      })`,
+    );
+  }
+});
+
+Deno.test("handler: LiveBlogUpdateQuery resolves the per-update fixture for a recorded child id", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const res = handle(
+    buildRequest({
+      operationName: "LiveBlogUpdateQuery",
+      variables: {
+        postID: 4514963,
+        postType: "liveblog-update",
+        preview: "",
+        isAmp: false,
+      },
+    }),
+    { fixtures: realFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data.posts.id, "4514963");
+  assertEquals(body.data.posts.postType, "liveblog-update");
+});
+
+Deno.test("handler: LiveBlogUpdateQuery is NOT snapshotted — same id returns same fixture regardless of snapshot header", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const reqVars = {
+    postID: 4514963,
+    postType: "liveblog-update",
+    preview: "",
+    isAmp: false,
+  };
+  const a = await handle(
+    buildRequest({
+      operationName: "LiveBlogUpdateQuery",
+      variables: reqVars,
+      snapshotHeader: "0",
+    }),
+    { fixtures: realFixtures },
+  ).text();
+  const b = await handle(
+    buildRequest({
+      operationName: "LiveBlogUpdateQuery",
+      variables: reqVars,
+      snapshotHeader: "2",
+    }),
+    { fixtures: realFixtures },
+  ).text();
+  assertEquals(a, b);
 });
 
 Deno.test("handler: non-live-blog operations are unaffected by x-liveblog-snapshot header (HomePageQuery)", () => {

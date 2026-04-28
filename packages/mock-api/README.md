@@ -77,15 +77,20 @@ Most fixtures are recorded verbatim from production via
 `scripts/record-fixtures.sh`. A few are hand-crafted to cover embed types
 production doesn't expose in our scouted query surface:
 
-| Fixture                                                              | Origin                                                                                   |
-| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `ArchipelagoSingleArticleQuery--sample-article-with-instagram-embed` | Hand-crafted. Production news articles don't carry Instagram embeds in scouting          |
-| `ArchipelagoSingleArticleQuery--sample-article-with-gallery-embed`   | Hand-crafted. Production `/gallery/*` uses a different `operationName` (out of M7 scope) |
+| Fixture                                                              | Origin                                                                                                                        |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `ArchipelagoSingleArticleQuery--sample-article-with-instagram-embed` | Hand-crafted. Production news articles don't carry Instagram embeds in scouting                                               |
+| `ArchipelagoSingleArticleQuery--sample-article-with-gallery-embed`   | Hand-crafted. Production `/gallery/*` uses a different `operationName` (out of M7 scope)                                      |
+| `ArchipelagoSingleLiveBlogQuery--…--snapshot-{1,2}`                  | Hand-crafted from `--snapshot-0` (recorded). Each prepends a real production child id + publishedTime to `childrenMeta`.      |
+| `SingleLiveBlogChildrensQuery--…--snapshot-{1,2}`                    | Hand-crafted from `--snapshot-0` (recorded), with the matching real child id prepended to the `children` list (newest-first). |
 
-Synthetic fixtures are flagged in-band: `title` ends with `(sample)`, `id` uses
-the 9000000-block (e.g. `9001001`, `9002001`), and `socialMediaSummary` /
-`excerpt` / `subheading` start with `Sample fixture:`. Don't strip these markers
-— they're how renderers and screenshots stay honest about provenance.
+Synthetic article fixtures are flagged in-band: `title` ends with `(sample)`,
+`id` uses the 9000000-block (e.g. `9001001`, `9002001`), and
+`socialMediaSummary` / `excerpt` / `subheading` start with `Sample fixture:`.
+Don't strip these markers — they're how renderers and screenshots stay honest
+about provenance. Live-blog `--snapshot-{1,2}` variants use real production ids
+and content, so no in-band markers apply; the tell is that the entries appear in
+`--snapshot-{1,2}` but not `--snapshot-0` for the same slug.
 
 ## Architecture
 

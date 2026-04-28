@@ -73,16 +73,22 @@ sample-* fixtures in `packages/mock-api/fixtures/` cover the gaps — see
 
 ## What gets captured
 
-15 fixtures covering all four production page types (per `docs/RESEARCH.md`
-§Verified Queries by Page):
+Fixtures cover all four production page types (per `docs/RESEARCH.md` §Verified
+Queries by Page). The recorder writes a baseline set; live-blog snapshot
+variants and additional per-update recordings are committed by hand to drive the
+polling-rotation behaviour (see "Live-blog snapshots" below).
 
-| Page type            | Operations                                                                                   | Fixtures                |
-| -------------------- | -------------------------------------------------------------------------------------------- | ----------------------- |
-| Homepage             | HomePageQuery, HomePageCuratedFeedQuery, ArchipelagoBreakingTickerQuery                      | 3                       |
-| Article              | ArchipelagoSingleArticleQuery (N slug variants per ARTICLE_SLUGS)                            | N (recorded) + 2 sample |
-| Live blog            | ArchipelagoSingleLiveBlogQuery, SingleLiveBlogChildrensQuery, LiveBlogUpdateQuery (1 each)   | 3                       |
-| Section (geographic) | ArchipelagoSectionQuery (middle-east), ArchipelagoAjeSectionPostsQuery (offsets 0, 9, 18)    | 4                       |
-| Section (topic)      | ArchipelagoTopicsPageQuery (opinion), ArchipelagoPaginatedTopicsFeedQuery (offsets 0, 9, 18) | 4                       |
+| Page type            | Operations                                                                                                               | Fixtures                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------- |
+| Homepage             | HomePageQuery, HomePageCuratedFeedQuery, ArchipelagoBreakingTickerQuery                                                  | 3                       |
+| Article              | ArchipelagoSingleArticleQuery (N slug variants per ARTICLE_SLUGS)                                                        | N (recorded) + 2 sample |
+| Live blog            | ArchipelagoSingleLiveBlogQuery, SingleLiveBlogChildrensQuery (snapshot-N variants), LiveBlogUpdateQuery (1 per child id) | 2×N + M                 |
+| Section (geographic) | ArchipelagoSectionQuery (middle-east), ArchipelagoAjeSectionPostsQuery (offsets 0, 9, 18)                                | 4                       |
+| Section (topic)      | ArchipelagoTopicsPageQuery (opinion), ArchipelagoPaginatedTopicsFeedQuery (offsets 0, 9, 18)                             | 4                       |
+
+For live-blog rotation: N is the number of snapshot variants on disk (currently
+3 for the iran-war slug), M is the number of distinct child posts covered by
+`LiveBlogUpdateQuery--{postID}.json` fixtures.
 
 Three pagination offsets (`0, 9, 18`) match the production "Load More" pattern
 documented in SMM Constraints — enough to test multi-page Load More semantics in
@@ -100,6 +106,18 @@ keep filenames safe.
   carries `preview` and `isAmp`; sending bare `"liveblog"` yields
   `no_posts_found`. The recorder uses the verified shape; do not change it
   without re-probing aljazeera.com/graphql.
+
+## Live-blog snapshots
+
+Live-blog shell + children fixtures use a `--snapshot-N.json` suffix so the
+mock-api can rotate through successive snapshots and downstream apps observe a
+growing children list (the polling-diff substrate). The recorder always writes
+`--snapshot-0` (the captured baseline). Subsequent snapshots are hand-crafted
+in-place: pick one or more child ids from production whose `LiveBlogUpdateQuery`
+returns real content, prepend their `id`/`publishedTime` entry to the shell
+`childrenMeta` and the children list, and record one
+`LiveBlogUpdateQuery--{newChildID}.json` fixture per added id. Maintain
+production's newest-first ordering across `childrenMeta`.
 
 ## Re-recording
 
