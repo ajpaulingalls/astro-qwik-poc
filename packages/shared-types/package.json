@@ -2,9 +2,15 @@
   "name": "@aje-poc/shared-types",
   "private": true,
   "version": "0.0.0",
-  "description": "Hand-curated subset of homepage UI fields, mirroring fixture data in packages/mock-api — consumed by both Astro and Qwik apps",
+  "description": "Shared types and section-routing constants for the AJE Astro and Qwik PoCs — single source of truth for HomepagePost/Article shapes and the GEOGRAPHIC_SECTIONS allowlist + page size",
   "type": "module",
   "exports": {
     ".": "./index.ts"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0"
   }
 }

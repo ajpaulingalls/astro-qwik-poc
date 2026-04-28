@@ -87,6 +87,9 @@
     "packages/shared-types": {
       "name": "@aje-poc/shared-types",
       "version": "0.0.0",
+      "devDependencies": {
+        "vitest": "^2.1.0",
+      },
     },
   },
   "packages": {
