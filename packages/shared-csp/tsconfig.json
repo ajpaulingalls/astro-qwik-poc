@@ -1,16 +1,4 @@
 {
-  "compilerOptions": {
-    "target": "es2022",
-    "module": "esnext",
-    "lib": ["es2022"],
-    "strict": true,
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "incremental": true,
-    "isolatedModules": true
-  },
+  "extends": "../../tsconfig.base.json",
   "include": ["**/*.ts"]
 }
