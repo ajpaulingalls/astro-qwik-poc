@@ -84,6 +84,33 @@ export interface Article {
   featuredImage?: HomepageImage | null;
 }
 
+export interface LiveBlogChildMeta {
+  id: string;
+  publishedTime: string;
+}
+
+export type LiveBlogChildrenIds = number[];
+
+export interface LiveBlogShell {
+  id: string;
+  title: string;
+  link: string;
+  slug: string;
+  subheading?: string;
+  excerpt?: string;
+  replacementHeadline?: string;
+  date: string;
+  content: string;
+  author: ArticleAuthor[];
+  categories: ArticleCategory[];
+  featuredImage?: HomepageImage | null;
+  postType: 'liveblog';
+  isLive: boolean;
+  isBreaking?: boolean;
+  children: LiveBlogChildrenIds;
+  childrenMeta?: LiveBlogChildMeta[];
+}
+
 // Production routes /{section} as either a geographic section (apps/{astro,
 // qwik}/docs/ARCHITECTURE.md §Section Type Resolution) or a topic page. The
 // allowlist is the only authority for the geographic branch — slugs not in
