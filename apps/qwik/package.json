@@ -10,8 +10,9 @@
     "preview": "bun --bun vite preview",
     "preview:prod": "bun run server.ts",
     "perf:qwik": "PUBLIC_API_BASE=http://localhost:4456 bun run ../../packages/perf-harness/runner.ts --target=qwik",
-    "test": "bun run build && vitest run",
-    "test:acceptance": "PUBLIC_API_BASE=http://localhost:4456 bun run build && vitest run tests/acceptance.test.ts"
+    "test": "PUBLIC_API_BASE=http://localhost:4456 bun run build && vitest run",
+    "test:acceptance": "PUBLIC_API_BASE=http://localhost:4456 bun run build && vitest run tests/acceptance.test.ts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aje-poc/shared-csp": "workspace:*",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@aje-poc/perf-harness": "workspace:*",
+    "@aje-poc/shared-test-helpers": "workspace:*",
     "@qwik.dev/core": "~2.0.0-beta.32",
     "@qwik.dev/router": "latest",
     "@tailwindcss/vite": "latest",

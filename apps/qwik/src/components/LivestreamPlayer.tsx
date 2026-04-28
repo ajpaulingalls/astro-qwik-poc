@@ -45,7 +45,7 @@ export const LivestreamPlayer = component$<Props>(({ livestream }) => {
             ref={iframeRef}
             src={brightcoveSrc(livestream.accountId, livestream.playerID, videoId)}
             allow="autoplay; fullscreen; encrypted-media"
-            allowFullScreen
+            allowFullscreen
             // tabIndex=-1 keeps the iframe out of sequential tab order
             // (the player UI inside has its own tab stops); programmatic
             // focus() above still works.

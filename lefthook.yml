@@ -19,8 +19,20 @@ pre-commit:
       glob: 'packages/mock-api/**/*.ts'
       run: deno lint {staged_files}
 
-# pre-push runs the slow build+test commands. pre-commit must stay <5s on
-# staged-file workspace; tests moved here to unblock the tripwire.
+    # Sprint-009: tsc + astro check on staged TS/Astro changes. Runs
+    # whole-project typecheck (tsc needs the full graph; the staged-file
+    # glob only gates *whether* the command runs, not its scope). Measured
+    # ~6s wall time (Astro check is the long pole; Qwik tsc finishes first
+    # under the parallel filter); user accepted the budget bust for the
+    # casing-error class of bugs vitest doesn't catch.
+    typecheck:
+      glob: '*.{ts,tsx,astro}'
+      run: bun run typecheck
+      stage_fixed: false
+
+# pre-push runs the slow build+test commands. pre-commit targets ~6s (the
+# typecheck block above is the long pole; lint/format are <1s on staged
+# files); tests live on push to keep commit feedback snappy.
 # test-mock-api joins so all test commands run at the same gate.
 pre-push:
   parallel: true

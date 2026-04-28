@@ -9,6 +9,7 @@
     "apps/qwik",
     "packages/perf-harness",
     "packages/shared-csp",
+    "packages/shared-test-helpers",
     "packages/shared-types"
   ],
   "scripts": {
@@ -23,6 +24,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
+    "typecheck": "bun --filter './apps/*' typecheck",
     "prepare": "lefthook install"
   },
   "devDependencies": {

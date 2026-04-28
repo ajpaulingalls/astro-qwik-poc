@@ -8,6 +8,11 @@ interface Props {
   post: StoryCardData;
 }
 
+// Stays as component$ — used inside LoadMoreButton's reactive `posts.value.map(...)`
+// (LoadMoreButton.tsx:99). Plain-function leaves are correct in static SSR maps
+// (CuratedCollection over routeLoader$ data) but break the reactive append in
+// LoadMore. HeroCard/MostPopular/CuratedCollection/Footer follow the leaf
+// convention; StoryCard is the documented exception.
 export const StoryCard = component$<Props>(({ post }) => {
   const img = post.featuredImage ?? null;
   return (

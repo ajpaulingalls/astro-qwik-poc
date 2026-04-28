@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mockFetchSequence, type MockedFetch } from '../lib/test-helpers/mock-fetch';
+import { mockFetchSequence, type MockedFetch } from '@aje-poc/shared-test-helpers';
 import { loadHomepageData } from './index';
 
 describe('loadHomepageData', () => {

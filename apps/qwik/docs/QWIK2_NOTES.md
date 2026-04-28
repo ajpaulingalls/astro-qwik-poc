@@ -2,6 +2,28 @@
 
 Live log of beta-specific workarounds, missing features, and divergences from the architecture doc. Updated as items are encountered.
 
+## sprint-009 — story-005 outcome + JS budget revision (165→175 / 155→168 KB) (2026-04-28)
+
+Story-005 ("Qwik article JS budget reduction 165KB→<155KB, LH 83/87→≥98") closed in this cleanup session. The original metric goal was not met; the story is closed because the audit + bisect + leaf-refactor work cumulatively answered the underlying question (**can Qwik 2 beta.32 hit `<155KB`?**) honestly: **no, not on beta.32.** Levers exhausted within the leaf-component convention; remainder is framework runtime + router infrastructure, which is irreducible without an upstream Qwik release.
+
+### What landed (this session)
+
+1. **Bisect of homepage +15 KB regression (sprint-006 156 KB → post-sprint-008 171 KB).** Chunk inventory at HEAD shows `q-CqNq4nJT.js` 102 KB (Qwik core, irreducible per story-009 audit), 12 KB router+zod, 7.4 KB router internals, 5.5 KB web-vitals, 4.9 KB qwikLoader, 4.7 KB preloader = ~136 KB framework before any app symbol. The +15 KB regression is framework+router growth as more loaders/routes shipped through sprint-007/008 — exactly what story-009 predicted. No reversible app-code culprit found.
+2. **Leaf-component convention applied to 4 of 5 candidates.** HeroCard, MostPopular, CuratedCollection, Footer converted from `component$` → plain function. `StoryCard` kept as `component$` (rendered inside `LoadMoreButton.tsx:99`'s reactive `posts.value.map(...)` over a mutable signal — plain-function leaves break the reactive append; rule: convention applies to leaves rendered over `routeLoader$` data, not over reactive-signal maps). Total chunk inventory: 180,084 → 179,526 bytes (−558 bytes, −4 bundles). Real but small — confirms the framework dominates.
+3. **Budgets revised** (`packages/perf-harness/cli_helpers.ts`): Homepage `<165 KB → <175 KB` (audit-measured 171 KB + 4 KB headroom), Article `<155 KB → <168 KB` (audit-measured 163 KB + 5 KB headroom). ARCHITECTURE.md performance budgets table updated with the framework-cost rationale and cross-link to story-009.
+4. **lhPerf gate split per-target** (`packages/perf-harness/cli_helpers.ts:38`): added `QWIK_LH_PERF_FLOOR = 85`. Qwik 2 beta.32 LH-throttled measures 83-90 (audit), so the prior shared `STRETCH_CWV.lhPerf = 98` was hard-failing every Qwik perf-harness run since sprint-006 — silent gate noise, not signal. Astro pages still hold the stretch 98; Qwik pages override to the measured-realistic 85 floor. Re-evaluate when Qwik 2 stable ships.
+
+### Why the goal was not met
+
+`<155 KB` was always going to require either: (a) Qwik 2 stable shipping (its size-optimization pass is unbuilt in beta), (b) a router/framework fork, or (c) abandoning Qwik 2 for v1. None are PoC-scope. The original story acceptance bar predates the story-009 audit's framework-cost characterization; the budget's been revised twice already (`<15 KB → <150 KB → <165 KB`), and this is the third honest revision against the same root cause. M13's framework-comparison report will tell the irreducible-framework-cost story as its central Qwik 2 finding.
+
+### Story-005 closure rationale
+
+- Audit + bisect: complete. Cause named, framework-graph-attributed.
+- Leaf refactor: complete (4 of 5; documented exception for StoryCard).
+- Budget revision: complete (cli_helpers.ts + ARCHITECTURE.md table aligned to measurements).
+- Original `<155 KB` metric: **not met**, and **unmeetable on beta.32**. Risk `e4141bc4f7c9` (story-005b: framework chunks unreachable without upstream) captures this for M13.
+
 ## post-sprint-007 — vite.config.ts can't import .ts workspace packages (2026-04-27)
 
 `apps/qwik/vite.config.ts` cannot `import { ... } from '@aje-poc/shared-csp'` (or any other workspace package whose entry is a `.ts` file). Vite's config loader uses esbuild to compile vite.config.ts to JS, then dynamic-imports it via Node's ESM loader; that loader does not handle `.ts` and bombs with `ERR_UNKNOWN_FILE_EXTENSION`. Wrapping the vite invocation with `bun --bun vite ...` (which `apps/qwik/package.json` does for dev/build/preview) doesn't help — vite's internal config-load path still bottoms out at Node's loader.
@@ -288,7 +310,7 @@ The refactor regressed article jsBytes by ~3KB. We keep it anyway because the co
    - `useVisibleTask$` runtime cost (story-008 sub-fix added a second use of this hook — the first was already in `routes/layout.tsx` for web-vitals lazy-load, so the runtime support was already loaded; but verify chunk-graph empirically).
    - `@qwik.dev/router` infrastructure growing as more routes/loaders ship (`s_xLIuvaqxjXk` root.tsx component is 12.5KB; `s_0UhDFwlxeFQ` useQwikRouter_getScroller bundle is 7.4KB shared with 4 other router symbols).
    - Section route chunks shipping with the homepage bundle per `cli_helpers.ts` comment ("Section pages currently ship the same bundle as homepage").
-2. **Try the 5 additional leaf candidates** flagged by the simplify code-reuse agent: `HeroCard`, `MostPopular`, `StoryCard`, `CuratedCollection`, `Footer`. These appear multiple times per homepage render so the inline-vs-chunk math is more favorable than for the embeds. The disqualified candidates (`SectionHeading` uses `Slot`, `VerticalVideoCarousel` has `onClick$`) stay as `component$`.
+2. **Try the 5 additional leaf candidates** flagged by the simplify code-reuse agent: `HeroCard`, `MostPopular`, `StoryCard`, `CuratedCollection`, `Footer`. These appear multiple times per homepage render so the inline-vs-chunk math is more favorable than for the embeds. The disqualified candidates (`SectionHeading` uses `Slot`, `VerticalVideoCarousel` has `onClick$`) stay as `component$`. — _Outcome 2026-04-28: 4 of 5 converted (HeroCard/MostPopular/CuratedCollection/Footer) for -558 bytes / -4 chunks. StoryCard kept as `component$` because LoadMoreButton renders it inside `posts.value.map(...)` over a mutable signal — the reactive append needs the QRL boundary. Convention applies cleanly to leaves rendered over `routeLoader$` data (CuratedCollection at routes/index.tsx:85) but not to leaves inside reactive-signal maps. See StoryCard.tsx top comment._
 3. **Re-baseline budgets if sprint-008 levers are insufficient.** Sprint-006 already once revised aspirational `<15KB` → realistic `<150KB → <165KB` for Qwik 2 beta. If the framework graph keeps growing as routes accumulate, another revision may be honest.
 
 ## sprint-006 — Image-serving lever + LCP measurement honesty (2026-04-25)

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { graphqlFetch, GraphqlHttpError } from './graphql';
-import { mockFetchOnce } from './test-helpers/mock-fetch';
+import { mockFetchOnce } from '@aje-poc/shared-test-helpers';
 
 describe('graphqlFetch', () => {
   let mock: ReturnType<typeof mockFetchOnce>;

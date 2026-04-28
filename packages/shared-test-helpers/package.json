@@ -1,0 +1,16 @@
+{
+  "name": "@aje-poc/shared-test-helpers",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Shared test helpers for the AJE Astro and Qwik PoCs — mockFetchOnce / mockFetchSequence / fetch-call capture types. Single source of truth so both apps' test suites mock fetch the same way.",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0"
+  }
+}

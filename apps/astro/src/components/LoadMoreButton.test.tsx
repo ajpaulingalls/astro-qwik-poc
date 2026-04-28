@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/preact';
 import { LoadMoreButton } from './LoadMoreButton';
-import { mockFetchOnce } from '../lib/test-helpers/mock-fetch';
+import { mockFetchOnce } from '@aje-poc/shared-test-helpers';
 import type { HomepagePost } from '@aje-poc/shared-types';
 
 function makePosts(start: number, count: number): HomepagePost[] {

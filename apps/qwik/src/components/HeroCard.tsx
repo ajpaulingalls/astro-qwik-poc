@@ -1,4 +1,3 @@
-import { component$ } from '@qwik.dev/core';
 import type { StoryCardData } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
 import { LeadImage } from './LeadImage';
@@ -8,7 +7,7 @@ interface Props {
   post: StoryCardData;
 }
 
-export const HeroCard = component$<Props>(({ post }) => {
+export function HeroCard({ post }: Props) {
   const img = post.featuredImage ?? null;
   return (
     <article>
@@ -24,4 +23,4 @@ export const HeroCard = component$<Props>(({ post }) => {
       </a>
     </article>
   );
-});
+}
