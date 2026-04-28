@@ -392,11 +392,11 @@ export function runAcceptanceSuite(target: Target): void {
               // Wait for `data-hydrated="true"` on the LoadMore button before
               // clicking. The contract: a LoadMoreButton emits this attribute
               // once its click handler is bound (Astro Preact mount, Qwik
-              // qvisible). aria-busy alone matches even at SSR time, so a
-              // click on aria-busy could race the framework and either drop
-              // the click (Astro pre-idle) or burn the latency budget on a
-              // QRL chunk download (Qwik). Waiting on data-hydrated removes
-              // both timing windows.
+              // useVisibleTask$ with document-ready strategy). aria-busy alone
+              // matches even at SSR time, so a click on aria-busy could race
+              // the framework and either drop the click (Astro pre-idle) or
+              // burn the latency budget on a QRL chunk download (Qwik).
+              // Waiting on data-hydrated removes both timing windows.
               await page.waitForFunction(
                 (size: number) =>
                   document.querySelectorAll('article').length === size &&
