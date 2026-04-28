@@ -373,6 +373,30 @@ Deno.test("handler: snapshot-2 childrenMeta is descending by publishedTime (prod
   }
 });
 
+Deno.test("handler: shell.children matches childrenMeta ids within each live-blog snapshot (parity invariant)", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  for (const snap of ["0", "1", "2"]) {
+    const res = handle(
+      buildRequest({
+        operationName: "ArchipelagoSingleLiveBlogQuery",
+        variables: { name: LIVE_BLOG_SLUG, postType: "liveblog", preview: "" },
+        snapshotHeader: snap,
+      }),
+      { fixtures: realFixtures },
+    );
+    assertEquals(res.status, 200);
+    const body = await res.json();
+    const children = body.data.article.children as number[];
+    const metaIds = (body.data.article.childrenMeta as Array<{ id: string }>)
+      .map((c) => Number(c.id));
+    assertEquals(
+      children,
+      metaIds,
+      `snapshot-${snap}: shell.children must equal childrenMeta ids (apps poll either field; they must agree)`,
+    );
+  }
+});
+
 Deno.test("handler: LiveBlogUpdateQuery resolves the per-update fixture for a recorded child id", async () => {
   const realFixtures = await loadFixtures("./fixtures");
   const res = handle(

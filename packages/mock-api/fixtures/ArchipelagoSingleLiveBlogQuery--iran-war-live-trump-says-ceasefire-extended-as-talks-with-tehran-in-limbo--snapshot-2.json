@@ -1,13 +1,13 @@
 {
   "data": {
     "article": {
-      "content": "<ul>\n<li>US President Donald Trump has announced an <a href=\"/news/2026/4/21/trump-announces-extending-iran-ceasefire-but-says-blockade-remains\">extension to the Iran ceasefire</a>, as he continues to blockade Iranian ports, until Tehran submits a proposal for talks, and “discussions are concluded, one way or the other”.</li>\n<li>Iran’s Foreign Minister Abbas Araghchi says that “blockading Iranian ports is an act of war and thus a violation of the ceasefire”, adding that Tehran knows &#8220;<a href=\"/news/2026/4/21/us-forces-detain-iran-linked-tanker-tifani-with-ceasefire-talks-on-edge\">how to resist bullying</a>&#8220;.</li>\n<li>Al Jazeera’s correspondent in Islamabad says that <a href=\"/news/2026/4/21/pakistan-races-against-time-to-get-iran-back-to-us-talks-as-truce-end-nears\">last-ditch efforts</a> are under way by Pakistani mediators to try to salvage the highly anticipated second round of peace talks between the US and Iran.</li>\n<li>Israel continues to <a href=\"/video/newsfeed/2026/4/21/video-israeli-soldiers-sing-national-anthem-on-ruins-of-lebanese-town\">bomb southern Lebanon</a> and demolish Lebanese homes, despite a 10-day ceasefire, with Hezbollah announcing an attack on northern Israel in retaliation for the truce violations.</li>\n<li>Visit <a href=\"/news/2026/3/1/us-israel-attacks-on-iran-death-toll-and-injuries-live-tracker\">our live tracker</a> for the latest casualty figures from across the region.</li>\n</ul>\n",
+      "content": "<ul>\n<li>US President Donald Trump has announced an <a href=\"/news/2026/4/21/trump-announces-extending-iran-ceasefire-but-says-blockade-remains\">extension to the Iran ceasefire</a>, as he continues to blockade Iranian ports, until Tehran submits a proposal for talks, and \u201cdiscussions are concluded, one way or the other\u201d.</li>\n<li>Iran\u2019s Foreign Minister Abbas Araghchi says that \u201cblockading Iranian ports is an act of war and thus a violation of the ceasefire\u201d, adding that Tehran knows &#8220;<a href=\"/news/2026/4/21/us-forces-detain-iran-linked-tanker-tifani-with-ceasefire-talks-on-edge\">how to resist bullying</a>&#8220;.</li>\n<li>Al Jazeera\u2019s correspondent in Islamabad says that <a href=\"/news/2026/4/21/pakistan-races-against-time-to-get-iran-back-to-us-talks-as-truce-end-nears\">last-ditch efforts</a> are under way by Pakistani mediators to try to salvage the highly anticipated second round of peace talks between the US and Iran.</li>\n<li>Israel continues to <a href=\"/video/newsfeed/2026/4/21/video-israeli-soldiers-sing-national-anthem-on-ruins-of-lebanese-town\">bomb southern Lebanon</a> and demolish Lebanese homes, despite a 10-day ceasefire, with Hezbollah announcing an attack on northern Israel in retaliation for the truce violations.</li>\n<li>Visit\u00a0<a href=\"/news/2026/3/1/us-israel-attacks-on-iran-death-toll-and-injuries-live-tracker\">our live tracker</a>\u00a0for the latest casualty figures from across the region.</li>\n</ul>\n",
       "slug": "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo",
-      "subheading": "Lebanon’s disaster management unit raises the death toll from weeks of Israeli attacks to 2,454, with 7,658 people injured.",
+      "subheading": "Lebanon\u2019s disaster management unit raises the death toll from weeks of Israeli attacks to 2,454, with 7,658 people injured.",
       "socialMediaSummary": "Lebanon's disaster management unit raises death toll from weeks of Israeli attacks to 2,454, with 7,658 people injured.",
       "id": "4511785",
       "title": "Iran war live: Trump says ceasefire extended as talks with Tehran in limbo",
-      "excerpt": "Lebanon’s disaster management unit raises death toll from weeks of Israeli attacks to 2,454, with 7,658 people injured.",
+      "excerpt": "Lebanon\u2019s disaster management unit raises death toll from weeks of Israeli attacks to 2,454, with 7,658 people injured.",
       "date": "2026-04-22T00:00:00",
       "link": "/news/liveblog/2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo",
       "isBreaking": false,
@@ -16,7 +16,7 @@
       "proxyShortUrl": "https://aje.news/q72sd5",
       "isDeveloping": false,
       "externalUrl": null,
-      "replacementHeadline": "Tehran vows to ‘resist bullying’ as Trump extends Iran truce, blocks ports",
+      "replacementHeadline": "Tehran vows to \u2018resist bullying\u2019 as Trump extends Iran truce, blocks ports",
       "sponsorshipType": null,
       "postType": "liveblog",
       "author": [
@@ -145,6 +145,8 @@
       },
       "showAuthorTitles": false,
       "children": [
+        4514963,
+        4514943,
         4512099,
         4512107,
         4512131,
@@ -515,7 +517,7 @@
                 {
                   "id": "4460013",
                   "parent": 0,
-                  "title": "Trump’s midterm strategy",
+                  "title": "Trump\u2019s midterm strategy",
                   "url": "/news/longform/2026/2/27/like-its-2024-again-trump-takes-centre-stage-in-2026-midterm-elections",
                   "target": "",
                   "classes": [
@@ -673,7 +675,7 @@
                 {
                   "id": "3381335",
                   "parent": 0,
-                  "title": "A war to shape Lebanon’s future",
+                  "title": "A war to shape Lebanon\u2019s future",
                   "url": "/video/between-us/2024/12/11/a-war-to-shape-lebanons-future",
                   "target": "",
                   "classes": [
@@ -763,7 +765,7 @@
                 {
                   "id": "4501190",
                   "parent": 0,
-                  "title": "Iran war’s big winners",
+                  "title": "Iran war\u2019s big winners",
                   "url": "/news/2026/4/17/iran-wars-big-winners-wall-street-weapons-firms-ai-and-green-energy",
                   "target": "",
                   "classes": [
@@ -825,7 +827,7 @@
                 {
                   "id": "4354454",
                   "parent": 0,
-                  "title": "Iran’s ‘axis’ in disarray",
+                  "title": "Iran\u2019s \u2018axis\u2019 in disarray",
                   "url": "/features/2026/3/2/hold-analysis-khameneis-killing-leaves-irans-axis-in-disarray",
                   "target": "",
                   "classes": [
@@ -855,7 +857,7 @@
                 {
                   "id": "4354457",
                   "parent": 0,
-                  "title": "Iran’s weapons",
+                  "title": "Iran\u2019s weapons",
                   "url": "/news/2026/3/1/what-are-irans-weapons-as-it-fights-the-us-and-israel",
                   "target": "",
                   "classes": [
@@ -950,7 +952,7 @@
         {
           "id": "4511343",
           "title": "Trump announces Iran ceasefire extension but says blockade remains",
-          "excerpt": "US president says attacks will be held off until Iranian leaders ‘come up with a unified proposal’ to end war.",
+          "excerpt": "US president says attacks will be held off until Iranian leaders \u2018come up with a unified proposal\u2019 to end war.",
           "link": "/news/2026/4/21/trump-announces-extending-iran-ceasefire-but-says-blockade-remains",
           "date": "2026-04-21T20:22:17",
           "showAuthor": true,
@@ -1034,7 +1036,7 @@
         {
           "id": "4511169",
           "title": "Israeli rabbi who bulldozed Gaza honoured as torchbearer",
-          "excerpt": "Avraham Zarbiv, known for gleefully documenting his bulldozing of Gaza, was honoured on Israel’s “Independence Day”.",
+          "excerpt": "Avraham Zarbiv, known for gleefully documenting his bulldozing of Gaza, was honoured on Israel\u2019s \u201cIndependence Day\u201d.",
           "link": "/video/newsfeed/2026/4/21/israeli-rabbi-who-bulldozed-gaza-honoured-as-torchbearer",
           "date": "2026-04-21T19:43:33",
           "showAuthor": false,
@@ -1066,7 +1068,7 @@
             "sourceUrl": "/wp-content/uploads/2026/04/Avraham_Zarbiv_Israeli_settler_soldier_rabbi-1776799994.jpg",
             "credit": "",
             "caption": "Avraham Zarbiv&ndash;a settler, soldier, rabbi, rabbinical judge, and school leader known for gleefully documenting his bulldozing of Gaza&ndash;is seen in Gaza. [Social media]",
-            "alt": "Avraham Zarbiv–a settler, soldier, rabbi, rabbinical judge, and school leader known for gleefully documenting his bulldozing of Gaza–is seen in Gaza. [Social media]",
+            "alt": "Avraham Zarbiv\u2013a settler, soldier, rabbi, rabbinical judge, and school leader known for gleefully documenting his bulldozing of Gaza\u2013is seen in Gaza. [Social media]",
             "width": 1920,
             "height": 1080,
             "__typename": "Media"
@@ -1077,7 +1079,7 @@
             "sourceUrl": "/wp-content/uploads/2026/04/Avraham_Zarbiv_Israeli_settler_soldier_rabbi-1776799994.jpg",
             "credit": "",
             "caption": "Avraham Zarbiv&ndash;a settler, soldier, rabbi, rabbinical judge, and school leader known for gleefully documenting his bulldozing of Gaza&ndash;is seen in Gaza. [Social media]",
-            "alt": "Avraham Zarbiv–a settler, soldier, rabbi, rabbinical judge, and school leader known for gleefully documenting his bulldozing of Gaza–is seen in Gaza. [Social media]",
+            "alt": "Avraham Zarbiv\u2013a settler, soldier, rabbi, rabbinical judge, and school leader known for gleefully documenting his bulldozing of Gaza\u2013is seen in Gaza. [Social media]",
             "width": 1920,
             "height": 1080,
             "__typename": "Media"
@@ -1088,7 +1090,7 @@
         {
           "id": "4510917",
           "title": "US issues more Iran sanctions on eve of possible talks in Pakistan",
-          "excerpt": "The Trump administration targets 14 individuals and entities over alleged links to Iran’s arms industry.",
+          "excerpt": "The Trump administration targets 14 individuals and entities over alleged links to Iran\u2019s arms industry.",
           "link": "/news/2026/4/21/us-issues-more-iran-sanctions-on-eve-of-possible-talks-in-pakistan",
           "date": "2026-04-21T20:42:21",
           "showAuthor": true,
@@ -1172,7 +1174,7 @@
         {
           "id": "4511277",
           "title": "Germany, Italy block bid to suspend EU-Israel trade agreement",
-          "excerpt": "Germany and Italy have blocked the European Union from suspending the bloc’s association agreement with Israel.",
+          "excerpt": "Germany and Italy have blocked the European Union from suspending the bloc\u2019s association agreement with Israel.",
           "link": "/video/newsfeed/2026/4/21/germany-italy-block-bid-to-suspend-eu-israel-trade-agreement",
           "date": "2026-04-21T20:16:19",
           "showAuthor": false,
