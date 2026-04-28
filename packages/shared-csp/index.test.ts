@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { buildAstroCspConfig, buildQwikCsp, FRAME_SRC_ORIGINS, SCRIPT_SRC_ORIGINS } from './index';
+import {
+  buildAstroCspConfig,
+  buildQwikCsp,
+  DEFAULT_API_BASE,
+  FRAME_SRC_ORIGINS,
+  SCRIPT_SRC_ORIGINS,
+} from './index';
 
 const API_BASE = 'http://localhost:4455';
 
@@ -104,5 +110,46 @@ describe('shared-csp', () => {
     const qwik = buildQwikCsp(customApiBase);
     expect(JSON.stringify(astro)).not.toContain('localhost:4455');
     expect(qwik).not.toContain('localhost:4455');
+  });
+});
+
+describe('DEFAULT_API_BASE', () => {
+  it('substitutes into Qwik CSP img-src and connect-src as the dev-default', () => {
+    // Stronger than asserting the constant equals a literal — proves wiring:
+    // DEFAULT_API_BASE is shaped so that downstream substitution actually
+    // produces the expected directive.
+    const qwik = buildQwikCsp(DEFAULT_API_BASE);
+    expect(parseQwikDirective(qwik, 'img-src')).toContain(DEFAULT_API_BASE);
+    expect(parseQwikDirective(qwik, 'connect-src')).toContain(DEFAULT_API_BASE);
+  });
+
+  it('passes the apiBase safety guard so consumers can use it without try/catch', () => {
+    expect(() => buildQwikCsp(DEFAULT_API_BASE)).not.toThrow();
+    expect(() => buildAstroCspConfig(DEFAULT_API_BASE)).not.toThrow();
+  });
+});
+
+describe('assertSafeApiBase (via builders)', () => {
+  // The injection guard protects CSP grammar boundaries: whitespace splits a
+  // source list, ';' splits a directive, ',' splits a multi-policy header,
+  // quotes/angle brackets/backslashes/control chars would corrupt the value.
+  // These four cases lock in the rejection so a future refactor can't silently
+  // weaken the regex.
+
+  it('rejects apiBase containing a semicolon (would inject a CSP directive)', () => {
+    expect(() => buildQwikCsp('http://x;script-src *')).toThrow(/apiBase contains/);
+    expect(() => buildAstroCspConfig('http://x;script-src *')).toThrow(/apiBase contains/);
+  });
+
+  it('rejects apiBase containing whitespace (would split the source list)', () => {
+    expect(() => buildQwikCsp('http://x foo')).toThrow(/apiBase contains/);
+  });
+
+  it('rejects apiBase containing a double quote (would corrupt header value)', () => {
+    expect(() => buildQwikCsp('http://x"y')).toThrow(/apiBase contains/);
+  });
+
+  it('rejects apiBase containing a control character (defensive)', () => {
+    expect(() => buildQwikCsp('http://x\u0001y')).toThrow(/control character/);
   });
 });

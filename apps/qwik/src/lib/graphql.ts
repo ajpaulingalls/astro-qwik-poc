@@ -1,3 +1,5 @@
+import { DEFAULT_API_BASE } from '@aje-poc/shared-csp';
+
 export type WpSite = 'aje' | 'aja';
 
 export interface GraphqlFetchOptions {
@@ -18,8 +20,6 @@ export class GraphqlHttpError extends Error {
     super(`graphqlFetch ${operationName} failed: ${status} ${statusText}`);
   }
 }
-
-const DEFAULT_API_BASE = 'http://localhost:4455';
 
 export function resolveApiBase(): string {
   // Build-time replacement first (Vite injects PUBLIC_API_BASE at build).

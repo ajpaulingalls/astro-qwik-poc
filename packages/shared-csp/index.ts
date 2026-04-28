@@ -20,6 +20,15 @@ export const SCRIPT_SRC_ORIGINS: readonly string[] = [
   'https://players.brightcove.net',
 ];
 
+// Single source of truth for the dev-default mock-api URL. Consumers fall
+// back to this when PUBLIC_API_BASE is unset: apps/astro/astro.config.mjs,
+// apps/astro/src/lib/graphql.ts, apps/qwik/src/lib/csp.ts, apps/qwik/server.ts,
+// apps/qwik/src/lib/graphql.ts. (apps/qwik/vite.config.ts also uses the
+// literal but cannot import .ts workspace packages — left inline; see
+// QWIK2_NOTES sprint-007 b419d0cc2c87.) M11 prod build sets PUBLIC_API_BASE
+// to override.
+export const DEFAULT_API_BASE = 'http://localhost:4455';
+
 // Reject apiBase values that could break out of the CSP source-list grammar
 // or the Content-Security-Policy header value: whitespace splits a source
 // list, ';' splits a directive, ',' splits a multi-policy header. Quotes,
