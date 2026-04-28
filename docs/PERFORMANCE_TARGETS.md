@@ -12,11 +12,12 @@ Framework-agnostic performance acceptance targets shared by both the Astro and Q
 
 ## Lighthouse Scores
 
-| Category       | "Good" floor     | **Stretch (target)** | Notes                       |
-| -------------- | ---------------- | -------------------- | --------------------------- |
-| Performance    | ≥ 85 (Qwik beta) | **≥ 98** (Astro)     | Per-target split, see below |
-| Accessibility  | ≥ 90             | ≥ 95                 |                             |
-| Best Practices | ≥ 95             | ≥ 98                 |                             |
-| SEO            | ≥ 95             | ≥ 98                 |                             |
+| Category                | "Good" floor | **Stretch (target)** |
+| ----------------------- | ------------ | -------------------- |
+| Performance (Astro)     | ≥ 95         | **≥ 98**             |
+| Performance (Qwik beta) | ≥ 85         | ≥ 85 (floor only)    |
+| Accessibility           | ≥ 90         | ≥ 95                 |
+| Best Practices          | ≥ 95         | ≥ 98                 |
+| SEO                     | ≥ 95         | ≥ 98                 |
 
 **Performance score is split per framework** (sprint-009): Astro pages hold the stretch ≥ 98; Qwik pages target the measured-realistic ≥ 85 floor because Qwik 2 beta.32 LH-throttled measures 83–90 — the framework runtime parse + chunk graph dominates the throttled-CPU critical path. See [`packages/perf-harness/cli_helpers.ts`](../packages/perf-harness/cli_helpers.ts) `QWIK_LH_PERF_FLOOR` and [`apps/qwik/docs/QWIK2_NOTES.md`](../apps/qwik/docs/QWIK2_NOTES.md) for the audit. The aspirational ≥ 98 target for Qwik returns when Qwik 2 stable ships.
