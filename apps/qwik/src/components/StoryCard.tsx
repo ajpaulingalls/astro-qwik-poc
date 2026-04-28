@@ -1,11 +1,11 @@
 import { component$ } from '@qwik.dev/core';
-import type { HomepagePost } from '@aje-poc/shared-types';
+import type { StoryCardData } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
 import { LeadImage } from './LeadImage';
 import { LiveBadge } from './LiveBadge';
 
 interface Props {
-  post: HomepagePost;
+  post: StoryCardData;
 }
 
 export const StoryCard = component$<Props>(({ post }) => {

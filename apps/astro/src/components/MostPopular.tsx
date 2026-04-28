@@ -1,9 +1,9 @@
-import type { HomepagePost } from '@aje-poc/shared-types';
+import type { StoryCardData } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
 import { SectionHeading } from './SectionHeading';
 
 interface Props {
-  items: HomepagePost[];
+  items: StoryCardData[];
 }
 
 export function MostPopular({ items }: Props) {
