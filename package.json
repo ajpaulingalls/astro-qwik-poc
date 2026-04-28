@@ -24,7 +24,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "typecheck": "bun --filter './apps/*' typecheck",
+    "typecheck": "bun --filter './apps/*' --filter './packages/*' typecheck",
     "prepare": "lefthook install"
   },
   "devDependencies": {

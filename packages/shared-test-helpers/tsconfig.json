@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2022",
     "module": "esnext",
-    "lib": ["es2022", "DOM", "DOM.Iterable"],
+    "lib": ["es2022", "DOM"],
     "strict": true,
     "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
@@ -10,8 +10,7 @@
     "skipLibCheck": true,
     "noEmit": true,
     "incremental": true,
-    "isolatedModules": true,
-    "types": ["node"]
+    "isolatedModules": true
   },
   "include": ["**/*.ts"]
 }
