@@ -8,9 +8,11 @@
     ".": "./index.ts"
   },
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "typescript": "^5.9.0",
     "vitest": "^2.1.0"
   }
 }

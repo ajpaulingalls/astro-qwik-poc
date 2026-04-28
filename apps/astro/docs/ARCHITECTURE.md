@@ -96,96 +96,7 @@ deno run \
 
 ## Mock GraphQL API
 
-### Design Principle
-
-Instead of inventing a GraphQL schema, the mock mirrors the **production API's interface exactly**:
-
-- Accepts GET requests with `operationName` and `variables` as URL parameters
-- Requires the `wp-site` header (`aje` or `aja`)
-- Returns **recorded production response fixtures** — real JSON captured from production calls, with sensitive data scrubbed
-
-### Server Implementation
-
-**Runtime:** Deno 2
-**Port:** `4455` (default)
-
-```typescript
-// mock-api/server.ts — simplified
-const fixtures = new Map<string, unknown>();
-// Load all fixtures from ./fixtures/ directory at startup
-
-Deno.serve({ port: 4455 }, (req: Request) => {
-  const url = new URL(req.url);
-  const operationName = url.searchParams.get('operationName');
-  const wpSite = req.headers.get('wp-site');
-
-  if (!wpSite) {
-    return new Response('Missing wp-site header', { status: 400 });
-  }
-
-  const fixture = fixtures.get(operationName ?? '');
-  if (!fixture) {
-    return new Response(`Unknown operation: ${operationName}`, { status: 404 });
-  }
-
-  // Optional: use variables to select fixture variants
-  // e.g., different article slugs return different fixture files
-
-  return new Response(JSON.stringify(fixture), {
-    headers: {
-      'content-type': 'application/json',
-      'access-control-allow-origin': '*',
-      'access-control-allow-headers': 'wp-site',
-    },
-  });
-});
-```
-
-> Uses Deno 2's built-in `Deno.serve()` rather than the deprecated `std/http/server.ts` `serve()` import.
-
-### Fixture Files
-
-```
-mock-api/fixtures/
-├── HomePageQuery.json
-├── HomePageCuratedFeedQuery.json
-├── ArchipelagoSingleArticleQuery.json
-├── ArchipelagoSingleArticleQuery--sample-slug.json   ← variant
-├── ArchipelagoSingleLiveBlogQuery.json
-├── SingleLiveBlogChildrensQuery.json
-├── LiveBlogUpdateQuery--{postID}.json   ← variant (numeric WP post ID)
-├── ArchipelagoSectionQuery--middle-east.json
-├── ArchipelagoAjeSectionPostsQuery--middle-east--offset-0.json
-├── ArchipelagoTopicsPageQuery--opinion.json
-├── ArchipelagoPaginatedTopicsFeedQuery--opinion--offset-0.json
-├── ArchipelagoBreakingTickerQuery.json
-└── HomePageCuratedFeedQuery.json
-```
-
-### Recording Fixtures
-
-```bash
-curl -s 'https://www.aljazeera.com/graphql?wp-site=aje&operationName=HomePageQuery&variables=%7B%22isAtf%22%3Atrue%2C%22atfLength%22%3A2%2C%22slug%22%3A%22%22%2C%22preview%22%3A%22%22%7D&extensions=%7B%7D' \
-  -H 'wp-site: aje' | python3 -m json.tool > fixtures/HomePageQuery.json
-```
-
-### Environment Variables
-
-| Variable      | Default      | Purpose                                             |
-| ------------- | ------------ | --------------------------------------------------- |
-| `PORT`        | `4455`       | Server port                                         |
-| `WP_SITE`     | `aje`        | Default wp-site if header missing (dev convenience) |
-| `FIXTURE_DIR` | `./fixtures` | Path to fixture JSON files                          |
-
-### Deno Permissions
-
-```bash
-deno run \
-  --allow-net=0.0.0.0:4455 \
-  --allow-read=./fixtures \
-  --allow-env=PORT,WP_SITE,FIXTURE_DIR \
-  server.ts
-```
+> **Mock GraphQL API.** Shared mock server living in `packages/mock-api/`. Full spec — server implementation, fixtures, recording, env vars, Deno permissions — at [docs/MOCK_API.md](../../../docs/MOCK_API.md). Applies identically to both apps.
 
 ---
 
@@ -394,22 +305,9 @@ The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page 
 | **Live Blog**     | < 60 KB   | Polling + dynamic updates + Preact runtime      |
 | **Section Front** | < 45 KB   | Load More button + ticker                       |
 
-### SSR Performance
+### SSR Performance & Lighthouse Scores
 
-| Metric             | Target                                 |
-| ------------------ | -------------------------------------- |
-| **Homepage TTFB**  | < 200ms (from mock API)                |
-| **Article TTFB**   | < 150ms                                |
-| **SSR throughput** | > 50 req/s per page type (single core) |
-
-### Lighthouse Scores
-
-| Category       | "Good" floor | **Stretch (target)** |
-| -------------- | ------------ | -------------------- |
-| Performance    | ≥ 95         | **≥ 98**             |
-| Accessibility  | ≥ 90         | ≥ 95                 |
-| Best Practices | ≥ 95         | ≥ 98                 |
-| SEO            | ≥ 95         | ≥ 98                 |
+> **SSR throughput targets and Lighthouse category scores** (Performance / Accessibility / Best Practices / SEO) are framework-agnostic. Full table — including the per-target Performance split (Astro ≥ 98, Qwik ≥ 85 floor) — at [docs/PERFORMANCE_TARGETS.md](../../../docs/PERFORMANCE_TARGETS.md). Applies identically to both apps.
 
 ---
 

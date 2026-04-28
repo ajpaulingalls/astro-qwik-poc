@@ -9,7 +9,8 @@
   },
   "scripts": {
     "run": "bun run runner.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "chrome-launcher": "^1.1.2",

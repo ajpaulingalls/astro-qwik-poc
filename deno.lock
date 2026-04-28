@@ -118,7 +118,7 @@
             "npm:chrome-launcher@^1.1.2",
             "npm:puppeteer-core@23",
             "npm:tailwindcss@latest",
-            "npm:typescript@latest",
+            "npm:typescript@^5.9.0",
             "npm:vite@^7.3.2",
             "npm:vitest@latest",
             "npm:web-vitals@^4.2.4"
@@ -146,6 +146,7 @@
       "packages/shared-csp": {
         "packageJson": {
           "dependencies": [
+            "npm:typescript@^5.9.0",
             "npm:vitest@^2.1.0"
           ]
         }
@@ -153,6 +154,7 @@
       "packages/shared-test-helpers": {
         "packageJson": {
           "dependencies": [
+            "npm:typescript@^5.9.0",
             "npm:vitest@^2.1.0"
           ]
         }
@@ -160,6 +162,7 @@
       "packages/shared-types": {
         "packageJson": {
           "dependencies": [
+            "npm:typescript@^5.9.0",
             "npm:vitest@^2.1.0"
           ]
         }
