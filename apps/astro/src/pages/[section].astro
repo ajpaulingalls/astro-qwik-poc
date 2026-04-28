@@ -1,11 +1,15 @@
 ---
+import {
+  GEO_API_CATEGORY_TYPE,
+  getSectionType,
+  type HomepagePost,
+  SECTION_PAGE_SIZE,
+} from '@aje-poc/shared-types';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { graphqlFetch, GraphqlHttpError } from '../lib/graphql';
 import { StoryCard } from '../components/StoryCard';
 import { LoadMoreButton } from '../components/LoadMoreButton';
-import { GEO_API_CATEGORY_TYPE, getSectionType, SECTION_PAGE_SIZE } from '../lib/section-type';
 import { LCP_PRELOAD_WIDTH, proportionalHeight, resizedImageUrl } from '../lib/image-url';
-import type { HomepagePost } from '@aje-poc/shared-types';
 
 interface SectionMeta {
   name?: string;

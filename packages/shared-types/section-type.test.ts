@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { getSectionType, GEOGRAPHIC_SECTIONS } from './section-type';
+import {
+  GEO_API_CATEGORY_TYPE,
+  GEOGRAPHIC_SECTIONS,
+  getSectionType,
+  SECTION_PAGE_SIZE,
+} from './index';
 
 describe('getSectionType', () => {
   it('classifies known geographic slugs as geographic', () => {
@@ -25,7 +30,7 @@ describe('getSectionType', () => {
 });
 
 describe('GEOGRAPHIC_SECTIONS', () => {
-  it('matches the production allowlist (apps/astro/docs/ARCHITECTURE.md §Section Type Resolution)', () => {
+  it('matches the production allowlist (apps/{astro,qwik}/docs/ARCHITECTURE.md §Section Type Resolution)', () => {
     expect([...GEOGRAPHIC_SECTIONS]).toEqual([
       'middle-east',
       'asia-pacific',
@@ -34,5 +39,15 @@ describe('GEOGRAPHIC_SECTIONS', () => {
       'africa',
       'latin-america',
     ]);
+  });
+});
+
+describe('section page-size + API category type', () => {
+  it('SECTION_PAGE_SIZE matches production page-size for section feeds', () => {
+    expect(SECTION_PAGE_SIZE).toBe(9);
+  });
+
+  it("GEO_API_CATEGORY_TYPE is the production GraphQL value 'where'", () => {
+    expect(GEO_API_CATEGORY_TYPE).toBe('where');
   });
 });

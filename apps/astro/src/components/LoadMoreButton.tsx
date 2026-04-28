@@ -1,7 +1,11 @@
 import { useState } from 'preact/hooks';
+import {
+  GEO_API_CATEGORY_TYPE,
+  type HomepagePost,
+  SECTION_PAGE_SIZE,
+  type SectionType,
+} from '@aje-poc/shared-types';
 import { graphqlFetch, GraphqlHttpError } from '../lib/graphql';
-import { GEO_API_CATEGORY_TYPE, SECTION_PAGE_SIZE, type SectionType } from '../lib/section-type';
-import type { HomepagePost } from '@aje-poc/shared-types';
 import { StoryCard } from './StoryCard';
 
 interface Props {

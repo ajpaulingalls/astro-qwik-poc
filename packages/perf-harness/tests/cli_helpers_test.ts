@@ -93,10 +93,10 @@ describe('buildPageList', () => {
       const topic = pages.find((p) => p.name === 'section-topic');
       expect(geo, `${target} section-geo`).toBeDefined();
       expect(topic, `${target} section-topic`).toBeDefined();
-      // Geographic vs topic distinction comes from the per-app section-type
-      // allowlist (apps/*/src/lib/section-type.ts). middle-east is geographic;
-      // opinion is topic. Hardcoding here keeps perf-harness independent of
-      // the apps' allowlists — a drift will fail the section-type tests, not
+      // Geographic vs topic distinction comes from the shared section-type
+      // allowlist (@aje-poc/shared-types). middle-east is geographic;
+      // opinion is topic. Hardcoding here keeps this gate independent of
+      // the allowlist — a drift will fail the shared-types tests, not
       // this gate.
       expect(geo!.path).toBe('/middle-east');
       expect(topic!.path).toBe('/opinion');
