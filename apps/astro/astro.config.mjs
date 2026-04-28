@@ -3,13 +3,13 @@ import { defineConfig, fontProviders } from 'astro/config';
 import preact from '@astrojs/preact';
 import deno from '@deno/astro-adapter';
 import tailwindcss from '@tailwindcss/vite';
-import { buildAstroCspConfig } from '@aje-poc/shared-csp';
+import { buildAstroCspConfig, DEFAULT_API_BASE } from '@aje-poc/shared-csp';
 
 // PUBLIC_API_BASE is baked into Astro CSP at build time. Local dev and
 // perf-harness:astro both run the mock-api on 4455, matching the default;
 // for M11 prod build, set PUBLIC_API_BASE=https://… in the build env so
 // img-src + connect-src reflect the actual API host.
-const API_BASE = process.env.PUBLIC_API_BASE ?? 'http://localhost:4455';
+const API_BASE = process.env.PUBLIC_API_BASE ?? DEFAULT_API_BASE;
 
 // https://astro.build/config
 export default defineConfig({

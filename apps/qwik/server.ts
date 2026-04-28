@@ -24,6 +24,7 @@ import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import middleware from './server/entry.preview.js';
 import { CSP } from './src/lib/csp.ts';
+import { DEFAULT_API_BASE } from '@aje-poc/shared-csp';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST_ROOT = resolve(__dirname, 'dist');
@@ -32,7 +33,7 @@ const HOST = process.env.HOST ?? '127.0.0.1';
 const PORT = Number(process.env.PORT ?? 4173);
 // Same-origin proxy target for /wp-content/uploads/* — see vite.config.ts
 // for the dev/preview equivalent and docs/QWIK2_NOTES.md for the why.
-const API_BASE = process.env.PUBLIC_API_BASE ?? 'http://localhost:4455';
+const API_BASE = process.env.PUBLIC_API_BASE ?? DEFAULT_API_BASE;
 
 const MIME: Record<string, string> = {
   '.js': 'text/javascript; charset=utf-8',

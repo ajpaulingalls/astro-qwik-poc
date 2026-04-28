@@ -4,7 +4,7 @@
 // import CSP from here so the header value is computed once at module
 // load using the runtime PUBLIC_API_BASE (perf-harness sets 4456 for
 // Qwik via spawn.ts; M11 prod will set https://… for the live demo).
-import { buildQwikCsp } from '@aje-poc/shared-csp';
+import { buildQwikCsp, DEFAULT_API_BASE } from '@aje-poc/shared-csp';
 
-const API_BASE = process.env.PUBLIC_API_BASE ?? 'http://localhost:4455';
+const API_BASE = process.env.PUBLIC_API_BASE ?? DEFAULT_API_BASE;
 export const CSP = buildQwikCsp(API_BASE);
