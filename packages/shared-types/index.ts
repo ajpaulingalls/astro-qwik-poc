@@ -1,5 +1,6 @@
-// Consolidation target for concern 1fa6ff30b786: previously duplicated in
-// apps/{astro,qwik}/src/lib/homepage-types.ts. Both apps now import from here.
+// Consolidation target for cross-app shared types and section-routing
+// constants. Previously duplicated under apps/{astro,qwik}/src/lib/
+// (homepage-types.ts, section-type.ts). Both apps import from here.
 
 export interface HomepageImage {
   sourceUrl: string;
@@ -70,3 +71,32 @@ export interface Article {
   categories: ArticleCategory[];
   featuredImage?: HomepageImage | null;
 }
+
+// Production routes /{section} as either a geographic section (apps/{astro,
+// qwik}/docs/ARCHITECTURE.md §Section Type Resolution) or a topic page. The
+// allowlist is the only authority for the geographic branch — slugs not in
+// it are treated as topics, and 404 is decided by fixture/live presence at
+// fetch time.
+export const GEOGRAPHIC_SECTIONS = [
+  'middle-east',
+  'asia-pacific',
+  'us-canada',
+  'europe',
+  'africa',
+  'latin-america',
+] as const;
+
+export type SectionType = 'geographic' | 'topic';
+
+export function getSectionType(slug: string): SectionType {
+  return (GEOGRAPHIC_SECTIONS as readonly string[]).includes(slug) ? 'geographic' : 'topic';
+}
+
+// Production page-size for section feeds (initial render and each LoadMore
+// click). Mirrored in mock-api fixtures and perf-harness acceptance tests.
+export const SECTION_PAGE_SIZE = 9;
+
+// API value of `categoryType` for geographic sections. Internal vocabulary
+// is 'geographic'/'topic' (SectionType); production GraphQL expects 'where'.
+// Mapped at the API boundary by the section route + LoadMoreButton in each app.
+export const GEO_API_CATEGORY_TYPE = 'where';
