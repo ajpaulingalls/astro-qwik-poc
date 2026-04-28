@@ -64,6 +64,26 @@ type CspDirectivePrefix =
   | `connect-src${string}`
   | `frame-src${string}`;
 
+// Compile-time lock: if CspDirectivePrefix above is widened (e.g. a prefix
+// removed, or accidentally `string`) without updating the list below, tsc
+// fails with "Type 'false' is not assignable to type 'true'". Without this,
+// widening to `string` is silent — Astro's directive narrowing breaks but
+// every test still passes. Keep the two lists in lockstep.
+type _Equal<X, Y> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
+type _Expect<T extends true> = T;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type _CspDirectivePrefixIsExact = _Expect<
+  _Equal<
+    CspDirectivePrefix,
+    | `default-src${string}`
+    | `img-src${string}`
+    | `font-src${string}`
+    | `connect-src${string}`
+    | `frame-src${string}`
+  >
+>;
+
 export function buildAstroCspConfig(apiBase: string): {
   scriptDirective: { resources: string[] };
   directives: CspDirectivePrefix[];
