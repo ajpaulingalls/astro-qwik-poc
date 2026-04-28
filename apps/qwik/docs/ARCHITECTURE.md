@@ -377,21 +377,18 @@ Qwik Router (`@qwik.dev/router`) uses **directory-based routing**:
 ### Section Type Resolution
 
 ```typescript
-const GEOGRAPHIC_SECTIONS = [
-  'middle-east',
-  'asia-pacific',
-  'us-canada',
-  'europe',
-  'africa',
-  'latin-america',
-];
-
-function getSectionType(section: string): 'geographic' | 'topic' {
-  return GEOGRAPHIC_SECTIONS.includes(section) ? 'geographic' : 'topic';
-}
+import {
+  GEOGRAPHIC_SECTIONS,
+  GEO_API_CATEGORY_TYPE,
+  getSectionType,
+  SECTION_PAGE_SIZE,
+} from '@aje-poc/shared-types';
+// GEOGRAPHIC_SECTIONS allowlist + getSectionType classifier + page-size live in
+// the shared-types workspace package — both apps and the perf-harness consume
+// the single source of truth (see packages/shared-types/index.ts).
 ```
 
-- **Geographic** → `ArchipelagoSectionQuery` (ID 64) with `categoryType: "where"`
+- **Geographic** → `ArchipelagoSectionQuery` (ID 64) with `categoryType: GEO_API_CATEGORY_TYPE` (`"where"`)
 - **Topic** → `ArchipelagoTopicsPageQuery` (ID 92) with `slug`
 
 ---
@@ -403,6 +400,13 @@ function getSectionType(section: string): 'geographic' | 'topic' {
 The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page acceptance criteria use the stretch column; a measured value worse than the floor fails the milestone outright. INP is measured on interactive components via puppeteer-core-driven interactions in the M2 harness; LCP/CLS on all page types under 4G throttling.
 
 > Same stretch targets apply to the Astro PoC — see top-level [README.md](../../../README.md#performance-targets--stretch-goals) for the canonical thresholds table.
+
+> **INP measurement divergence — read before tuning interactive components.** Two distinct INP code paths exist today:
+>
+> 1. **Acceptance suite** (`packages/perf-harness/acceptance.ts`) measures a synthetic **click → DOM-mutation latency** budget (`SECTION_LOADMORE_LATENCY_BUDGET_MS = 500ms`). This is a pragmatic INP _proxy_ — the same UX semantic (user clicks, user sees the result) as INP but driven by puppeteer instead of `PerformanceObserver`. Synthetic puppeteer clicks don't reliably emit `event-timing` entries, so the proxy is the only viable signal in CI today.
+> 2. **Real INP capture** is a future perf-harness item (deferred; see `acceptance.ts:84-90`). When `onINP` lands in the harness, it will measure the real Web Vital from `web-vitals` event-timing entries, separately from the click→mutation budget above.
+>
+> The M8 done-state names INP ≤ 100ms — that's the real-user metric the future perf-harness gate will enforce. The 500ms acceptance budget is a different, looser, synthetic check. Don't assume one number constrains the other; they instrument different things.
 
 ### JavaScript Budgets (Transferred, all script bytes per Lighthouse network-requests)
 
