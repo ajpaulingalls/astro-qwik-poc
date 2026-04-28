@@ -389,13 +389,18 @@ export function runAcceptanceSuite(target: Target): void {
           const result = await withPage(
             DESKTOP,
             async (page) => {
-              // Both apps emit `<button aria-busy="false">Load more</button>`
-              // once mounted; the layout's hamburger button has aria-label,
-              // not aria-busy, so this selector is unambiguous on section pages.
+              // Wait for `data-hydrated="true"` on the LoadMore button before
+              // clicking. The contract: a LoadMoreButton emits this attribute
+              // once its click handler is bound (Astro Preact mount, Qwik
+              // useVisibleTask$ with document-ready strategy). aria-busy alone
+              // matches even at SSR time, so a click on aria-busy could race
+              // the framework and either drop the click (Astro pre-idle) or
+              // burn the latency budget on a QRL chunk download (Qwik).
+              // Waiting on data-hydrated removes both timing windows.
               await page.waitForFunction(
                 (size: number) =>
                   document.querySelectorAll('article').length === size &&
-                  !!document.querySelector('button[aria-busy]'),
+                  !!document.querySelector('button[data-hydrated="true"]'),
                 { timeout: 10_000 },
                 SECTION_PAGE_SIZE,
               );
@@ -405,7 +410,7 @@ export function runAcceptanceSuite(target: Target): void {
               const urlBeforeClick = page.url();
 
               const t0 = Date.now();
-              await page.click('button[aria-busy]');
+              await page.click('button[data-hydrated="true"]');
 
               await page.waitForFunction(
                 (size: number) => document.querySelectorAll('article').length >= size * 2,

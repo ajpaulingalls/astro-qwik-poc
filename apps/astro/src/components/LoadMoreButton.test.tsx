@@ -34,6 +34,16 @@ describe('LoadMoreButton', () => {
     expect(container.querySelectorAll('article').length).toBe(0);
   });
 
+  it('flips data-hydrated to "true" after mount (acceptance-suite contract)', async () => {
+    const { getByRole } = render(
+      <LoadMoreButton section="middle-east" categoryType="geographic" initialOffset={9} />,
+    );
+    const button = getByRole('button', { name: /load more/i }) as HTMLButtonElement;
+    await waitFor(() => {
+      expect(button.getAttribute('data-hydrated')).toBe('true');
+    });
+  });
+
   it('disables the button and sets aria-busy while a fetch is in flight (double-click guard)', async () => {
     let resolveFetch!: (value: Response) => void;
     const original = globalThis.fetch;
