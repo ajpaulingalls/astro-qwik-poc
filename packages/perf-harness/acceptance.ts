@@ -235,6 +235,50 @@ export function runAcceptanceSuite(target: Target): void {
       expect(probe.headers.get('content-type')).toBe('image/png');
     });
 
+    // CSP must reach the browser with the runtime apiBase substituted in,
+    // not just the build-time default. Carriers per target:
+    // - Qwik: HTTP header set by server.ts. Header is the only emit point.
+    // - Astro: Astro 6's security.csp emits via TWO paths — page.js sets the
+    //   HTTP header AND head.js injects a <meta http-equiv> tag. Either is
+    //   sufficient (a meta tag is what matters to the browser when the
+    //   adapter strips response headers, which the @deno/astro-adapter has
+    //   been observed to do). Assert OR for Astro to match the framework's
+    //   own redundancy; assert HEADER ONLY for Qwik (no meta path exists).
+    it('serves Content-Security-Policy with apiBase substituted at request time', async () => {
+      const expectedApiBase = `http://localhost:${MOCK_API_PORT[target]}`;
+      const response = await fetch(APP_URL);
+      const html = await response.text();
+
+      const headerCsp = response.headers.get('content-security-policy');
+      // Match either attribute order (http-equiv before content, or vice versa)
+      // so a template tweak that swaps them doesn't silently null-match.
+      const metaMatch =
+        html.match(
+          /<meta\s+http-equiv=["']content-security-policy["']\s+content=["']([^"']+)["']/i,
+        ) ??
+        html.match(
+          /<meta\s+content=["']([^"']+)["']\s+http-equiv=["']content-security-policy["']/i,
+        );
+      const metaCsp = metaMatch ? metaMatch[1] : null;
+
+      const csp = target === 'qwik' ? headerCsp : (headerCsp ?? metaCsp);
+      const carrierMessage =
+        target === 'qwik'
+          ? 'Qwik must serve CSP via HTTP header (server.ts setHeader)'
+          : 'Astro must emit CSP via HTTP header or <meta http-equiv> tag (security.csp config)';
+      expect(csp, carrierMessage).not.toBeNull();
+
+      // Three properties prove the wiring end-to-end:
+      // - default-src 'self' is the canonical baseline both builders emit;
+      // - apiBase substituted into img-src/connect-src proves the runtime
+      //   PUBLIC_API_BASE flowed through to the served CSP;
+      // - frame-src includes a known embed origin (youtube), proving
+      //   FRAME_SRC_ORIGINS made it into the directive list.
+      expect(csp).toContain("default-src 'self'");
+      expect(csp).toContain(expectedApiBase);
+      expect(csp).toContain('https://www.youtube.com');
+    });
+
     // The /wp-content/uploads/* proxy must forward the query string so the
     // ?w=&resize= resize hints reach mock-api. LeadImage emits srcset URLs
     // carrying these params; if the proxy strips them, every srcset entry
