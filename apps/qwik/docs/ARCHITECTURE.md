@@ -401,12 +401,7 @@ The PoC aims to **exceed** the "Good" thresholds, not just clear them. Per-page 
 
 > Same stretch targets apply to the Astro PoC — see top-level [README.md](../../../README.md#performance-targets--stretch-goals) for the canonical thresholds table.
 
-> **INP measurement divergence — read before tuning interactive components.** Two distinct INP code paths exist today:
->
-> 1. **Acceptance suite** (`packages/perf-harness/acceptance.ts`) measures a synthetic **click → DOM-mutation latency** budget (`SECTION_LOADMORE_LATENCY_BUDGET_MS = 500ms`). This is a pragmatic INP _proxy_ — the same UX semantic (user clicks, user sees the result) as INP but driven by puppeteer instead of `PerformanceObserver`. Synthetic puppeteer clicks don't reliably emit `event-timing` entries, so the proxy is the only viable signal in CI today.
-> 2. **Real INP capture** is a future perf-harness item (deferred; see `acceptance.ts:84-90`). When `onINP` lands in the harness, it will measure the real Web Vital from `web-vitals` event-timing entries, separately from the click→mutation budget above.
->
-> The M8 done-state names INP ≤ 100ms — that's the real-user metric the future perf-harness gate will enforce. The 500ms acceptance budget is a different, looser, synthetic check. Don't assume one number constrains the other; they instrument different things.
+> **INP measurement divergence — read before tuning interactive components.** Two distinct INP code paths exist (acceptance-suite click→DOM-mutation proxy vs future real `onINP` capture). The full callout lives in [docs/PERF_INSTRUMENTATION.md § INP measurement divergence](../../../docs/PERF_INSTRUMENTATION.md#inp-measurement-divergence) — applies identically to both apps.
 
 ### JavaScript Budgets (Transferred, all script bytes per Lighthouse network-requests)
 
