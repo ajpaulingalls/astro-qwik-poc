@@ -1,9 +1,10 @@
-import { component$ } from '@qwik.dev/core';
-
 interface Props {
   html: string;
 }
 
-export const YouTubeEmbed = component$<Props>(({ html }) => {
+// Leaf component — see apps/qwik/docs/QWIK2_NOTES.md "Leaf component convention".
+// No signals, no $()-wrapped handlers, no Slot. component$ would emit a QRL chunk
+// for pure overhead; plain function lands inline at each call site.
+export function YouTubeEmbed({ html }: Props) {
   return <div class="embed-youtube" dangerouslySetInnerHTML={html} />;
-});
+}
