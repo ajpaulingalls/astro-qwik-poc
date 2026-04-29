@@ -72,19 +72,37 @@ export function LiveBlogUpdater({ slug, initialChildIds }: Props) {
   // current value without re-arming the interval on every state change.
   const newEntriesRef = useRef<LiveBlogUpdate[]>([]);
   newEntriesRef.current = newEntries;
+  // Concurrency guard: if a fetch from tick N stalls past the 30s
+  // interval, tick N+1 must NOT fire a second concurrent fetch — the
+  // older fetch could resolve last and prepend stale entries above
+  // newer ones. Drop the late tick on the floor; the next tick after
+  // pollingRef clears picks up the latest known ids. Mirrors the Qwik
+  // LiveBlogUpdater guard.
+  const pollingRef = useRef(false);
 
   useEffect(() => {
     sectionRef.current?.setAttribute('data-hydrated', 'true');
     const intervalId = setInterval(async () => {
+      if (pollingRef.current) return;
       // Skip background tabs — no point burning the user's battery (and the
       // server) when entries aren't being read. document is always defined
       // here (this useEffect is browser-only).
       if (document.hidden) return;
-      const polled = newEntriesRef.current.map((e) => Number(e.id));
-      const known = [...polled, ...initialChildIds];
-      const fresh = await fetchPollUpdate(slug, known);
-      if (fresh.length === 0) return;
-      setNewEntries((prev) => [...fresh, ...prev]);
+      pollingRef.current = true;
+      try {
+        const polled = newEntriesRef.current.map((e) => Number(e.id));
+        const known = [...polled, ...initialChildIds];
+        const fresh = await fetchPollUpdate(slug, known);
+        if (fresh.length === 0) return;
+        setNewEntries((prev) => [...fresh, ...prev]);
+      } catch (err) {
+        // fetchLiveBlogShell or any other unhandled awaitable can reject
+        // (5xx, network, parse). Without this catch the rejection becomes
+        // an unhandled promise rejection at every tick.
+        console.error('liveblog-updater: poll tick failed:', err);
+      } finally {
+        pollingRef.current = false;
+      }
     }, POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [slug, initialChildIds]);

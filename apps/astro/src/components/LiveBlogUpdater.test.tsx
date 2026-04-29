@@ -175,6 +175,36 @@ describe('LiveBlogUpdater', () => {
     expect(region!.children.length).toBe(0);
   });
 
+  it('skips overlapping ticks while a previous fetch is in flight (concurrency guard)', async () => {
+    let pendingResolve: ((r: Response) => void) | undefined;
+    const originalFetch = globalThis.fetch;
+    const fetchSpy = vi.fn(
+      () =>
+        new Promise<Response>((resolve) => {
+          pendingResolve = resolve;
+        }),
+    );
+    globalThis.fetch = fetchSpy as unknown as typeof fetch;
+    try {
+      render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001]} />);
+      // Tick 1 arms the first fetch.
+      await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      // Tick 2 fires while the prior fetch is still pending — guard skips it.
+      await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+      // Resolve tick 1; let microtasks flush.
+      pendingResolve!(new Response(JSON.stringify(shellResponse([4001]).body), { status: 200 }));
+      await Promise.resolve();
+      await Promise.resolve();
+      // Tick 3 proceeds normally now that the guard has cleared.
+      await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+      expect(fetchSpy).toHaveBeenCalledTimes(2);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   it('polls every 30s, prepends fetched updates, and inserts newest at the top', async () => {
     mock = mockFetchSequence([
       // First poll tick: 4099 is new
