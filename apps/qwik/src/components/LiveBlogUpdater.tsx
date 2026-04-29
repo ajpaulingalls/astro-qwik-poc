@@ -88,16 +88,36 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
   useVisibleTask$(
     ({ cleanup }) => {
       hydrated.value = true;
+      // Concurrency guard: if a fetch from tick N stalls past the 30s
+      // interval, tick N+1 must NOT fire a second concurrent fetch — the
+      // older fetch could resolve last and prepend stale entries above
+      // newer ones. Drop the late tick on the floor; the next tick after
+      // `polling` clears will pick up the latest known ids. Production
+      // upgrade path: AbortController + sequence number to actively
+      // cancel the stalled fetch.
+      let polling = false;
       const intervalId = setInterval(async () => {
+        if (polling) return;
         // Skip background tabs — no point burning the user's battery (and the
         // server) when the entries aren't being read. useVisibleTask$ is
         // client-only, so document is always defined here.
         if (document.hidden) return;
-        const polledIds = newEntries.value.map((e) => Number(e.id));
-        const known = [...polledIds, ...initialChildIds];
-        const fresh = await fetchPollUpdate(slug, known);
-        if (fresh.length === 0) return;
-        newEntries.value = [...fresh, ...newEntries.value];
+        polling = true;
+        try {
+          const polledIds = newEntries.value.map((e) => Number(e.id));
+          const known = [...polledIds, ...initialChildIds];
+          const fresh = await fetchPollUpdate(slug, known);
+          if (fresh.length === 0) return;
+          newEntries.value = [...fresh, ...newEntries.value];
+        } catch (err) {
+          // fetchLiveBlogShell or any other unhandled awaitable can reject
+          // (5xx, network, parse). Without this catch the rejection becomes
+          // an unhandled promise rejection at every tick. The `finally`
+          // still resets polling so the next tick proceeds.
+          console.error('liveblog-updater: poll tick failed:', err);
+        } finally {
+          polling = false;
+        }
       }, POLL_INTERVAL_MS);
       cleanup(() => clearInterval(intervalId));
     },
