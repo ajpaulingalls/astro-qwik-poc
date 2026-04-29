@@ -59,7 +59,7 @@ exist but can be ignored for the PoC.
 | `LiveBlogUpdateQuery`                    | `{ postID: <int>, postType: "liveblog-update", preview: "", isAmp: false }` | Individual update content (title, HTML body, author, date). **`postType` must be `"liveblog-update"`** (hyphenated); omitting `preview`/`isAmp` or using `"liveblog"` returns `no_posts_found`. |
 | `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                                        | Breaking news ticker                                                                                                                                                                            |
 
-> **PoC polling design + CLS-on-prepend gate moved out of this file.** RESEARCH.md is scoped to verified production behavior; PoC implementation choices (poll cadence, diff strategy, skeleton reservation) live in each app's docs — see `apps/qwik/docs/ARCHITECTURE.md` § "Live blog polling" for the Qwik implementation. The Astro counterpart will land in `apps/astro/docs/ARCHITECTURE.md` with story-003.
+> **PoC polling design + CLS-on-prepend gate moved out of this file.** RESEARCH.md is scoped to verified production behavior; PoC implementation choices (poll cadence, diff strategy, skeleton reservation) live in each app's docs — `apps/qwik/docs/ARCHITECTURE.md` § "Live blog polling" for the Qwik implementation, `apps/astro/docs/ARCHITECTURE.md` § "Live blog polling" for the Astro implementation.
 
 #### Snapshot rotation in the mock-api
 

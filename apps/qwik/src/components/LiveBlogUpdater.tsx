@@ -1,9 +1,11 @@
 import { component$, useSignal, useVisibleTask$ } from '@qwik.dev/core';
-import type { LiveBlogChildrenIds } from '@aje-poc/shared-types';
+import {
+  LIVEBLOG_POLL_INTERVAL_MS,
+  type LiveBlogChildrenIds,
+  type LiveBlogUpdate,
+} from '@aje-poc/shared-types';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
-import { LiveBlogEntry, type LiveBlogUpdate } from './LiveBlogEntry';
-
-const POLL_INTERVAL_MS = 30_000;
+import { LiveBlogEntry } from './LiveBlogEntry';
 
 // Exported for unit tests — see LiveBlogUpdater.test.tsx header for the
 // qwikLoader/createDOM rationale that forces helper-extraction.
@@ -51,7 +53,7 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
       const fresh = await fetchPollUpdate(slug, known);
       if (fresh.length === 0) return;
       newEntries.value = [...fresh, ...newEntries.value];
-    }, POLL_INTERVAL_MS);
+    }, LIVEBLOG_POLL_INTERVAL_MS);
     cleanup(() => clearInterval(intervalId));
   });
 

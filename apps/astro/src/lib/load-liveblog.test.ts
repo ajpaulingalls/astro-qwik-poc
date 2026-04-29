@@ -1,11 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockFetchSequence } from '@aje-poc/shared-test-helpers';
-import {
-  loadLiveBlogData,
-  INITIAL_ENTRY_COUNT,
-  type LiveBlogPageData,
-  type LiveBlogNotFound,
-} from './load-liveblog';
+import { loadLiveBlogData, type LiveBlogPageData, type LiveBlogNotFound } from './load-liveblog';
 
 function expectFound(result: LiveBlogPageData | LiveBlogNotFound): LiveBlogPageData {
   if ('notFound' in result) throw new Error('expected loadLiveBlogData to return page data');
@@ -82,10 +77,6 @@ describe('loadLiveBlogData', () => {
   afterEach(() => {
     mock?.restore();
     vi.unstubAllEnvs();
-  });
-
-  it('exports an INITIAL_ENTRY_COUNT of 5 (per wave-2 plan)', () => {
-    expect(INITIAL_ENTRY_COUNT).toBe(5);
   });
 
   it('fetches the shell then the first 5 children in parallel and returns shaped data', async () => {

@@ -1,15 +1,5 @@
-import type { LiveBlogShell } from '@aje-poc/shared-types';
+import type { LiveBlogShell, LiveBlogUpdate } from '@aje-poc/shared-types';
 import { graphqlFetch } from './graphql';
-
-export interface LiveBlogUpdate {
-  id: string;
-  title: string;
-  // Production sometimes returns updates whose title is internal-only and
-  // should not render (e.g., a tweet-only update). Honored by LiveBlogEntry.
-  shouldDisplayTitle: boolean;
-  content: string;
-  date: string;
-}
 
 interface SingleLiveBlogData {
   article: LiveBlogShell | null;

@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { fetchLiveBlogShell, fetchLiveBlogUpdate, type LiveBlogUpdate } from '../lib/liveblog-api';
+import { LIVEBLOG_POLL_INTERVAL_MS, type LiveBlogUpdate } from '@aje-poc/shared-types';
+import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
-
-const POLL_INTERVAL_MS = 30_000;
 
 // Exported for unit tests. Polls the shell, diffs against currentIds,
 // fetches per-update content for any new ids in parallel, and returns the
@@ -60,7 +59,7 @@ export function LiveBlogUpdater({ slug, initialChildIds }: Props) {
       const fresh = await fetchPollUpdate(slug, known);
       if (fresh.length === 0) return;
       setNewEntries((prev) => [...fresh, ...prev]);
-    }, POLL_INTERVAL_MS);
+    }, LIVEBLOG_POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [slug, initialChildIds]);
 

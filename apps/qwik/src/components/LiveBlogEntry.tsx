@@ -1,16 +1,6 @@
+import type { LiveBlogUpdate } from '@aje-poc/shared-types';
 import { formatDate } from '../lib/format-date';
 import { ArticleBody } from './ArticleBody';
-
-export interface LiveBlogUpdate {
-  id: string;
-  title: string;
-  shouldDisplayTitle: boolean;
-  date: string;
-  // Trusted CMS HTML — may carry Twitter/Brightcove/YouTube/gallery embeds.
-  // ArticleBody dispatches embeds via parseEmbeds; raw injection would
-  // strip the embed scripts and break interactive content.
-  content: string;
-}
 
 interface Props {
   entry: LiveBlogUpdate;

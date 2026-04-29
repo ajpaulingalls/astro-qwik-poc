@@ -89,7 +89,40 @@ export interface LiveBlogChildMeta {
   publishedTime: string;
 }
 
+// shouldDisplayTitle: production sometimes returns updates whose title is
+// internal-only (e.g., a tweet-only entry); honored by LiveBlogEntry.
+// content: trusted CMS HTML carrying Twitter/Brightcove/YouTube/gallery
+// embeds — must be dispatched via ArticleBody/parseEmbeds, not raw-injected.
+export interface LiveBlogUpdate {
+  id: string;
+  title: string;
+  shouldDisplayTitle: boolean;
+  content: string;
+  date: string;
+}
+
+// Render-needed projection of LiveBlogShell consumed by LiveBlogHeader in
+// both apps. Qwik's routeLoader projects the shell down to this shape so
+// the larger LiveBlogShell doesn't enter the resume payload; Astro mirrors
+// the projection to keep the component contract identical across apps.
+// Encoded as Pick so a future drift in LiveBlogShell.featuredImage (etc.)
+// propagates here automatically instead of silently desyncing.
+export type LiveBlogHeaderData = Pick<
+  LiveBlogShell,
+  'title' | 'subheading' | 'excerpt' | 'isLive' | 'date' | 'featuredImage'
+>;
+
 export type LiveBlogChildrenIds = number[];
+
+// Live-blog poll cadence — both apps' Updaters arm a setInterval at this
+// rate. M9 spec target; not a production-observed cadence (RESEARCH.md
+// §Live Blog).
+export const LIVEBLOG_POLL_INTERVAL_MS = 30_000;
+
+// Above-the-fold entries the routes fetch in parallel during SSR.
+// Production's iran-war live blog has ~128 children; 5 is what shows above
+// the fold, with "Load older" deferred to a future story.
+export const LIVEBLOG_INITIAL_ENTRY_COUNT = 5;
 
 export interface LiveBlogShell {
   id: string;

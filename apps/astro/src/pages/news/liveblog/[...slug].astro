@@ -1,6 +1,7 @@
 ---
+import type { LiveBlogHeaderData } from '@aje-poc/shared-types';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { LiveBlogHeader, type LiveBlogHeaderData } from '../../../components/LiveBlogHeader';
+import { LiveBlogHeader } from '../../../components/LiveBlogHeader';
 import { LiveBlogEntry } from '../../../components/LiveBlogEntry';
 import { LiveBlogUpdater } from '../../../components/LiveBlogUpdater';
 import { loadLiveBlogData } from '../../../lib/load-liveblog';
@@ -15,8 +16,9 @@ if ('notFound' in result) {
 const { shell, entries } = result;
 
 // Header receives a projected slice of the shell. Astro doesn't need to trim
-// for serialization (Qwik does — see apps/qwik/src/components/LiveBlogHeader.tsx),
-// but mirroring the shape keeps the cross-app component contract identical.
+// for serialization (Qwik does — see the routeLoader in
+// apps/qwik/src/routes/news/liveblog/[...slug]/index.tsx), but mirroring the
+// shape keeps the cross-app component contract identical.
 const header: LiveBlogHeaderData = {
   title: shell.title,
   subheading: shell.subheading,

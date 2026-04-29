@@ -1,7 +1,8 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render } from '@testing-library/preact';
-import { LiveBlogHeader, type LiveBlogHeaderData } from './LiveBlogHeader';
+import type { LiveBlogHeaderData } from '@aje-poc/shared-types';
+import { LiveBlogHeader } from './LiveBlogHeader';
 
 const baseHeader: LiveBlogHeaderData = {
   title: 'Iran war live',

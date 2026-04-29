@@ -1,16 +1,7 @@
-import type { HomepageImage } from '@aje-poc/shared-types';
+import type { LiveBlogHeaderData } from '@aje-poc/shared-types';
 import { formatDate } from '../lib/format-date';
 import { LeadImage } from './LeadImage';
 import { LiveBadge } from './LiveBadge';
-
-export interface LiveBlogHeaderData {
-  title: string;
-  subheading?: string;
-  excerpt?: string;
-  isLive: boolean;
-  date: string;
-  featuredImage?: HomepageImage | null;
-}
 
 interface Props {
   header: LiveBlogHeaderData;
