@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { LiveBlogHeader, type LiveBlogHeaderData } from '../../../components/LiveBlogHeader';
+import { LiveBlogEntry } from '../../../components/LiveBlogEntry';
 import { loadLiveBlogData } from '../../../lib/load-liveblog';
 
 const rawSlug = Astro.params.slug ?? '';
@@ -10,11 +12,25 @@ if ('notFound' in result) {
   return new Response(`Live blog not found: ${slugLeaf}`, { status: 404 });
 }
 const { shell, entries } = result;
+
+// Header receives a projected slice of the shell. Astro doesn't need to trim
+// for serialization (Qwik does — see apps/qwik/src/components/LiveBlogHeader.tsx),
+// but mirroring the shape keeps the cross-app component contract identical.
+const header: LiveBlogHeaderData = {
+  title: shell.title,
+  subheading: shell.subheading,
+  excerpt: shell.excerpt,
+  isLive: shell.isLive,
+  date: shell.date,
+  featuredImage: shell.featuredImage,
+};
 ---
 
 <BaseLayout title={shell.title}>
   <main class="mx-auto max-w-3xl px-4 py-6">
-    <h1>{shell.title}</h1>
-    <p>{entries.length} initial entries hydrated</p>
+    <LiveBlogHeader header={header} />
+    <section class="live-blog-entries">
+      {entries.map((entry) => <LiveBlogEntry entry={entry} />)}
+    </section>
   </main>
 </BaseLayout>
