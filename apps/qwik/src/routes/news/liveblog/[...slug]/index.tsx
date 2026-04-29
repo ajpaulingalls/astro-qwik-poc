@@ -1,29 +1,11 @@
 import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead, type RequestEventLoader } from '@qwik.dev/router';
 import { graphqlFetch, GraphqlHttpError } from '../../../../lib/graphql';
-import type { HomepageImage, LiveBlogChildrenIds, LiveBlogShell } from '@aje-poc/shared-types';
+import type { LiveBlogChildrenIds, LiveBlogShell } from '@aje-poc/shared-types';
+import { LiveBlogHeader, type LiveBlogHeaderData } from '../../../../components/LiveBlogHeader';
+import { LiveBlogEntry, type LiveBlogUpdate } from '../../../../components/LiveBlogEntry';
 
 const INITIAL_ENTRY_COUNT = 5;
-
-// Per-update payload shape — narrow projection of the production
-// LiveBlogUpdateQuery response. Only fields the entry component renders
-// are kept so the resume payload stays small.
-export interface LiveBlogUpdate {
-  id: string;
-  title: string;
-  shouldDisplayTitle: boolean;
-  date: string;
-  content: string;
-}
-
-export interface LiveBlogHeaderData {
-  title: string;
-  subheading?: string;
-  excerpt?: string;
-  isLive: boolean;
-  date: string;
-  featuredImage?: HomepageImage | null;
-}
 
 export interface LiveBlogLoaderSuccess {
   slug: string;
@@ -109,10 +91,15 @@ export default component$(() => {
   if ('notFound' in data.value) {
     return <div class="mx-auto max-w-3xl px-4 py-6">Live blog not found: {data.value.slug}</div>;
   }
-  const { header } = data.value;
+  const { header, entries } = data.value;
   return (
     <article class="mx-auto max-w-3xl px-4 py-6">
-      <h1 class="text-3xl md:text-4xl font-bold leading-tight">{header.title}</h1>
+      <LiveBlogHeader header={header} />
+      <section class="live-blog-entries">
+        {entries.map((entry) => (
+          <LiveBlogEntry key={entry.id} entry={entry} />
+        ))}
+      </section>
     </article>
   );
 });
