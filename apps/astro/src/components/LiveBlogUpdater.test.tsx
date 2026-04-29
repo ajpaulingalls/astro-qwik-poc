@@ -177,29 +177,30 @@ describe('LiveBlogUpdater', () => {
 
   it('skips overlapping ticks while a previous fetch is in flight (concurrency guard)', async () => {
     let pendingResolve: ((r: Response) => void) | undefined;
+    let pendingFetch: Promise<Response> | undefined;
     const originalFetch = globalThis.fetch;
-    const fetchSpy = vi.fn(
-      () =>
-        new Promise<Response>((resolve) => {
-          pendingResolve = resolve;
-        }),
-    );
+    const fetchSpy = vi.fn(() => {
+      pendingFetch = new Promise<Response>((resolve) => {
+        pendingResolve = resolve;
+      });
+      return pendingFetch;
+    });
     globalThis.fetch = fetchSpy as unknown as typeof fetch;
     try {
       render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001]} />);
-      // Tick 1 arms the first fetch.
       await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       // Tick 2 fires while the prior fetch is still pending — guard skips it.
       await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
       expect(fetchSpy).toHaveBeenCalledTimes(1);
-      // Resolve tick 1; let microtasks flush.
+      // Resolve tick 1's fetch and await it explicitly so the awaiter chain
+      // (response.json → fetchPollUpdate → finally{} clearing pollingRef)
+      // settles before we advance to tick 3. waitFor polls the assertion to
+      // tolerate any extra microtask the chain might add later.
       pendingResolve!(new Response(JSON.stringify(shellResponse([4001]).body), { status: 200 }));
-      await Promise.resolve();
-      await Promise.resolve();
-      // Tick 3 proceeds normally now that the guard has cleared.
+      await pendingFetch;
       await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
-      expect(fetchSpy).toHaveBeenCalledTimes(2);
+      await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(2));
     } finally {
       globalThis.fetch = originalFetch;
     }

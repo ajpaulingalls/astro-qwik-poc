@@ -176,6 +176,10 @@ export function isBreakingTickerActive(ticker: BreakingTicker | null): boolean {
   );
 }
 
+// Shared so a copy edit in one app can't silently drift from the other.
+export const LIVEBLOG_DEGRADED_BANNER_TEXT =
+  'Some updates may be missing right now. Refresh to retry.';
+
 // Production routes /{section} as either a geographic section (apps/{astro,
 // qwik}/docs/ARCHITECTURE.md §Section Type Resolution) or a topic page. The
 // allowlist is the only authority for the geographic branch — slugs not in

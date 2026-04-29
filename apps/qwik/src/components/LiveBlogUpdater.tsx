@@ -108,6 +108,7 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
           const polledIds = newEntries.value.map((e) => Number(e.id));
           const known = [...polledIds, ...initialChildIds];
           const fresh = await fetchPollUpdate(slug, known);
+          // Early return is safe: finally clears polling.
           if (fresh.length === 0) return;
           newEntries.value = [...fresh, ...newEntries.value];
         } catch (err) {

@@ -1,5 +1,5 @@
 ---
-import type { LiveBlogHeaderData } from '@aje-poc/shared-types';
+import { LIVEBLOG_DEGRADED_BANNER_TEXT, type LiveBlogHeaderData } from '@aje-poc/shared-types';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { LiveBlogHeader } from '../../../components/LiveBlogHeader';
 import { LiveBlogEntry } from '../../../components/LiveBlogEntry';
@@ -46,7 +46,7 @@ const header: LiveBlogHeaderData = {
           role="status"
           class="mb-4 rounded border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm text-yellow-900"
         >
-          Some updates may be missing right now. Refresh to retry.
+          {LIVEBLOG_DEGRADED_BANNER_TEXT}
         </aside>
       )
     }
