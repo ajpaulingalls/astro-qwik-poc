@@ -5,10 +5,16 @@ import type { LiveBlogShell, LiveBlogChildrenIds } from './index';
 
 const LIVEBLOG_SLUG = 'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
 const FIXTURES_DIR = join(__dirname, '..', 'mock-api', 'fixtures');
-const FIXTURE_PATH = join(FIXTURES_DIR, `ArchipelagoSingleLiveBlogQuery--${LIVEBLOG_SLUG}.json`);
+// Live-blog fixtures are snapshot-rotated on disk; snapshot-0 is the recorded
+// production baseline. Pinned here so type/shape conformance tests stay
+// deterministic as new snapshots (1, 2, …) land.
+const FIXTURE_PATH = join(
+  FIXTURES_DIR,
+  `ArchipelagoSingleLiveBlogQuery--${LIVEBLOG_SLUG}--snapshot-0.json`,
+);
 const CHILDREN_FIXTURE_PATH = join(
   FIXTURES_DIR,
-  `SingleLiveBlogChildrensQuery--${LIVEBLOG_SLUG}.json`,
+  `SingleLiveBlogChildrensQuery--${LIVEBLOG_SLUG}--snapshot-0.json`,
 );
 
 interface ShellFixture {
