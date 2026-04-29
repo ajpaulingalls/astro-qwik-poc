@@ -8,6 +8,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, waitFor } from '@testing-library/preact';
 import { mockFetchSequence } from '@aje-poc/shared-test-helpers';
+import { LIVEBLOG_POLL_INTERVAL_MS } from '@aje-poc/shared-types';
 import { LiveBlogUpdater, fetchPollUpdate } from './LiveBlogUpdater';
 
 const SLUG = 'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
@@ -140,11 +141,11 @@ describe('LiveBlogUpdater', () => {
     const region = container.querySelector('section[data-live-blog-updater]')!;
     expect(region.children.length).toBe(0);
 
-    await vi.advanceTimersByTimeAsync(30_000);
+    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
     await waitFor(() => expect(region.children.length).toBe(1));
     expect(region.querySelector('[data-entry-id="4099"]')).not.toBeNull();
 
-    await vi.advanceTimersByTimeAsync(30_000);
+    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
     await waitFor(() => expect(region.children.length).toBe(2));
     // Newest first
     expect(region.children[0]!.getAttribute('data-entry-id')).toBe('4100');

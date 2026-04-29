@@ -1,17 +1,16 @@
 import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead, type RequestEventLoader } from '@qwik.dev/router';
 import { GraphqlHttpError } from '../../../../lib/graphql';
-import type {
-  LiveBlogChildrenIds,
-  LiveBlogHeaderData,
-  LiveBlogUpdate,
+import {
+  LIVEBLOG_INITIAL_ENTRY_COUNT,
+  type LiveBlogChildrenIds,
+  type LiveBlogHeaderData,
+  type LiveBlogUpdate,
 } from '@aje-poc/shared-types';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../../../../lib/liveblog-api';
 import { LiveBlogHeader } from '../../../../components/LiveBlogHeader';
 import { LiveBlogEntry } from '../../../../components/LiveBlogEntry';
 import { LiveBlogUpdater } from '../../../../components/LiveBlogUpdater';
-
-const INITIAL_ENTRY_COUNT = 5;
 
 export interface LiveBlogLoaderSuccess {
   slug: string;
@@ -45,7 +44,7 @@ export async function loadLiveBlogData(
   // allSettled (not all) because individual updates can be deleted between
   // shell-fetch and update-fetch; one missing entry shouldn't 404 the route.
   const meta = shell.childrenMeta ?? [];
-  const targets = meta.slice(0, INITIAL_ENTRY_COUNT).map((m) => Number(m.id));
+  const targets = meta.slice(0, LIVEBLOG_INITIAL_ENTRY_COUNT).map((m) => Number(m.id));
   const settled = await Promise.allSettled(targets.map(fetchLiveBlogUpdate));
   const entries = settled
     .filter((s): s is PromiseFulfilledResult<LiveBlogUpdate> => s.status === 'fulfilled')

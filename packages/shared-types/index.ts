@@ -114,6 +114,16 @@ export type LiveBlogHeaderData = Pick<
 
 export type LiveBlogChildrenIds = number[];
 
+// Live-blog poll cadence — both apps' Updaters arm a setInterval at this
+// rate. M9 spec target; not a production-observed cadence (RESEARCH.md
+// §Live Blog).
+export const LIVEBLOG_POLL_INTERVAL_MS = 30_000;
+
+// Above-the-fold entries the routes fetch in parallel during SSR.
+// Production's iran-war live blog has ~128 children; 5 is what shows above
+// the fold, with "Load older" deferred to a future story.
+export const LIVEBLOG_INITIAL_ENTRY_COUNT = 5;
+
 export interface LiveBlogShell {
   id: string;
   title: string;

@@ -2,6 +2,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { RequestEventLoader } from '@qwik.dev/router';
 import { mockFetchSequence, type MockedFetch } from '@aje-poc/shared-test-helpers';
+import { LIVEBLOG_INITIAL_ENTRY_COUNT } from '@aje-poc/shared-types';
 import { GraphqlHttpError } from '../../../../lib/graphql';
 import { loadLiveBlogData } from './index';
 
@@ -59,7 +60,7 @@ describe('loadLiveBlogData', () => {
     vi.unstubAllEnvs();
   });
 
-  it('fetches shell then 5 LiveBlogUpdate calls in parallel and returns trimmed payload', async () => {
+  it('fetches shell then LIVEBLOG_INITIAL_ENTRY_COUNT LiveBlogUpdate calls in parallel and returns trimmed payload', async () => {
     mock = mockFetchSequence([
       { body: { data: { article: SHELL } } },
       { body: { data: { posts: makeUpdate('4514963', 'Newest') } } },
@@ -93,7 +94,7 @@ describe('loadLiveBlogData', () => {
     if (!('header' in result)) throw new Error('expected loader success');
     expect(result.header.title).toBe('Iran war live: ceasefire extended');
     expect(result.header.isLive).toBe(true);
-    expect(result.entries).toHaveLength(5);
+    expect(result.entries).toHaveLength(LIVEBLOG_INITIAL_ENTRY_COUNT);
     expect(result.entries[0]!.id).toBe('4514963');
     expect(result.entries[4]!.id).toBe('4512131');
     expect(result.initialChildIds).toEqual([4514963, 4514943, 4512107, 4512099, 4512131]);
