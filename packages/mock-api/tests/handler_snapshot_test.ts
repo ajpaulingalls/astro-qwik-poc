@@ -220,7 +220,10 @@ Deno.test("handler: x-liveblog-snapshot:1 pins ArchipelagoBreakingTickerQuery to
   );
   assert(typeof banner.link === "string" && banner.link.length > 0);
   assert(typeof banner.modified === "string" && banner.modified.length > 0);
-  assert(banner.post !== null && typeof banner.post.id === "string");
+  assert(banner.post !== null);
+  assert(typeof banner.post.id === "string" && banner.post.id.length > 0);
+  assert(typeof banner.post.title === "string" && banner.post.title.length > 0);
+  assert(typeof banner.post.link === "string" && banner.post.link.length > 0);
 });
 
 Deno.test("handler: x-liveblog-snapshot beyond available count clamps to the last ticker snapshot", async () => {
