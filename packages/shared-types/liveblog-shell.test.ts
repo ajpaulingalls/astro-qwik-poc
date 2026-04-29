@@ -16,11 +16,6 @@ const CHILDREN_FIXTURE_PATH = join(
   `SingleLiveBlogChildrensQuery--${LIVEBLOG_SLUG}--snapshot-0.json`,
 );
 
-// Shape conformance is enforced at runtime by the per-field expect(...)
-// calls inside each `it` block. Do NOT decorate JSON.parse(...) with
-// `satisfies SomeShape` — JSON.parse returns `any`, so `satisfies` is a
-// no-op there and reads as a compile-time guarantee that doesn't exist.
-
 describe('LiveBlogShell fixture shape (runtime validation)', () => {
   it('every required LiveBlogShell field is present in the production-recorded shell', () => {
     const raw = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8'));
