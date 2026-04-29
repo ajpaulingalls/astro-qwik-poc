@@ -101,6 +101,17 @@ export interface LiveBlogUpdate {
   date: string;
 }
 
+// Render-needed projection of LiveBlogShell consumed by LiveBlogHeader in
+// both apps. Qwik's routeLoader projects the shell down to this shape so
+// the larger LiveBlogShell doesn't enter the resume payload; Astro mirrors
+// the projection to keep the component contract identical across apps.
+// Encoded as Pick so a future drift in LiveBlogShell.featuredImage (etc.)
+// propagates here automatically instead of silently desyncing.
+export type LiveBlogHeaderData = Pick<
+  LiveBlogShell,
+  'title' | 'subheading' | 'excerpt' | 'isLive' | 'date' | 'featuredImage'
+>;
+
 export type LiveBlogChildrenIds = number[];
 
 export interface LiveBlogShell {

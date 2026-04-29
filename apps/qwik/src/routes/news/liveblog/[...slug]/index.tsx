@@ -1,9 +1,13 @@
 import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead, type RequestEventLoader } from '@qwik.dev/router';
 import { GraphqlHttpError } from '../../../../lib/graphql';
-import type { LiveBlogChildrenIds, LiveBlogUpdate } from '@aje-poc/shared-types';
+import type {
+  LiveBlogChildrenIds,
+  LiveBlogHeaderData,
+  LiveBlogUpdate,
+} from '@aje-poc/shared-types';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../../../../lib/liveblog-api';
-import { LiveBlogHeader, type LiveBlogHeaderData } from '../../../../components/LiveBlogHeader';
+import { LiveBlogHeader } from '../../../../components/LiveBlogHeader';
 import { LiveBlogEntry } from '../../../../components/LiveBlogEntry';
 import { LiveBlogUpdater } from '../../../../components/LiveBlogUpdater';
 
