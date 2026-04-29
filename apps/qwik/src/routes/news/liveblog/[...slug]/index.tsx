@@ -1,9 +1,11 @@
 import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead, type RequestEventLoader } from '@qwik.dev/router';
-import { graphqlFetch, GraphqlHttpError } from '../../../../lib/graphql';
-import type { LiveBlogChildrenIds, LiveBlogShell } from '@aje-poc/shared-types';
+import { GraphqlHttpError } from '../../../../lib/graphql';
+import type { LiveBlogChildrenIds } from '@aje-poc/shared-types';
+import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../../../../lib/liveblog-api';
 import { LiveBlogHeader, type LiveBlogHeaderData } from '../../../../components/LiveBlogHeader';
 import { LiveBlogEntry, type LiveBlogUpdate } from '../../../../components/LiveBlogEntry';
+import { LiveBlogUpdater } from '../../../../components/LiveBlogUpdater';
 
 const INITIAL_ENTRY_COUNT = 5;
 
@@ -14,25 +16,9 @@ export interface LiveBlogLoaderSuccess {
   initialChildIds: LiveBlogChildrenIds;
 }
 
-interface SingleLiveBlogData {
-  article: LiveBlogShell;
-}
-
-interface LiveBlogUpdateData {
-  posts: LiveBlogUpdate;
-}
-
 function lastSegment(slug: string): string {
   const parts = slug.split('/').filter(Boolean);
   return parts[parts.length - 1] ?? '';
-}
-
-async function fetchUpdate(postID: number): Promise<LiveBlogUpdate> {
-  const data = await graphqlFetch<LiveBlogUpdateData>({
-    operationName: 'LiveBlogUpdateQuery',
-    variables: { postID, postType: 'liveblog-update', preview: '', isAmp: false },
-  });
-  return data.posts;
 }
 
 // Exported for unit tests — `routeLoader$` wraps this directly.
@@ -41,12 +27,9 @@ export async function loadLiveBlogData(
 ): Promise<LiveBlogLoaderSuccess | { notFound: true; slug: string }> {
   const { params, fail } = ctx;
   const slug = lastSegment(params.slug ?? '');
-  let shellData: SingleLiveBlogData;
+  let shell;
   try {
-    shellData = await graphqlFetch<SingleLiveBlogData>({
-      operationName: 'ArchipelagoSingleLiveBlogQuery',
-      variables: { name: slug, preview: '' },
-    });
+    shell = await fetchLiveBlogShell(slug);
   } catch (err) {
     if (err instanceof GraphqlHttpError && err.status === 404) {
       return fail(404, { notFound: true, slug });
@@ -54,13 +37,12 @@ export async function loadLiveBlogData(
     throw err;
   }
 
-  const shell = shellData.article;
   // Per-update fan-out: childrenMeta carries each entry's post ID. Using
   // allSettled (not all) because individual updates can be deleted between
   // shell-fetch and update-fetch; one missing entry shouldn't 404 the route.
   const meta = shell.childrenMeta ?? [];
   const targets = meta.slice(0, INITIAL_ENTRY_COUNT).map((m) => Number(m.id));
-  const settled = await Promise.allSettled(targets.map(fetchUpdate));
+  const settled = await Promise.allSettled(targets.map(fetchLiveBlogUpdate));
   const entries = settled
     .filter((s): s is PromiseFulfilledResult<LiveBlogUpdate> => s.status === 'fulfilled')
     .map((s) => s.value);
@@ -91,10 +73,14 @@ export default component$(() => {
   if ('notFound' in data.value) {
     return <div class="mx-auto max-w-3xl px-4 py-6">Live blog not found: {data.value.slug}</div>;
   }
-  const { header, entries } = data.value;
+  const { slug, header, entries, initialChildIds } = data.value;
   return (
     <article class="mx-auto max-w-3xl px-4 py-6">
       <LiveBlogHeader header={header} />
+      {/* Updater renders ONLY new polled entries; static initial entries
+          stay below as plain SSR HTML so they're not duplicated in the
+          resume payload's component$ closure. */}
+      <LiveBlogUpdater slug={slug} initialChildIds={initialChildIds} />
       <section class="live-blog-entries">
         {entries.map((entry) => (
           <LiveBlogEntry key={entry.id} entry={entry} />
