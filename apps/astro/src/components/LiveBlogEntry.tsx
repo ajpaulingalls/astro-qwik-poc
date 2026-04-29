@@ -1,4 +1,4 @@
-import type { LiveBlogUpdate } from '../lib/load-liveblog';
+import type { LiveBlogUpdate } from '../lib/liveblog-api';
 import { formatDate } from '../lib/format-date';
 import { ArticleBody } from './ArticleBody';
 

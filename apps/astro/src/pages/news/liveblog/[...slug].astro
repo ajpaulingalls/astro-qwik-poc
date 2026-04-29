@@ -2,6 +2,7 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { LiveBlogHeader, type LiveBlogHeaderData } from '../../../components/LiveBlogHeader';
 import { LiveBlogEntry } from '../../../components/LiveBlogEntry';
+import { LiveBlogUpdater } from '../../../components/LiveBlogUpdater';
 import { loadLiveBlogData } from '../../../lib/load-liveblog';
 
 const rawSlug = Astro.params.slug ?? '';
@@ -29,6 +30,7 @@ const header: LiveBlogHeaderData = {
 <BaseLayout title={shell.title}>
   <main class="mx-auto max-w-3xl px-4 py-6">
     <LiveBlogHeader header={header} />
+    <LiveBlogUpdater client:idle slug={slugLeaf} initialChildIds={shell.children} />
     <section class="live-blog-entries">
       {entries.map((entry) => <LiveBlogEntry entry={entry} />)}
     </section>

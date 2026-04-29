@@ -1,22 +1,10 @@
 import type { LiveBlogShell } from '@aje-poc/shared-types';
-import { graphqlFetch, GraphqlHttpError } from './graphql';
+import { GraphqlHttpError } from './graphql';
+import { fetchLiveBlogShell, fetchLiveBlogUpdate, type LiveBlogUpdate } from './liveblog-api';
 
 // Production above-the-fold count for live blog updates. Updater hydration
 // can later lazy-fetch older entries; SSR ships this many in parallel.
 export const INITIAL_ENTRY_COUNT = 5;
-
-// Per-update payload shape. Mirrors what production returns from
-// LiveBlogUpdateQuery (postType MUST be "liveblog-update", not "liveblog" —
-// see docs/RESEARCH.md §Live Blog).
-export interface LiveBlogUpdate {
-  id: string;
-  title: string;
-  // Production sometimes returns updates whose title is internal-only and
-  // should not render (e.g., a tweet-only update). Honored by LiveBlogEntry.
-  shouldDisplayTitle: boolean;
-  content: string;
-  date: string;
-}
 
 export interface LiveBlogPageData {
   shell: LiveBlogShell;
@@ -28,29 +16,16 @@ export interface LiveBlogNotFound {
   slug: string;
 }
 
-interface ShellResponse {
-  article: LiveBlogShell | null;
-}
-
-interface UpdateResponse {
-  // Per-update payload may be null if the postID 404s (no_posts_found).
-  posts: LiveBlogUpdate | null;
-}
-
 export async function loadLiveBlogData(slug: string): Promise<LiveBlogPageData | LiveBlogNotFound> {
-  let shellData: ShellResponse;
+  let shell: LiveBlogShell | null;
   try {
-    shellData = await graphqlFetch<ShellResponse>({
-      operationName: 'ArchipelagoSingleLiveBlogQuery',
-      variables: { name: slug, postType: 'liveblog', preview: '' },
-    });
+    shell = await fetchLiveBlogShell(slug);
   } catch (err) {
     if (err instanceof GraphqlHttpError && err.status === 404) {
       return { notFound: true, slug };
     }
     throw err;
   }
-  const shell = shellData.article;
   if (!shell) return { notFound: true, slug };
 
   const childMeta = shell.childrenMeta ?? [];
@@ -60,24 +35,14 @@ export async function loadLiveBlogData(slug: string): Promise<LiveBlogPageData |
   // no_posts_found for some ids). Filter to fulfilled+non-null so the page
   // still renders the entries we have.
   const settled = await Promise.allSettled(
-    initial.map((meta) =>
-      graphqlFetch<UpdateResponse>({
-        operationName: 'LiveBlogUpdateQuery',
-        variables: {
-          postID: Number(meta.id),
-          postType: 'liveblog-update',
-          preview: '',
-          isAmp: false,
-        },
-      }),
-    ),
+    initial.map((meta) => fetchLiveBlogUpdate(Number(meta.id))),
   );
   const entries = settled
     .filter(
-      (r): r is PromiseFulfilledResult<UpdateResponse> =>
-        r.status === 'fulfilled' && r.value.posts !== null,
+      (r): r is PromiseFulfilledResult<LiveBlogUpdate> =>
+        r.status === 'fulfilled' && r.value !== null,
     )
-    .map((r) => r.value.posts as LiveBlogUpdate);
+    .map((r) => r.value);
 
   return { shell, entries };
 }

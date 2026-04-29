@@ -1,0 +1,153 @@
+// @vitest-environment happy-dom
+//
+// Note on coverage scope: tests below verify (a) the pure fetchPollUpdate
+// helper, (b) initial render shape (data-hydrated marker, aria-live), and
+// (c) prepend behavior when fresh entries arrive. CLS verification (the
+// binding M9 perf gate) is deferred to story-005 capstone — measuring real
+// layout-shift requires a real browser, not happy-dom.
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, render, waitFor } from '@testing-library/preact';
+import { mockFetchSequence } from '@aje-poc/shared-test-helpers';
+import { LiveBlogUpdater, fetchPollUpdate } from './LiveBlogUpdater';
+
+const SLUG = 'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
+
+function shellResponse(childIds: number[]) {
+  return {
+    body: {
+      data: {
+        article: {
+          id: '4511785',
+          title: 'Iran war live',
+          link: `/news/liveblog/2026/4/22/${SLUG}`,
+          slug: SLUG,
+          date: '2026-04-22T00:00:00',
+          content: '<ul><li>Summary</li></ul>',
+          author: [],
+          categories: [],
+          postType: 'liveblog',
+          isLive: true,
+          children: childIds,
+          childrenMeta: childIds.map((id) => ({ id: String(id), publishedTime: '0' })),
+        },
+      },
+    },
+  };
+}
+
+function updateResponse(id: string, title: string) {
+  return {
+    body: {
+      data: {
+        posts: {
+          id,
+          link: `/news/liveblog/2026/4/22/${SLUG}`,
+          postType: 'liveblog-update',
+          title,
+          content: `<p>${title}</p>`,
+          author: [],
+          showAuthor: false,
+          date: '2026-04-22T00:00:00',
+          shouldDisplayTitle: true,
+          postLabel: [],
+        },
+      },
+    },
+  };
+}
+
+describe('fetchPollUpdate', () => {
+  let mock: ReturnType<typeof mockFetchSequence>;
+
+  beforeEach(() => {
+    vi.stubEnv('PUBLIC_API_BASE', '');
+  });
+
+  afterEach(() => {
+    mock?.restore();
+    vi.unstubAllEnvs();
+  });
+
+  it('returns no entries when shell.children matches currentIds (no new updates)', async () => {
+    mock = mockFetchSequence([shellResponse([4001, 4002, 4003])]);
+    const result = await fetchPollUpdate(SLUG, [4001, 4002, 4003]);
+    expect(result).toEqual([]);
+    expect(mock.calls.length).toBe(1);
+  });
+
+  it('fetches per-update for ids new since the last poll', async () => {
+    mock = mockFetchSequence([
+      shellResponse([4099, 4001, 4002, 4003]),
+      updateResponse('4099', 'Brand new'),
+    ]);
+    const result = await fetchPollUpdate(SLUG, [4001, 4002, 4003]);
+    expect(result.length).toBe(1);
+    expect(result[0]!.id).toBe('4099');
+  });
+
+  it('skips per-update fetches that fail (allSettled, not all)', async () => {
+    mock = mockFetchSequence([
+      shellResponse([4099, 4100, 4001]),
+      updateResponse('4099', 'Visible'),
+      { status: 404, body: { error: 'not found' } },
+    ]);
+    const result = await fetchPollUpdate(SLUG, [4001]);
+    expect(result.length).toBe(1);
+    expect(result[0]!.id).toBe('4099');
+  });
+});
+
+describe('LiveBlogUpdater', () => {
+  let mock: ReturnType<typeof mockFetchSequence>;
+
+  beforeEach(() => {
+    vi.stubEnv('PUBLIC_API_BASE', '');
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    mock?.restore();
+    vi.unstubAllEnvs();
+    cleanup();
+  });
+
+  it('renders an empty live region with data-hydrated marker on mount', async () => {
+    const { container } = render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001, 4002]} />);
+    // Allow useEffect to run.
+    await Promise.resolve();
+    const region = container.querySelector('section[data-live-blog-updater]');
+    expect(region).not.toBeNull();
+    expect(region!.getAttribute('aria-live')).toBe('polite');
+    expect(region!.getAttribute('aria-relevant')).toBe('additions');
+    await waitFor(() => {
+      expect(region!.getAttribute('data-hydrated')).toBe('true');
+    });
+    expect(region!.children.length).toBe(0);
+  });
+
+  it('polls every 30s, prepends fetched updates, and inserts newest at the top', async () => {
+    mock = mockFetchSequence([
+      // First poll tick: 4099 is new
+      shellResponse([4099, 4001, 4002]),
+      updateResponse('4099', 'First poll'),
+      // Second poll tick: 4100 is new on top of 4099
+      shellResponse([4100, 4099, 4001, 4002]),
+      updateResponse('4100', 'Second poll'),
+    ]);
+
+    const { container } = render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001, 4002]} />);
+    const region = container.querySelector('section[data-live-blog-updater]')!;
+    expect(region.children.length).toBe(0);
+
+    await vi.advanceTimersByTimeAsync(30_000);
+    await waitFor(() => expect(region.children.length).toBe(1));
+    expect(region.querySelector('[data-entry-id="4099"]')).not.toBeNull();
+
+    await vi.advanceTimersByTimeAsync(30_000);
+    await waitFor(() => expect(region.children.length).toBe(2));
+    // Newest first
+    expect(region.children[0]!.getAttribute('data-entry-id')).toBe('4100');
+    expect(region.children[1]!.getAttribute('data-entry-id')).toBe('4099');
+  });
+});
