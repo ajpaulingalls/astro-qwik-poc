@@ -25,7 +25,7 @@ export function spawnMockApi(target: Target): ChildProcess {
       'run',
       `--allow-net=0.0.0.0:${port}`,
       '--allow-read=./fixtures',
-      '--allow-env=PORT,FIXTURE_DIR,LIVEBLOG_SNAPSHOT_INDEX,LIVEBLOG_SNAPSHOT_INTERVAL_MS',
+      '--allow-env=PORT,FIXTURE_DIR,SNAPSHOT_INDEX,SNAPSHOT_INTERVAL_MS,LIVEBLOG_SNAPSHOT_INDEX,LIVEBLOG_SNAPSHOT_INTERVAL_MS',
       'server.ts',
     ],
     {

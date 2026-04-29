@@ -66,11 +66,11 @@ exist but can be ignored for the PoC.
 So polling sees real deltas, the mock-api serves different fixture snapshots
 over time. Three precedence tiers, header > env > wall-clock:
 
-| Tier        | Where                                                               | Use                                                       |
-| ----------- | ------------------------------------------------------------------- | --------------------------------------------------------- |
-| Per-request | `x-liveblog-snapshot: N` request header                             | Perf-harness pinning, deterministic acceptance tests      |
-| Per-process | `LIVEBLOG_SNAPSHOT_INDEX=N` env                                     | Single-snapshot test runs                                 |
-| Wall-clock  | auto-rotate every `LIVEBLOG_SNAPSHOT_INTERVAL_MS` (default 30000ms) | Dev/demo so live polling visibly advances without tooling |
+| Tier        | Where                                                                                              | Use                                                       |
+| ----------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Per-request | `x-liveblog-snapshot: N` request header                                                            | Perf-harness pinning, deterministic acceptance tests      |
+| Per-process | `SNAPSHOT_INDEX=N` env (alias: `LIVEBLOG_SNAPSHOT_INDEX`)                                          | Single-snapshot test runs                                 |
+| Wall-clock  | auto-rotate every `SNAPSHOT_INTERVAL_MS` (alias: `LIVEBLOG_SNAPSHOT_INTERVAL_MS`; default 30000ms) | Dev/demo so live polling visibly advances without tooling |
 
 `apps/{astro,qwik}/src/lib/graphql.ts:graphqlFetch` accepts an optional
 `headers` field forwarded into the fetch request — the live-blog updater uses it

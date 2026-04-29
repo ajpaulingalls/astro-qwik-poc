@@ -18,10 +18,27 @@ const CORS_HEADERS: HeadersInit = {
 // Snapshot env vars are read once at startup; the dev/spawn env-allow lists
 // pin them to process lifetime, and re-reading per request would only return
 // the same captured values.
-const SNAPSHOT_ENV = {
-  index: Deno.env.get("LIVEBLOG_SNAPSHOT_INDEX") ?? null,
-  interval: Deno.env.get("LIVEBLOG_SNAPSHOT_INTERVAL_MS") ?? null,
-};
+//
+// The unprefixed names (SNAPSHOT_INDEX / SNAPSHOT_INTERVAL_MS) are the
+// primary names since the snapshot rotation now governs the breaking ticker
+// in addition to live-blog. The LIVEBLOG_-prefixed names are kept as
+// fallbacks for back-compat with existing test scripts and .env files.
+//
+// envGet is injected so the function stays pure — tests pass a stubbed
+// getter (parallel-safe) rather than mutating the global Deno.env.
+export function readSnapshotEnv(
+  envGet: (key: string) => string | undefined = (k) => Deno.env.get(k),
+): { index: string | null; interval: string | null } {
+  return {
+    index: envGet("SNAPSHOT_INDEX") ?? envGet("LIVEBLOG_SNAPSHOT_INDEX") ??
+      null,
+    interval: envGet("SNAPSHOT_INTERVAL_MS") ??
+      envGet("LIVEBLOG_SNAPSHOT_INTERVAL_MS") ??
+      null,
+  };
+}
+
+const SNAPSHOT_ENV = readSnapshotEnv();
 
 // 1x1 transparent PNG (67 bytes). Served for any /wp-content/uploads/* request so
 // perf-harness LCP measurements don't time out on a 404. We don't ship realistic
