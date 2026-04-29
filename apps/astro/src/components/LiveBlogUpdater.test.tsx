@@ -136,6 +136,14 @@ describe('resolvePollIntervalMs', () => {
     expect(resolvePollIntervalMs('-1', 30_000)).toBe(30_000);
     expect(resolvePollIntervalMs('not-a-number', 30_000)).toBe(30_000);
   });
+  // Pins the Number.isFinite half of the rule. Without this, dropping
+  // isFinite from the impl (using only `n > 0`) would silently let
+  // Infinity through and arm setInterval with a non-finite delay.
+  it('falls through to default on NaN, Infinity, and -Infinity', () => {
+    expect(resolvePollIntervalMs(NaN, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs(Infinity, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs(-Infinity, 30_000)).toBe(30_000);
+  });
 });
 
 describe('LiveBlogUpdater', () => {
