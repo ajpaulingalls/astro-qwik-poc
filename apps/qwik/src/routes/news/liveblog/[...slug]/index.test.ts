@@ -151,6 +151,43 @@ describe('loadLiveBlogData', () => {
     expect(result.entries.map((e) => e.id)).toEqual(['4514943', '4512099']);
   });
 
+  it('logs and surfaces non-404 per-update rejections via degraded marker', async () => {
+    mock = mockFetchSequence([
+      { body: { data: { article: SHELL } } },
+      { body: { data: { posts: makeUpdate('4514963', 'One') } } },
+      { status: 500, rawBody: 'upstream broken' },
+      { body: { data: { posts: makeUpdate('4512107', 'Three') } } },
+      { body: { data: { posts: makeUpdate('4512099', 'Four') } } },
+      { body: { data: { posts: makeUpdate('4512131', 'Five') } } },
+    ]);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    if (!('header' in result)) throw new Error('expected success');
+
+    expect(result.entries.map((e) => e.id)).toEqual(['4514963', '4512107', '4512099', '4512131']);
+    expect(result.degraded?.failedUpdateIds).toEqual([4514943]);
+    expect(errSpy).toHaveBeenCalledWith(
+      'liveblog-route: per-update fetch failed:',
+      expect.objectContaining({ id: 4514943 }),
+    );
+    errSpy.mockRestore();
+  });
+
+  it('omits degraded marker when only 404s occur (intentional, not a failure)', async () => {
+    mock = mockFetchSequence([
+      { body: { data: { article: SHELL } } },
+      { body: { data: { posts: makeUpdate('4514963', 'One') } } },
+      { status: 404, rawBody: 'no fixture' },
+      { body: { data: { posts: makeUpdate('4512107', 'Three') } } },
+      { body: { data: { posts: makeUpdate('4512099', 'Four') } } },
+      { body: { data: { posts: makeUpdate('4512131', 'Five') } } },
+    ]);
+    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    if (!('header' in result)) throw new Error('expected success');
+    expect(result.degraded).toBeUndefined();
+  });
+
   it('handles shells with no childrenMeta (skips per-update fan-out)', async () => {
     mock = mockFetchSequence([
       { body: { data: { article: { ...SHELL, children: [], childrenMeta: undefined } } } },
