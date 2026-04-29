@@ -124,7 +124,7 @@ describe('loadLiveBlogData', () => {
     });
   });
 
-  it('skips per-update fetches that 404 (allSettled, not all)', async () => {
+  it('skips per-update fetches that 404 (allSettled, not all) without marking degraded', async () => {
     const childMeta = [
       { id: '4001', publishedTime: '1700000005' },
       { id: '4002', publishedTime: '1700000004' },
@@ -140,9 +140,11 @@ describe('loadLiveBlogData', () => {
     const result = expectFound(await loadLiveBlogData(SLUG));
 
     expect(result.entries.map((e) => e.id)).toEqual(['4001', '4003']);
+    // 404 is intentional (post deleted / no_posts_found) — NOT a degraded state.
+    expect(result.degraded).toBeUndefined();
   });
 
-  it('skips per-update fetches that return no_posts_found despite HTTP 200', async () => {
+  it('skips per-update fetches that return no_posts_found despite HTTP 200 without marking degraded', async () => {
     const childMeta = [
       { id: '4001', publishedTime: '1700000002' },
       { id: '4002', publishedTime: '1700000001' },
@@ -157,6 +159,31 @@ describe('loadLiveBlogData', () => {
 
     expect(result.entries.length).toBe(1);
     expect(result.entries[0]!.id).toBe('4001');
+    // no_posts_found is intentional — NOT a degraded state.
+    expect(result.degraded).toBeUndefined();
+  });
+
+  it('logs and surfaces non-404 per-update rejections via degraded marker', async () => {
+    const childMeta = [
+      { id: '4001', publishedTime: '1700000002' },
+      { id: '4002', publishedTime: '1700000001' },
+    ];
+    mock = mockFetchSequence([
+      shellResponse(childMeta),
+      updateResponse('4001', 'One'),
+      { status: 500, body: { error: 'upstream broken' } }, // 4002 5xx — transient, should surface
+    ]);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = expectFound(await loadLiveBlogData(SLUG));
+
+    expect(result.entries.map((e) => e.id)).toEqual(['4001']);
+    expect(result.degraded?.failedUpdateIds).toEqual([4002]);
+    expect(errSpy).toHaveBeenCalledWith(
+      'load-liveblog: per-update fetch failed:',
+      expect.objectContaining({ id: 4002 }),
+    );
+    errSpy.mockRestore();
   });
 
   it('returns notFound when the shell GraphQL response 404s', async () => {
