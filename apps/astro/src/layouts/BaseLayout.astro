@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { Font } from 'astro:assets';
 import { NavigationMenu } from '../components/NavigationMenu';
+import { BreakingTicker } from '../components/BreakingTicker';
 import Footer from '../components/Footer.astro';
 
 interface Props {
@@ -34,6 +35,7 @@ const { title, preloadImage } = Astro.props;
   </head>
   <body class="font-sans">
     <NavigationMenu client:idle />
+    <BreakingTicker client:idle />
     <slot />
     <Footer />
   </body>
