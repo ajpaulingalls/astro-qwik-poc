@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { loadLiveBlogData } from '../../../lib/load-liveblog';
+
+const rawSlug = Astro.params.slug ?? '';
+const slugLeaf = rawSlug.split('/').pop() ?? '';
+
+const result = await loadLiveBlogData(slugLeaf);
+if ('notFound' in result) {
+  return new Response(`Live blog not found: ${slugLeaf}`, { status: 404 });
+}
+const { shell, entries } = result;
+---
+
+<BaseLayout title={shell.title}>
+  <main class="mx-auto max-w-3xl px-4 py-6">
+    <h1>{shell.title}</h1>
+    <p>{entries.length} initial entries hydrated</p>
+  </main>
+</BaseLayout>
