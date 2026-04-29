@@ -7,6 +7,19 @@ import {
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
+// Build-time poll-cadence override for acceptance tests — Vite inlines
+// import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS at build, so production
+// builds bake the 30s default unless the build is run with the env set.
+// Non-positive / non-finite values fall through to the default.
+export function resolvePollIntervalMs(rawEnv: unknown, defaultMs: number): number {
+  const n = Number(rawEnv);
+  return Number.isFinite(n) && n > 0 ? n : defaultMs;
+}
+const POLL_INTERVAL_MS = resolvePollIntervalMs(
+  import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
+  LIVEBLOG_POLL_INTERVAL_MS,
+);
+
 // Exported for unit tests — see LiveBlogUpdater.test.tsx header for the
 // qwikLoader/createDOM rationale that forces helper-extraction.
 export async function fetchPollUpdate(
@@ -53,7 +66,7 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
       const fresh = await fetchPollUpdate(slug, known);
       if (fresh.length === 0) return;
       newEntries.value = [...fresh, ...newEntries.value];
-    }, LIVEBLOG_POLL_INTERVAL_MS);
+    }, POLL_INTERVAL_MS);
     cleanup(() => clearInterval(intervalId));
   });
 
