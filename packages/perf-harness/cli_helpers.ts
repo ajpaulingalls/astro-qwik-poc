@@ -24,6 +24,11 @@ export interface Page {
 // embed so the run exercises mixed text + provider-script content.
 const STRETCH_CWV = { lcp: 1500, cls: 0.05, lhPerf: 98 } as const;
 const ARTICLE_PATH = '/news/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries';
+// Live blog fixture path — slug's last segment matches the snapshot fixtures.
+// The slug parents (year/month/day) mirror production URL shape but the
+// liveblog route only keys off lastSegment().
+const LIVEBLOG_PATH =
+  '/news/liveblog/2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
 
 // Qwik 2 beta.32 routes share a common 175KB jsBytes ceiling — the resumability
 // runtime + router + shared chunks dominate (~136KB framework alone before app
@@ -44,6 +49,18 @@ const PAGES: Record<Target, Page[]> = {
     { name: 'article', path: ARTICLE_PATH, budgets: { ...STRETCH_CWV, jsBytes: 30 * 1024 } },
     { name: 'section-geo', path: '/middle-east', budgets: { ...STRETCH_CWV, jsBytes: 45 * 1024 } },
     { name: 'section-topic', path: '/opinion', budgets: { ...STRETCH_CWV, jsBytes: 45 * 1024 } },
+    // Live-blog route adds the LiveBlogUpdater Preact island (client:idle).
+    // Story-003 commit-D measured 14.65KB initial JS — well under the M9
+    // plan's 60KB ceiling. Embed components (Twitter/Brightcove/etc) are
+    // not pulled into the initial chunk because the Updater starts empty;
+    // ArticleBody only loads when a polled entry first renders. Budget set
+    // to 17KB (measured + 2.35KB headroom) so the gate fires on a real
+    // regression instead of hiding under the original speculative ceiling.
+    {
+      name: 'liveblog',
+      path: LIVEBLOG_PATH,
+      budgets: { ...STRETCH_CWV, jsBytes: 17 * 1024 },
+    },
   ],
   qwik: [
     {

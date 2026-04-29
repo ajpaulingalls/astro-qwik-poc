@@ -127,6 +127,17 @@ describe('buildPageList', () => {
       expect(page.budgets!.jsBytes).toBe(175 * 1024);
     }
   });
+
+  // Story-003: liveblog route gets its own gate so a regression in the
+  // Updater Preact island fires here instead of slipping past the article
+  // page's 30KB budget. Path is the snapshot fixture; budget is
+  // measurement+headroom (story-003 commit-D measured 14.65KB; ceiling 17KB).
+  it('exposes an astro liveblog page under /news/liveblog/ with a 17KB jsBytes budget', () => {
+    const liveblog = buildPageList('astro').find((p) => p.name === 'liveblog');
+    expect(liveblog).toBeDefined();
+    expect(liveblog!.path.startsWith('/news/liveblog/')).toBe(true);
+    expect(liveblog!.budgets!.jsBytes).toBe(17 * 1024);
+  });
 });
 
 describe('waitForPort', () => {
