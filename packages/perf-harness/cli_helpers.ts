@@ -20,10 +20,16 @@ export interface Page {
 //   astro/article  <30KB (M7)
 //   qwik/index    <175KB (sprint-009 revision per QWIK2_NOTES)
 //   qwik/article  <168KB (sprint-009 revision per QWIK2_NOTES)
+//   qwik/liveblog <171KB (story-004 close: measured 169.2KB + 1.85KB headroom)
 // `russian-oil-...` is the article fixture chosen for perf — has a Twitter
 // embed so the run exercises mixed text + provider-script content.
 const STRETCH_CWV = { lcp: 1500, cls: 0.05, lhPerf: 98 } as const;
 const ARTICLE_PATH = '/news/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries';
+// Live blog fixture path — slug's last segment matches the snapshot fixtures.
+// The slug parents (year/month/day) mirror production URL shape but the
+// liveblog route only keys off lastSegment().
+const LIVEBLOG_PATH =
+  '/news/liveblog/2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
 
 // Qwik 2 beta.32 routes share a common 175KB jsBytes ceiling — the resumability
 // runtime + router + shared chunks dominate (~136KB framework alone before app
@@ -66,6 +72,18 @@ const PAGES: Record<Target, Page[]> = {
       name: 'section-topic',
       path: '/opinion',
       budgets: { ...QWIK_BASE_BUDGET, jsBytes: QWIK_HOMEPAGE_JS_BUDGET },
+    },
+    // Live-blog route adds a small Updater QRL chunk (~446 bytes) on top
+    // of the framework+router baseline. Measured 169.2KB at story-004
+    // close; budget set to 171KB (1.85KB headroom) so the gate fires on
+    // ~5x growth in app code or any framework regression, instead of
+    // hiding under the homepage 175KB ceiling.
+    // (Story-004 DoD said "<20KB" for route-specific app code — that's
+    // the QRL chunk, not the transfer-size total dominated by framework.)
+    {
+      name: 'liveblog',
+      path: LIVEBLOG_PATH,
+      budgets: { ...QWIK_BASE_BUDGET, jsBytes: 171 * 1024 },
     },
   ],
 };

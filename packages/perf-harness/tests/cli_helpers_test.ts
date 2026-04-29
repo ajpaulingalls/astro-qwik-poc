@@ -127,6 +127,17 @@ describe('buildPageList', () => {
       expect(page.budgets!.jsBytes).toBe(175 * 1024);
     }
   });
+
+  // Story-004: liveblog route gets its own gate so a regression in the
+  // Updater QRL chunk fires here instead of hiding under the homepage
+  // ceiling. Path is the snapshot fixture; budget is measurement+headroom
+  // (story-004 close measured 169.2KB; ceiling 171KB).
+  it('exposes a qwik liveblog page under /news/liveblog/ with a 171KB jsBytes budget', () => {
+    const liveblog = buildPageList('qwik').find((p) => p.name === 'liveblog');
+    expect(liveblog).toBeDefined();
+    expect(liveblog!.path.startsWith('/news/liveblog/')).toBe(true);
+    expect(liveblog!.budgets!.jsBytes).toBe(171 * 1024);
+  });
 });
 
 describe('waitForPort', () => {
