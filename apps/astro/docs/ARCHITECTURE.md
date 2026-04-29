@@ -358,6 +358,35 @@ The Deno-targeted SSR build (see [Runtime & Tooling](#runtime--tooling)) starts 
 
 ---
 
+## Live blog polling
+
+The live-blog route splits rendering: initial entries are static SSR HTML emitted by the route's `entries.map(<LiveBlogEntry/>)`, while `LiveBlogUpdater` (`apps/astro/src/components/LiveBlogUpdater.tsx`, a `client:idle` Preact island) polls every 30s and prepends only new entries to a separate `<section data-live-blog-updater>`. The split keeps initial-entry HTML out of the client bundle — the route's measured initial JS is ~14.65KB (gated at 17KB by `packages/perf-harness/cli_helpers.ts`), well under the M9 plan's 60KB ceiling.
+
+The load-bearing shape — `useEffect` arms `setInterval` and returns `clearInterval` so Preact invokes it on unmount:
+
+```tsx
+useEffect(() => {
+  const intervalId = setInterval(async () => {
+    if (document.hidden) return; // skip background tabs (battery/server)
+    const known = [...newEntriesRef.current.map((e) => Number(e.id)), ...initialChildIds];
+    const fresh = await fetchPollUpdate(slug, known);
+    if (fresh.length === 0) return;
+    setNewEntries((prev) => [...fresh, ...prev]);
+  }, POLL_INTERVAL_MS);
+  return () => clearInterval(intervalId);
+}, [slug, initialChildIds]);
+```
+
+Three pieces matter:
+
+1. **`fetchPollUpdate(slug, currentIds)` is exported** from the same file so it can be unit-tested without rendering the island. Tests use `vi.useFakeTimers()` + `vi.advanceTimersByTimeAsync(30_000)` to drive the polling deterministically.
+2. **`newEntriesRef` mirrors state into a ref** so the interval callback always reads the latest entries without re-arming the interval on every state change. Functional `setState((prev) => ...)` keeps the prepend race-safe across overlapping resolutions.
+3. **CLS-on-prepend verification** — Updater renders an `aria-live="polite" aria-relevant="additions"` region; e2e CLS measurement during polling lives in story-005's acceptance suite (happy-dom can't measure layout shift, so it isn't unit-testable).
+
+The mock-api rotates fixture snapshots so polling sees real deltas (header `x-liveblog-snapshot` > env `LIVEBLOG_SNAPSHOT_INDEX` > wall-clock auto-rotate every 30s — see `docs/RESEARCH.md` § "Snapshot rotation in the mock-api"). The Updater itself does not send the header — `fetchLiveBlogShell` / `fetchLiveBlogUpdate` call `graphqlFetch` with no `headers`, so browser polling relies on wall-clock rotation. The header path is wired through `graphqlFetch`'s `headers?` parameter (covered by `graphql.test.ts`) for perf-harness / acceptance-test pinning at the harness layer.
+
+---
+
 ## Testing
 
 ### Unit Tests — Vitest
