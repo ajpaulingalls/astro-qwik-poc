@@ -93,6 +93,7 @@ export function LiveBlogUpdater({ slug, initialChildIds }: Props) {
         const polled = newEntriesRef.current.map((e) => Number(e.id));
         const known = [...polled, ...initialChildIds];
         const fresh = await fetchPollUpdate(slug, known);
+        // Early return is safe: finally clears pollingRef.
         if (fresh.length === 0) return;
         setNewEntries((prev) => [...fresh, ...prev]);
       } catch (err) {

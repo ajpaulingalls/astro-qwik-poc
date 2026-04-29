@@ -2,6 +2,7 @@ import { component$ } from '@qwik.dev/core';
 import { routeLoader$, type DocumentHead, type RequestEventLoader } from '@qwik.dev/router';
 import { GraphqlHttpError } from '../../../../lib/graphql';
 import {
+  LIVEBLOG_DEGRADED_BANNER_TEXT,
   LIVEBLOG_INITIAL_ENTRY_COUNT,
   type LiveBlogChildrenIds,
   type LiveBlogHeaderData,
@@ -116,7 +117,7 @@ export default component$(() => {
           role="status"
           class="mb-4 rounded border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm text-yellow-900"
         >
-          Some updates may be missing right now. Refresh to retry.
+          {LIVEBLOG_DEGRADED_BANNER_TEXT}
         </aside>
       )}
       <LiveBlogHeader header={header} />

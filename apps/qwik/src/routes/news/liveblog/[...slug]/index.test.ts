@@ -112,6 +112,14 @@ describe('loadLiveBlogData', () => {
     expect(result).toMatchObject({ notFound: true, slug: 'missing-blog' });
   });
 
+  it('returns notFound via fail(404) when shell payload is null (production no_posts_found)', async () => {
+    mock = mockFetchSequence([{ body: { data: { article: null } } }]);
+    const ctx = makeCtx('2026/4/22/missing-blog');
+    const result = await loadLiveBlogData(ctx);
+    expect(ctx.fail).toHaveBeenCalledWith(404, { notFound: true, slug: 'missing-blog' });
+    expect(result).toMatchObject({ notFound: true, slug: 'missing-blog' });
+  });
+
   it('shell fetch 500 re-throws (not notFound)', async () => {
     mock = mockFetchSequence([{ status: 500, rawBody: 'oops' }]);
     await expect(loadLiveBlogData(makeCtx('2026/4/22/some-blog'))).rejects.toBeInstanceOf(
