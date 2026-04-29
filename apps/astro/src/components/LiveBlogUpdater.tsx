@@ -3,6 +3,19 @@ import { LIVEBLOG_POLL_INTERVAL_MS, type LiveBlogUpdate } from '@aje-poc/shared-
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
+// Build-time poll-cadence override for acceptance tests — Vite inlines
+// import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS at build, so production
+// builds bake the 30s default unless the build is run with the env set.
+// Non-positive / non-finite values fall through to the default.
+export function resolvePollIntervalMs(rawEnv: unknown, defaultMs: number): number {
+  const n = Number(rawEnv);
+  return Number.isFinite(n) && n > 0 ? n : defaultMs;
+}
+const POLL_INTERVAL_MS = resolvePollIntervalMs(
+  import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
+  LIVEBLOG_POLL_INTERVAL_MS,
+);
+
 // Exported for unit tests. Polls the shell, diffs against currentIds,
 // fetches per-update content for any new ids in parallel, and returns the
 // fulfilled+non-null entries newest-first. allSettled keeps a single
@@ -59,7 +72,7 @@ export function LiveBlogUpdater({ slug, initialChildIds }: Props) {
       const fresh = await fetchPollUpdate(slug, known);
       if (fresh.length === 0) return;
       setNewEntries((prev) => [...fresh, ...prev]);
-    }, LIVEBLOG_POLL_INTERVAL_MS);
+    }, POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [slug, initialChildIds]);
 

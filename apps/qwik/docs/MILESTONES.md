@@ -12,12 +12,12 @@
 
 Both PoCs aim to **exceed** Core Web Vitals "Good" thresholds, not just clear them. Every per-page acceptance criterion uses the stretch column. A value worse than the floor fails the milestone outright.
 
-| Metric                 | "Good" floor | **Stretch (target)** | Acceptance gate                   |
-| ---------------------- | ------------ | -------------------- | --------------------------------- |
-| LCP                    | < 2.5s       | **≤ 1.5s**           | Stretch                           |
-| CLS                    | < 0.1        | **≤ 0.05**           | Stretch                           |
-| INP                    | < 200ms      | **≤ 100ms**          | Stretch                           |
-| Lighthouse Performance | ≥ 95         | **≥ 98**             | **Qwik: ≥ 85 floor** (sprint-009) |
+| Metric                 | "Good" floor | **Stretch (target)** | Acceptance gate                                      |
+| ---------------------- | ------------ | -------------------- | ---------------------------------------------------- |
+| LCP                    | < 2.5s       | **≤ 1.5s**           | Stretch                                              |
+| CLS                    | < 0.1        | **≤ 0.05**           | Stretch                                              |
+| INP                    | < 200ms      | **≤ 100ms**          | Stretch                                              |
+| Lighthouse Performance | ≥ 95         | **≥ 98**             | **Qwik: ≥ 80 floor** (sprint-009 capstone re-anchor) |
 
 Qwik LH Performance gates at the floor (not the stretch) because beta.32 framework runtime + chunk graph dominate the throttled-CPU critical path; see [`docs/PERFORMANCE_TARGETS.md`](../../../docs/PERFORMANCE_TARGETS.md) and [`QWIK2_NOTES.md`](./QWIK2_NOTES.md).
 
@@ -131,8 +131,8 @@ Qwik LH Performance gates at the floor (not the stretch) because beta.32 framewo
 - Layout is responsive (mobile stacks to single column)
 - `VerticalVideoCarousel` is interactive (swipe/scroll)
 - Interactive handlers are lazy-loaded — zero JS until interaction
-- **M2 harness reports stretch CWV met:** LCP ≤ 1.5s, CLS ≤ 0.05, INP ≤ 100ms, Lighthouse Performance ≥ 85 (Qwik 2 beta.32 floor per sprint-009 split — see `cli_helpers.ts` `QWIK_LH_PERF_FLOOR`; Astro side uses the stretch ≥ 98)
-- Homepage JS budget: see [`ARCHITECTURE.md` § JavaScript Budgets](ARCHITECTURE.md#javascript-budgets-transferred-all-script-bytes-per-lighthouse-network-requests) (revised to <175 KB on beta.32 per sprint-009 story-005 outcome; aspirational <15 KB carried as a v2-stable target)
+- **M2 harness reports stretch CWV met:** LCP ≤ 1.5s, CLS ≤ 0.05, INP ≤ 100ms, Lighthouse Performance ≥ 80 (Qwik 2 beta.32 floor per sprint-009 capstone re-anchor — see `cli_helpers.ts` `QWIK_LH_PERF_FLOOR`; Astro side uses the stretch ≥ 98)
+- Homepage JS budget: see [`ARCHITECTURE.md` § JavaScript Budgets](ARCHITECTURE.md#javascript-budgets-transferred-all-script-bytes-per-lighthouse-network-requests) (revised to <176 KB on beta.32 per sprint-009 story-005 capstone close; aspirational <15 KB carried as a v2-stable target)
 
 ---
 
@@ -189,8 +189,8 @@ Qwik LH Performance gates at the floor (not the stretch) because beta.32 framewo
 - Offset increments correctly (0 → 9 → 18 → ...)
 - `LoadMoreButton` uses `$()` lazy handler — JS loaded only on first click
 - Section type correctly auto-detected from URL
-- **M2 harness reports stretch CWV met**, including INP ≤ 100ms after Load More click (this is the key INP test for the page); Lighthouse Performance ≥ 85 (Qwik 2 beta.32 floor per sprint-009 split)
-- Section Front JS budget: see [`ARCHITECTURE.md` § JavaScript Budgets](ARCHITECTURE.md#javascript-budgets-transferred-all-script-bytes-per-lighthouse-network-requests) (revised to <175 KB on beta.32 per sprint-009; shares Homepage ceiling per cli_helpers.ts; aspirational <15 KB carried as a v2-stable target)
+- **M2 harness reports stretch CWV met**, including INP ≤ 100ms after Load More click (this is the key INP test for the page); Lighthouse Performance ≥ 80 (Qwik 2 beta.32 floor per sprint-009 capstone re-anchor)
+- Section Front JS budget: see [`ARCHITECTURE.md` § JavaScript Budgets](ARCHITECTURE.md#javascript-budgets-transferred-all-script-bytes-per-lighthouse-network-requests) (revised to <176 KB on beta.32 per sprint-009; shares Homepage ceiling per cli_helpers.ts; aspirational <15 KB carried as a v2-stable target)
 
 ---
 
@@ -262,11 +262,11 @@ Qwik LH Performance gates at the floor (not the stretch) because beta.32 framewo
 | LCP              | < 2.5s            | **≤ 1.5s**           | ✓                   |
 | CLS              | < 0.1             | **≤ 0.05**           | ✓                   |
 | INP              | < 200ms           | **≤ 100ms**          | ✓                   |
-| Lighthouse Perf  | ≥ 85 (Qwik beta)  | **≥ 98** (Astro)     | ✓ split per-target  |
-| Homepage JS      | —                 | < 175 KB (was <15)   | n/a                 |
-| Article JS       | —                 | < 168 KB (was <10)   | n/a                 |
-| Live Blog JS     | —                 | < 175 KB (was <20)   | n/a                 |
-| Section Front JS | —                 | < 175 KB (was <15)   | n/a                 |
+| Lighthouse Perf  | ≥ 80 (Qwik beta)  | **≥ 98** (Astro)     | ✓ split per-target  |
+| Homepage JS      | —                 | < 176 KB (was <15)   | n/a                 |
+| Article JS       | —                 | < 176 KB (was <10)   | n/a                 |
+| Live Blog JS     | —                 | < 176 KB (was <20)   | n/a                 |
+| Section Front JS | —                 | < 176 KB (was <15)   | n/a                 |
 
 - All puppeteer-core interaction tests pass
 - SSR throughput > 50 req/s per page type

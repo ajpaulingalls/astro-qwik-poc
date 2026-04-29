@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, waitFor } from '@testing-library/preact';
 import { mockFetchSequence } from '@aje-poc/shared-test-helpers';
 import { LIVEBLOG_POLL_INTERVAL_MS } from '@aje-poc/shared-types';
-import { LiveBlogUpdater, fetchPollUpdate } from './LiveBlogUpdater';
+import { LiveBlogUpdater, fetchPollUpdate, resolvePollIntervalMs } from './LiveBlogUpdater';
 
 const SLUG = 'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
 
@@ -95,6 +95,23 @@ describe('fetchPollUpdate', () => {
     const result = await fetchPollUpdate(SLUG, [4001]);
     expect(result.length).toBe(1);
     expect(result[0]!.id).toBe('4099');
+  });
+});
+
+describe('resolvePollIntervalMs', () => {
+  it('returns the env value when finite and positive', () => {
+    expect(resolvePollIntervalMs('500', 30_000)).toBe(500);
+    expect(resolvePollIntervalMs(1234, 30_000)).toBe(1234);
+  });
+  it('falls through to default on undefined / null / empty', () => {
+    expect(resolvePollIntervalMs(undefined, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs(null, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs('', 30_000)).toBe(30_000);
+  });
+  it('falls through to default on zero, negatives, and non-numeric strings', () => {
+    expect(resolvePollIntervalMs(0, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs('-1', 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs('not-a-number', 30_000)).toBe(30_000);
   });
 });
 

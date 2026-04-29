@@ -10,7 +10,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { mockFetchSequence, type MockedFetch } from '@aje-poc/shared-test-helpers';
-import { fetchPollUpdate, LiveBlogUpdater } from './LiveBlogUpdater';
+import { fetchPollUpdate, LiveBlogUpdater, resolvePollIntervalMs } from './LiveBlogUpdater';
 import type { LiveBlogUpdate } from '@aje-poc/shared-types';
 
 function makeUpdate(id: string, title: string): LiveBlogUpdate {
@@ -31,6 +31,23 @@ const SHELL_WITH_TWO_NEW = {
     },
   },
 };
+
+describe('resolvePollIntervalMs', () => {
+  it('returns the env value when finite and positive', () => {
+    expect(resolvePollIntervalMs('500', 30_000)).toBe(500);
+    expect(resolvePollIntervalMs(1234, 30_000)).toBe(1234);
+  });
+  it('falls through to default on undefined / null / empty', () => {
+    expect(resolvePollIntervalMs(undefined, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs(null, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs('', 30_000)).toBe(30_000);
+  });
+  it('falls through to default on zero, negatives, and non-numeric strings', () => {
+    expect(resolvePollIntervalMs(0, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs('-1', 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs('not-a-number', 30_000)).toBe(30_000);
+  });
+});
 
 describe('fetchPollUpdate', () => {
   let mock: MockedFetch | undefined;

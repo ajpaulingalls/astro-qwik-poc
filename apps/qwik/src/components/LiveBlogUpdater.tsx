@@ -7,6 +7,19 @@ import {
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
+// Build-time poll-cadence override for acceptance tests — Vite inlines
+// import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS at build, so production
+// builds bake the 30s default unless the build is run with the env set.
+// Non-positive / non-finite values fall through to the default.
+export function resolvePollIntervalMs(rawEnv: unknown, defaultMs: number): number {
+  const n = Number(rawEnv);
+  return Number.isFinite(n) && n > 0 ? n : defaultMs;
+}
+const POLL_INTERVAL_MS = resolvePollIntervalMs(
+  import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
+  LIVEBLOG_POLL_INTERVAL_MS,
+);
+
 // Exported for unit tests — see LiveBlogUpdater.test.tsx header for the
 // qwikLoader/createDOM rationale that forces helper-extraction.
 export async function fetchPollUpdate(
@@ -34,6 +47,11 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
   // the resume payload's component$ closure protects the route's <20KB JS
   // budget.
   const newEntries = useSignal<LiveBlogUpdate[]>([]);
+  // Mirrors the Astro Updater's data-hydrated marker so the perf-harness
+  // acceptance suite has a single cross-app signal for "Updater is alive"
+  // instead of a target-specific OR fallback. Flips false→true once the
+  // visible-task arms.
+  const hydrated = useSignal(false);
 
   // routeLoader$ is not re-invoked from the client without a navigation,
   // so polling lives here as a manual setInterval inside useVisibleTask$.
@@ -41,25 +59,37 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
   // see apps/qwik/docs/QWIK2_NOTES.md for the recorded decision. clearInterval
   // MUST be registered via the visible-task `cleanup` callback (not from
   // inside the setInterval body) so QRL teardown invokes it on unmount.
+  //
+  // strategy: 'document-ready' (not the default 'intersection-observer')
+  // because the section starts empty (0 height) — IntersectionObserver
+  // doesn't reliably fire for 0-height elements in headless Chrome and
+  // would leave the Updater dormant for users who landed at the top.
+  // Polling should start as soon as the document is ready, mirroring the
+  // Astro Updater's useEffect behavior for cross-app fairness.
   // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(({ cleanup }) => {
-    const intervalId = setInterval(async () => {
-      // Skip background tabs — no point burning the user's battery (and the
-      // server) when the entries aren't being read. useVisibleTask$ is
-      // client-only, so document is always defined here.
-      if (document.hidden) return;
-      const polledIds = newEntries.value.map((e) => Number(e.id));
-      const known = [...polledIds, ...initialChildIds];
-      const fresh = await fetchPollUpdate(slug, known);
-      if (fresh.length === 0) return;
-      newEntries.value = [...fresh, ...newEntries.value];
-    }, LIVEBLOG_POLL_INTERVAL_MS);
-    cleanup(() => clearInterval(intervalId));
-  });
+  useVisibleTask$(
+    ({ cleanup }) => {
+      hydrated.value = true;
+      const intervalId = setInterval(async () => {
+        // Skip background tabs — no point burning the user's battery (and the
+        // server) when the entries aren't being read. useVisibleTask$ is
+        // client-only, so document is always defined here.
+        if (document.hidden) return;
+        const polledIds = newEntries.value.map((e) => Number(e.id));
+        const known = [...polledIds, ...initialChildIds];
+        const fresh = await fetchPollUpdate(slug, known);
+        if (fresh.length === 0) return;
+        newEntries.value = [...fresh, ...newEntries.value];
+      }, POLL_INTERVAL_MS);
+      cleanup(() => clearInterval(intervalId));
+    },
+    { strategy: 'document-ready' },
+  );
 
   return (
     <section
       data-live-blog-updater
+      data-hydrated={hydrated.value ? 'true' : 'false'}
       aria-live="polite"
       aria-relevant="additions"
       class="live-blog-updater"
