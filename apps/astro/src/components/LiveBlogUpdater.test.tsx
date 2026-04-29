@@ -86,15 +86,38 @@ describe('fetchPollUpdate', () => {
     expect(result[0]!.id).toBe('4099');
   });
 
-  it('skips per-update fetches that fail (allSettled, not all)', async () => {
+  it('skips per-update fetches that 404 (allSettled, not all) without logging', async () => {
     mock = mockFetchSequence([
       shellResponse([4099, 4100, 4001]),
       updateResponse('4099', 'Visible'),
       { status: 404, body: { error: 'not found' } },
     ]);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const result = await fetchPollUpdate(SLUG, [4001]);
     expect(result.length).toBe(1);
     expect(result[0]!.id).toBe('4099');
+    // 404 is intentional (no_posts_found) — must NOT log.
+    expect(errSpy).not.toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  it('logs non-404 per-update rejections to console.error (5xx case)', async () => {
+    mock = mockFetchSequence([
+      shellResponse([4099, 4100, 4001]),
+      updateResponse('4099', 'Visible'),
+      { status: 500, body: { error: 'upstream broken' } }, // 4100 5xx — transient
+    ]);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = await fetchPollUpdate(SLUG, [4001]);
+
+    expect(result.length).toBe(1);
+    expect(result[0]!.id).toBe('4099');
+    expect(errSpy).toHaveBeenCalledWith(
+      'liveblog-updater: per-update fetch failed:',
+      expect.objectContaining({ id: 4100 }),
+    );
+    errSpy.mockRestore();
   });
 });
 
