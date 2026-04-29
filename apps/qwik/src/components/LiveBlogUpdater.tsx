@@ -36,9 +36,9 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
   // routeLoader$ is not re-invoked from the client without a navigation,
   // so polling lives here as a manual setInterval inside useVisibleTask$.
   // allowStale (the v2-shaped equivalent) does not exist in beta.32 —
-  // see apps/qwik/docs/QWIK2_NOTES.md for the recorded decision. Cleanup
-  // MUST return from useVisibleTask$ (not from inside setInterval) so the
-  // QRL teardown invokes it on unmount.
+  // see apps/qwik/docs/QWIK2_NOTES.md for the recorded decision. clearInterval
+  // MUST be registered via the visible-task `cleanup` callback (not from
+  // inside the setInterval body) so QRL teardown invokes it on unmount.
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ cleanup }) => {
     const intervalId = setInterval(async () => {
