@@ -137,6 +137,20 @@ describe('loadLiveBlogData', () => {
     expect(result.entries[0]!.id).toBe('4512107');
   });
 
+  it('drops per-update results whose payload is null (production no_posts_found per id)', async () => {
+    mock = mockFetchSequence([
+      { body: { data: { article: SHELL } } },
+      { body: { data: { posts: null } } },
+      { body: { data: { posts: makeUpdate('4514943', 'Survived') } } },
+      { body: { data: { posts: null } } },
+      { body: { data: { posts: makeUpdate('4512099', 'Also survived') } } },
+      { body: { data: { posts: null } } },
+    ]);
+    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    if (!('header' in result)) throw new Error('expected success');
+    expect(result.entries.map((e) => e.id)).toEqual(['4514943', '4512099']);
+  });
+
   it('handles shells with no childrenMeta (skips per-update fan-out)', async () => {
     mock = mockFetchSequence([
       { body: { data: { article: { ...SHELL, children: [], childrenMeta: undefined } } } },

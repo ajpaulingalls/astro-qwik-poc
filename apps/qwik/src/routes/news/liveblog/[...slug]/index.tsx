@@ -39,6 +39,7 @@ export async function loadLiveBlogData(
     }
     throw err;
   }
+  if (shell === null) return fail(404, { notFound: true, slug });
 
   // Per-update fan-out: childrenMeta carries each entry's post ID. Using
   // allSettled (not all) because individual updates can be deleted between
@@ -47,7 +48,10 @@ export async function loadLiveBlogData(
   const targets = meta.slice(0, LIVEBLOG_INITIAL_ENTRY_COUNT).map((m) => Number(m.id));
   const settled = await Promise.allSettled(targets.map(fetchLiveBlogUpdate));
   const entries = settled
-    .filter((s): s is PromiseFulfilledResult<LiveBlogUpdate> => s.status === 'fulfilled')
+    .filter(
+      (s): s is PromiseFulfilledResult<LiveBlogUpdate> =>
+        s.status === 'fulfilled' && s.value !== null,
+    )
     .map((s) => s.value);
 
   // Trim to render-needed shape only. Qwik 2 serializes the full loader
