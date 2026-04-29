@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { mockFetchSequence, type MockedFetch } from '@aje-poc/shared-test-helpers';
 import { fetchPollUpdate, LiveBlogUpdater } from './LiveBlogUpdater';
-import type { LiveBlogUpdate } from './LiveBlogEntry';
+import type { LiveBlogUpdate } from '@aje-poc/shared-types';
 
 function makeUpdate(id: string, title: string): LiveBlogUpdate {
   return {

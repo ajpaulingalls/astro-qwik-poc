@@ -1,4 +1,4 @@
-import type { LiveBlogUpdate } from '../lib/liveblog-api';
+import type { LiveBlogUpdate } from '@aje-poc/shared-types';
 import { formatDate } from '../lib/format-date';
 import { ArticleBody } from './ArticleBody';
 

@@ -1,6 +1,6 @@
-import type { LiveBlogShell } from '@aje-poc/shared-types';
+import type { LiveBlogShell, LiveBlogUpdate } from '@aje-poc/shared-types';
 import { GraphqlHttpError } from './graphql';
-import { fetchLiveBlogShell, fetchLiveBlogUpdate, type LiveBlogUpdate } from './liveblog-api';
+import { fetchLiveBlogShell, fetchLiveBlogUpdate } from './liveblog-api';
 
 // Production above-the-fold count for live blog updates. Updater hydration
 // can later lazy-fetch older entries; SSR ships this many in parallel.

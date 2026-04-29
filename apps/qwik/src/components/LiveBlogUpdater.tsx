@@ -1,7 +1,7 @@
 import { component$, useSignal, useVisibleTask$ } from '@qwik.dev/core';
-import type { LiveBlogChildrenIds } from '@aje-poc/shared-types';
+import type { LiveBlogChildrenIds, LiveBlogUpdate } from '@aje-poc/shared-types';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
-import { LiveBlogEntry, type LiveBlogUpdate } from './LiveBlogEntry';
+import { LiveBlogEntry } from './LiveBlogEntry';
 
 const POLL_INTERVAL_MS = 30_000;
 

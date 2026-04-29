@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { fetchLiveBlogShell, fetchLiveBlogUpdate, type LiveBlogUpdate } from '../lib/liveblog-api';
+import type { LiveBlogUpdate } from '@aje-poc/shared-types';
+import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
 const POLL_INTERVAL_MS = 30_000;

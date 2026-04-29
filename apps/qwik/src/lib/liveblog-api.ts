@@ -1,6 +1,5 @@
-import type { LiveBlogShell } from '@aje-poc/shared-types';
+import type { LiveBlogShell, LiveBlogUpdate } from '@aje-poc/shared-types';
 import { graphqlFetch } from './graphql';
-import type { LiveBlogUpdate } from '../components/LiveBlogEntry';
 
 interface SingleLiveBlogData {
   article: LiveBlogShell;

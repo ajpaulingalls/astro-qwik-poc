@@ -89,6 +89,18 @@ export interface LiveBlogChildMeta {
   publishedTime: string;
 }
 
+// shouldDisplayTitle: production sometimes returns updates whose title is
+// internal-only (e.g., a tweet-only entry); honored by LiveBlogEntry.
+// content: trusted CMS HTML carrying Twitter/Brightcove/YouTube/gallery
+// embeds — must be dispatched via ArticleBody/parseEmbeds, not raw-injected.
+export interface LiveBlogUpdate {
+  id: string;
+  title: string;
+  shouldDisplayTitle: boolean;
+  content: string;
+  date: string;
+}
+
 export type LiveBlogChildrenIds = number[];
 
 export interface LiveBlogShell {
