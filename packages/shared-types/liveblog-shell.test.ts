@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
-import type { LiveBlogShell, LiveBlogChildrenIds } from './index';
 
 const LIVEBLOG_SLUG = 'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
 const FIXTURES_DIR = join(__dirname, '..', 'mock-api', 'fixtures');
@@ -17,17 +16,14 @@ const CHILDREN_FIXTURE_PATH = join(
   `SingleLiveBlogChildrensQuery--${LIVEBLOG_SLUG}--snapshot-0.json`,
 );
 
-interface ShellFixture {
-  data: { article: LiveBlogShell };
-}
+// Shape conformance is enforced at runtime by the per-field expect(...)
+// calls inside each `it` block. Do NOT decorate JSON.parse(...) with
+// `satisfies SomeShape` — JSON.parse returns `any`, so `satisfies` is a
+// no-op there and reads as a compile-time guarantee that doesn't exist.
 
-interface ChildrenFixture {
-  data: { article: { children: LiveBlogChildrenIds } };
-}
-
-describe('LiveBlogShell type vs ArchipelagoSingleLiveBlogQuery fixture', () => {
+describe('LiveBlogShell fixture shape (runtime validation)', () => {
   it('every required LiveBlogShell field is present in the production-recorded shell', () => {
-    const raw = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8')) satisfies ShellFixture;
+    const raw = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8'));
     const shell = raw.data.article;
     expect(typeof shell.id).toBe('string');
     expect(typeof shell.title).toBe('string');
@@ -43,7 +39,7 @@ describe('LiveBlogShell type vs ArchipelagoSingleLiveBlogQuery fixture', () => {
   });
 
   it('childrenMeta entries (when present) match LiveBlogChildMeta shape', () => {
-    const raw = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8')) satisfies ShellFixture;
+    const raw = JSON.parse(readFileSync(FIXTURE_PATH, 'utf8'));
     const meta = raw.data.article.childrenMeta;
     if (!meta) return;
     expect(meta.length).toBeGreaterThan(0);
@@ -54,9 +50,9 @@ describe('LiveBlogShell type vs ArchipelagoSingleLiveBlogQuery fixture', () => {
   });
 });
 
-describe('LiveBlogChildrenIds type vs SingleLiveBlogChildrensQuery fixture', () => {
+describe('LiveBlogChildrenIds fixture shape (runtime validation)', () => {
   it('parses children fixture as number[]', () => {
-    const raw = JSON.parse(readFileSync(CHILDREN_FIXTURE_PATH, 'utf8')) satisfies ChildrenFixture;
+    const raw = JSON.parse(readFileSync(CHILDREN_FIXTURE_PATH, 'utf8'));
     const ids = raw.data.article.children;
     expect(ids.length).toBeGreaterThan(0);
     for (const id of ids) {

@@ -13,7 +13,18 @@ const result = await loadLiveBlogData(slugLeaf);
 if ('notFound' in result) {
   return new Response(`Live blog not found: ${slugLeaf}`, { status: 404 });
 }
-const { shell, entries } = result;
+const { shell, entries, degraded } = result;
+if (degraded) {
+  // SSR-side log so a transient upstream failure surfaces in deploy logs
+  // instead of being invisible to operators. The marker is also available
+  // to a future <aside data-live-blog-degraded> banner — TODO: render that
+  // banner once the design lands. Until then, the marker is a server-side
+  // signal only; client-side users see the page with fewer entries.
+  console.error('liveblog-route: SSR degraded:', {
+    slug: slugLeaf,
+    failedUpdateIds: degraded.failedUpdateIds,
+  });
+}
 
 // Header receives a projected slice of the shell. Astro doesn't need to trim
 // for serialization (Qwik does — see the routeLoader in

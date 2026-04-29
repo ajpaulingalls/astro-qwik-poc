@@ -4,6 +4,7 @@ import {
   type LiveBlogChildrenIds,
   type LiveBlogUpdate,
 } from '@aje-poc/shared-types';
+import { GraphqlHttpError } from '../lib/graphql';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
@@ -22,6 +23,12 @@ const POLL_INTERVAL_MS = resolvePollIntervalMs(
 
 // Exported for unit tests — see LiveBlogUpdater.test.tsx header for the
 // qwikLoader/createDOM rationale that forces helper-extraction.
+//
+// Intentionally swallowed: rejected-404 (deleted post / no_posts_found).
+// Anything else — 5xx, network, parse — is logged so a transient upstream
+// failure surfaces in the console. The poll site has no UI consumer for a
+// degraded marker today; loadLiveBlogData (Astro side) carries the marker
+// on the SSR path where the route is a credible UI consumer.
 export async function fetchPollUpdate(
   slug: string,
   currentIds: LiveBlogChildrenIds,
@@ -31,9 +38,20 @@ export async function fetchPollUpdate(
   const newIds = shell.children.filter((id) => !known.has(id));
   if (newIds.length === 0) return [];
   const settled = await Promise.allSettled(newIds.map(fetchLiveBlogUpdate));
-  return settled
-    .filter((s): s is PromiseFulfilledResult<LiveBlogUpdate> => s.status === 'fulfilled')
-    .map((s) => s.value);
+  const entries: LiveBlogUpdate[] = [];
+  for (let i = 0; i < settled.length; i++) {
+    const result = settled[i]!;
+    const id = newIds[i]!;
+    if (result.status === 'fulfilled') {
+      entries.push(result.value);
+      continue;
+    }
+    if (result.reason instanceof GraphqlHttpError && result.reason.status === 404) {
+      continue;
+    }
+    console.error('liveblog-updater: per-update fetch failed:', { id, reason: result.reason });
+  }
+  return entries;
 }
 
 interface Props {
@@ -70,16 +88,36 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
   useVisibleTask$(
     ({ cleanup }) => {
       hydrated.value = true;
+      // Concurrency guard: if a fetch from tick N stalls past the 30s
+      // interval, tick N+1 must NOT fire a second concurrent fetch — the
+      // older fetch could resolve last and prepend stale entries above
+      // newer ones. Drop the late tick on the floor; the next tick after
+      // `polling` clears will pick up the latest known ids. Production
+      // upgrade path: AbortController + sequence number to actively
+      // cancel the stalled fetch.
+      let polling = false;
       const intervalId = setInterval(async () => {
+        if (polling) return;
         // Skip background tabs — no point burning the user's battery (and the
         // server) when the entries aren't being read. useVisibleTask$ is
         // client-only, so document is always defined here.
         if (document.hidden) return;
-        const polledIds = newEntries.value.map((e) => Number(e.id));
-        const known = [...polledIds, ...initialChildIds];
-        const fresh = await fetchPollUpdate(slug, known);
-        if (fresh.length === 0) return;
-        newEntries.value = [...fresh, ...newEntries.value];
+        polling = true;
+        try {
+          const polledIds = newEntries.value.map((e) => Number(e.id));
+          const known = [...polledIds, ...initialChildIds];
+          const fresh = await fetchPollUpdate(slug, known);
+          if (fresh.length === 0) return;
+          newEntries.value = [...fresh, ...newEntries.value];
+        } catch (err) {
+          // fetchLiveBlogShell or any other unhandled awaitable can reject
+          // (5xx, network, parse). Without this catch the rejection becomes
+          // an unhandled promise rejection at every tick. The `finally`
+          // still resets polling so the next tick proceeds.
+          console.error('liveblog-updater: poll tick failed:', err);
+        } finally {
+          polling = false;
+        }
       }, POLL_INTERVAL_MS);
       cleanup(() => clearInterval(intervalId));
     },

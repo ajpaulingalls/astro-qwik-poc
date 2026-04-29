@@ -47,6 +47,14 @@ describe('resolvePollIntervalMs', () => {
     expect(resolvePollIntervalMs('-1', 30_000)).toBe(30_000);
     expect(resolvePollIntervalMs('not-a-number', 30_000)).toBe(30_000);
   });
+  // Pins the Number.isFinite half of the rule. Without this, dropping
+  // isFinite from the impl (using only `n > 0`) would silently let
+  // Infinity through and arm setInterval with a non-finite delay.
+  it('falls through to default on NaN, Infinity, and -Infinity', () => {
+    expect(resolvePollIntervalMs(NaN, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs(Infinity, 30_000)).toBe(30_000);
+    expect(resolvePollIntervalMs(-Infinity, 30_000)).toBe(30_000);
+  });
 });
 
 describe('fetchPollUpdate', () => {
@@ -101,14 +109,36 @@ describe('fetchPollUpdate', () => {
     expect(newEntries).toEqual([]);
   });
 
-  it('skips per-update 404s gracefully (Promise.allSettled)', async () => {
+  it('skips per-update 404s gracefully (allSettled, not all) without logging', async () => {
     mock = mockFetchSequence([
       { body: SHELL_WITH_TWO_NEW },
       { status: 404, rawBody: 'no fixture' },
       { body: { data: { posts: makeUpdate('4514943', 'Survived') } } },
     ]);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const newEntries = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
     expect(newEntries.map((e) => e.id)).toEqual(['4514943']);
+    // 404 is intentional (no_posts_found) — must NOT log.
+    expect(errSpy).not.toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  it('logs non-404 per-update rejections to console.error (5xx case)', async () => {
+    mock = mockFetchSequence([
+      { body: SHELL_WITH_TWO_NEW },
+      { body: { data: { posts: makeUpdate('4514963', 'Survived') } } },
+      { status: 500, rawBody: 'upstream broken' }, // 4514943 5xx — transient
+    ]);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const newEntries = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
+
+    expect(newEntries.map((e) => e.id)).toEqual(['4514963']);
+    expect(errSpy).toHaveBeenCalledWith(
+      'liveblog-updater: per-update fetch failed:',
+      expect.objectContaining({ id: 4514943 }),
+    );
+    errSpy.mockRestore();
   });
 });
 

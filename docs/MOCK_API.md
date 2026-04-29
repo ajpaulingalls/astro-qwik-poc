@@ -84,12 +84,12 @@ curl -s 'https://www.aljazeera.com/graphql?wp-site=aje&operationName=HomePageQue
 
 ## Environment Variables
 
-| Variable                        | Default      | Purpose                                                                                                             |
-| ------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `PORT`                          | `4455`       | Server port (0–65535)                                                                                               |
-| `FIXTURE_DIR`                   | `./fixtures` | Path to fixture JSON files                                                                                          |
-| `LIVEBLOG_SNAPSHOT_INDEX`       | (unset)      | Pins live-blog `--snapshot-N` selection for the process. Overridden per-request by `x-liveblog-snapshot: N` header. |
-| `LIVEBLOG_SNAPSHOT_INTERVAL_MS` | `30000`      | Wall-clock auto-rotation interval (ms) when neither header nor `LIVEBLOG_SNAPSHOT_INDEX` is set.                    |
+| Variable                                                             | Default      | Purpose                                                                                                                                  |
+| -------------------------------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `PORT`                                                               | `4455`       | Server port (0–65535)                                                                                                                    |
+| `FIXTURE_DIR`                                                        | `./fixtures` | Path to fixture JSON files                                                                                                               |
+| `SNAPSHOT_INDEX`<br>_(alias: `LIVEBLOG_SNAPSHOT_INDEX`)_             | (unset)      | Pins `--snapshot-N` selection for the process (governs live-blog AND ticker). Overridden per-request by `x-liveblog-snapshot: N` header. |
+| `SNAPSHOT_INTERVAL_MS`<br>_(alias: `LIVEBLOG_SNAPSHOT_INTERVAL_MS`)_ | `30000`      | Wall-clock auto-rotation interval (ms) when neither header nor `SNAPSHOT_INDEX` is set.                                                  |
 
 > Per-app `PUBLIC_API_BASE` (consumer-side env that points an app at
 > `http://localhost:4455` or `:4456`) is documented in each app's
@@ -101,6 +101,6 @@ curl -s 'https://www.aljazeera.com/graphql?wp-site=aje&operationName=HomePageQue
 deno run \
   --allow-net=0.0.0.0:4455 \
   --allow-read=./fixtures \
-  --allow-env=PORT,FIXTURE_DIR,LIVEBLOG_SNAPSHOT_INDEX,LIVEBLOG_SNAPSHOT_INTERVAL_MS \
+  --allow-env=PORT,FIXTURE_DIR,SNAPSHOT_INDEX,SNAPSHOT_INTERVAL_MS,LIVEBLOG_SNAPSHOT_INDEX,LIVEBLOG_SNAPSHOT_INTERVAL_MS \
   packages/mock-api/server.ts
 ```
