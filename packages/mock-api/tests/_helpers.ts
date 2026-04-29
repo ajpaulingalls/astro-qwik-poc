@@ -1,5 +1,38 @@
 import { startServer } from "../server.ts";
 
+export const LIVE_BLOG_SLUG =
+  "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+
+export function buildRequest(opts: {
+  method?: string;
+  path?: string;
+  operationName?: string;
+  variables?: unknown;
+  wpSite?: string | null;
+  snapshotHeader?: string;
+}): Request {
+  const path = opts.path ?? "/graphql";
+  const params = new URLSearchParams();
+  if (opts.operationName !== undefined) {
+    params.set("operationName", opts.operationName);
+  }
+  if (opts.variables !== undefined) {
+    const v = typeof opts.variables === "string"
+      ? opts.variables
+      : JSON.stringify(opts.variables);
+    params.set("variables", v);
+  }
+  const url = `http://localhost:4455${path}${
+    params.toString() ? "?" + params.toString() : ""
+  }`;
+  const headers = new Headers();
+  if (opts.wpSite !== null) headers.set("wp-site", opts.wpSite ?? "aje");
+  if (opts.snapshotHeader !== undefined) {
+    headers.set("x-liveblog-snapshot", opts.snapshotHeader);
+  }
+  return new Request(url, { method: opts.method ?? "GET", headers });
+}
+
 export async function withTempDir<T>(
   fn: (dir: string) => Promise<T>,
   prefix = "mock-api-test-",
