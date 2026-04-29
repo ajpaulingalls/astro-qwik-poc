@@ -97,6 +97,27 @@ const SECTION_LOADMORE_LATENCY_BUDGET_MS = 500;
 // chained character classes.
 const LCP_IMAGE_PRELOAD_RE = /<link\b[^>]*\brel=["']preload["'][^>]*\bas=["']image["']/;
 
+// Live-blog capstone (story-005): both apps' Updater islands must poll the
+// shell, fetch new entries, and prepend them with no CLS regression.
+//
+// Determinism: SSR fetches go server→mock-api with no special headers and
+// LIVEBLOG_SNAPSHOT_INDEX=0 in the env (test:acceptance script), pinning
+// every server-side fetch to snapshot-0 (25 children). The browser then
+// adds `x-liveblog-snapshot: 2` via setExtraHTTPHeaders before the Updater
+// starts polling; mock-api's per-request header overrides the env, so polls
+// see snapshot-2 (27 children) and the diff yields the 2 new entries that
+// triggered the prepend. Wall-clock auto-rotation is OFF in tests because
+// it can cycle backwards (snapshot-2 → snapshot-0 = no new ids = test hangs).
+//
+// Both apps' builds also bake PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 so the
+// Updater's setInterval fires within ~1s instead of waiting for the
+// production 30s cadence.
+const LIVEBLOG_SLUG =
+  '2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
+const LIVEBLOG_PATH = `/news/liveblog/${LIVEBLOG_SLUG}`;
+// CLS-during-prepend gate from execution_plan.json M9 done-state.
+const CLS_PREPEND_BUDGET = 0.05;
+
 // HTML5 forbids nested <main> landmarks. Qwik's layout wraps every route in
 // <main>; per-route components must NOT add another (use <div> with the
 // content-width classes instead). Astro's BaseLayout doesn't add <main>, so
@@ -462,6 +483,106 @@ export function runAcceptanceSuite(target: Target): void {
         },
       );
     }
+
+    // Live blog capstone (story-005, M9 done-state): the Updater island
+    // must poll, prepend new entries, and not break the CLS-on-prepend
+    // budget. Mock-api auto-rotates snapshots every 200ms (env override);
+    // both apps' builds bake PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 so the
+    // Updater fires within ~1s. The PerformanceObserver with buffered:false
+    // captures only layout-shift entries that fire AFTER the observer is
+    // installed — scoped to the prepend window, not page load (which would
+    // include initial render shifts that are not the polling-prepend's
+    // fault). hadRecentInput excludes shifts attributable to user input.
+    it(
+      'live-blog Updater polls + prepends new entries with no CLS regression',
+      { timeout: 30_000 },
+      async () => {
+        const url = `http://127.0.0.1:${APP_PORT[target]}${LIVEBLOG_PATH}`;
+        // Open page manually (not via withPage) so we can install the
+        // x-liveblog-snapshot header BEFORE polling starts — withPage's
+        // goto would race the Updater's first poll. The header is pinned
+        // for the lifetime of this page; production code never sends it.
+        const page = await browser.newPage();
+        try {
+          await page.setViewport(DESKTOP);
+          // setExtraHTTPHeaders applies to ALL outgoing browser requests,
+          // including the navigation request. The header on the SSR
+          // navigation is harmless: the app server hits mock-api with its
+          // own Node fetch (no header forwarding), so SSR resolves at
+          // env-pinned snapshot-0 regardless. Only the browser-originated
+          // polling fetches carry the header — those resolve at snapshot-2.
+          await page.setExtraHTTPHeaders({ 'x-liveblog-snapshot': '2' });
+          // domcontentloaded (not networkidle2) — the Updater starts polling
+          // every 500ms once hydrated, so the network never idles long
+          // enough for networkidle2 to resolve. We wait for hydration via
+          // an explicit waitForFunction below, which is the correct signal
+          // for "Updater is alive" anyway.
+          await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+
+          // Both apps' Updater sections flip data-hydrated false→true once
+          // their visible task / useEffect arms — single cross-app signal.
+          await page.waitForFunction(
+            () =>
+              document
+                .querySelector('section[data-live-blog-updater]')
+                ?.getAttribute('data-hydrated') === 'true',
+            { timeout: 10_000 },
+          );
+
+          // Bootstrap: snapshot initial entry IDs AND install the layout-
+          // shift observer in one round-trip. buffered:false skips shifts
+          // that fired before this point (initial render, font swap) so we
+          // only measure the polling-prepend window.
+          const initialEntryIds = await page.evaluate(() => {
+            const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
+            w.__cls = 0;
+            const obs = new PerformanceObserver((list) => {
+              for (const entry of list.getEntries()) {
+                const ls = entry as PerformanceEntry & {
+                  value: number;
+                  hadRecentInput: boolean;
+                };
+                if (!ls.hadRecentInput) w.__cls += ls.value;
+              }
+            });
+            obs.observe({ type: 'layout-shift', buffered: false });
+            w.__obs = obs;
+            return Array.from(document.querySelectorAll('[data-entry-id]')).map(
+              (el) => el.getAttribute('data-entry-id') ?? '',
+            );
+          });
+
+          // Wait for the Updater to prepend at least one new entry — the
+          // count of [data-entry-id] elements grows because both apps'
+          // Updater section appends polled entries with the same data-
+          // entry-id wrapper as the SSR'd entries below.
+          await page.waitForFunction(
+            (initial: number) => document.querySelectorAll('[data-entry-id]').length > initial,
+            { timeout: 15_000 },
+            initialEntryIds.length,
+          );
+
+          // Teardown: disconnect observer, return CLS + final IDs in one
+          // round-trip.
+          const { cls, finalEntryIds } = await page.evaluate(() => {
+            const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
+            w.__obs.disconnect();
+            return {
+              cls: w.__cls,
+              finalEntryIds: Array.from(document.querySelectorAll('[data-entry-id]')).map(
+                (el) => el.getAttribute('data-entry-id') ?? '',
+              ),
+            };
+          });
+
+          expect(initialEntryIds.length).toBeGreaterThan(0);
+          expect(finalEntryIds.length).toBeGreaterThan(initialEntryIds.length);
+          expect(cls).toBeLessThanOrEqual(CLS_PREPEND_BUDGET);
+        } finally {
+          await page.close();
+        }
+      },
+    );
 
     // Capstone article suite (story-008): one navigated DOM probe per
     // fixture variant, asserting the article shell, the embed-specific DOM
