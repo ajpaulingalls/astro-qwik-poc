@@ -1,6 +1,7 @@
 import { component$, useSignal, useVisibleTask$ } from '@qwik.dev/core';
 import {
   LIVEBLOG_POLL_INTERVAL_MS,
+  resolvePollIntervalMs,
   type LiveBlogChildrenIds,
   type LiveBlogUpdate,
 } from '@aje-poc/shared-types';
@@ -8,14 +9,6 @@ import { GraphqlHttpError } from '../lib/graphql';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
-// Build-time poll-cadence override for acceptance tests — Vite inlines
-// import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS at build, so production
-// builds bake the 30s default unless the build is run with the env set.
-// Non-positive / non-finite values fall through to the default.
-export function resolvePollIntervalMs(rawEnv: unknown, defaultMs: number): number {
-  const n = Number(rawEnv);
-  return Number.isFinite(n) && n > 0 ? n : defaultMs;
-}
 const POLL_INTERVAL_MS = resolvePollIntervalMs(
   import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
   LIVEBLOG_POLL_INTERVAL_MS,

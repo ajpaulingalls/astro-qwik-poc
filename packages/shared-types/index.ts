@@ -165,6 +165,18 @@ export interface BreakingTicker {
 // Both apps' BreakingTicker islands arm setInterval at this rate.
 export const TICKER_POLL_INTERVAL_MS = 30_000;
 
+// Build-time poll-cadence override for acceptance tests — Vite inlines
+// import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS at build, so production
+// builds bake the default unless the env is set. Pure helper shared by both
+// LiveBlogUpdater (apps/{astro,qwik}/src/components/LiveBlogUpdater.tsx) and
+// BreakingTicker (apps/{astro,qwik}/src/components/BreakingTicker.tsx); single
+// env var controls both pollers because their cadences are identical (30s).
+// Non-positive / non-finite values fall through to the default.
+export function resolvePollIntervalMs(rawEnv: unknown, defaultMs: number): number {
+  const n = Number(rawEnv);
+  return Number.isFinite(n) && n > 0 ? n : defaultMs;
+}
+
 // Banner render gate. Empty or whitespace-only tickerText is treated as
 // inactive (defensive: avoids rendering an empty banner if the API ever
 // returns "" or "   " instead of null). Only the all-null no-banner shape

@@ -3,8 +3,14 @@ import {
   TICKER_POLL_INTERVAL_MS,
   type BreakingTicker as BreakingTickerData,
   isBreakingTickerActive,
+  resolvePollIntervalMs,
 } from '@aje-poc/shared-types';
 import { fetchBreakingTicker } from '../lib/ticker-api';
+
+const POLL_INTERVAL_MS = resolvePollIntervalMs(
+  import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
+  TICKER_POLL_INTERVAL_MS,
+);
 
 export const BreakingTicker = component$(() => {
   const ticker = useSignal<BreakingTickerData | null>(null);
@@ -34,7 +40,7 @@ export const BreakingTicker = component$(() => {
         }
       };
       tick();
-      const intervalId = setInterval(tick, TICKER_POLL_INTERVAL_MS);
+      const intervalId = setInterval(tick, POLL_INTERVAL_MS);
       cleanup(() => clearInterval(intervalId));
     },
     { strategy: 'document-ready' },
