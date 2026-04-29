@@ -234,7 +234,28 @@ export const BreakingTicker = component$(() => {
 });
 ```
 
-> For the breaking ticker and live blog polling, consider Qwik 2's new `allowStale` option on `routeLoader$` / `AsyncSignal` as an alternative to manual `setInterval` — it returns cached data immediately while revalidating in the background.
+> `allowStale` (the v2-shaped cache-revalidate primitive) does **not** exist on `routeLoader$` / `AsyncSignal` in `@qwik.dev/core` ~2.0.0-beta.32 — see `docs/QWIK2_NOTES.md` § "M3 scaffolding > Divergences from apps/qwik/docs/ARCHITECTURE.md", item 3 (the same heading also appears under "M7 article shell" — make sure you land on the M3 one). Manual `setInterval` inside `useVisibleTask$` is the canonical workaround until it lands. Revisit on subsequent beta bumps.
+
+### Live blog polling
+
+The live-blog route splits rendering: initial entries are static SSR HTML emitted by the route, while `LiveBlogUpdater` (`apps/qwik/src/components/LiveBlogUpdater.tsx`, a `component$`) polls every 30s and prepends only new entries. The split keeps initial-entry HTML out of the resume payload's `component$` closure (one less copy) so the route stays under its 171KB transfer-size budget.
+
+The load-bearing shape — register `clearInterval` via the visible-task `cleanup` callback so QRL teardown invokes it on unmount:
+
+```ts
+useVisibleTask$(({ cleanup }) => {
+  const id = setInterval(async () => {
+    /* poll, diff, prepend */
+  }, 30_000);
+  cleanup(() => clearInterval(id));
+});
+```
+
+Three pieces matter:
+
+1. **`fetchPollUpdate(slug, currentIds)` is exported** from the same file so it can be unit-tested without bootstrapping qwikLoader. createDOM doesn't bootstrap qwikLoader, so `useVisibleTask$` bodies don't fire under vitest — `LoadMoreButton` follows the same helper-extraction pattern.
+2. **The route loader trims the shell to a render-needed shape** (`LiveBlogHeaderData` + the initial `LiveBlogUpdate[]` projections) — Qwik 2 serializes the full loader value into the resume payload, so projecting at the loader directly shrinks what ships.
+3. CLS-on-prepend verification — Updater renders an `aria-live="polite" aria-relevant="additions"` region; e2e CLS measurement during polling lives in story-005's acceptance suite (createDOM can't fire `useVisibleTask$`, so it isn't unit-testable).
 
 ---
 

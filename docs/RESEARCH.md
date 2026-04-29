@@ -59,21 +59,7 @@ exist but can be ignored for the PoC.
 | `LiveBlogUpdateQuery`                    | `{ postID: <int>, postType: "liveblog-update", preview: "", isAmp: false }` | Individual update content (title, HTML body, author, date). **`postType` must be `"liveblog-update"`** (hyphenated); omitting `preview`/`isAmp` or using `"liveblog"` returns `no_posts_found`. |
 | `ArchipelagoBreakingTickerQuery` (ID 18) | `{}`                                                                        | Breaking news ticker                                                                                                                                                                            |
 
-#### Polling decision
-
-Three-query design from the M9 spec. 30s cadence is the M9 spec target — each
-query was verified individually with `curl`, no browser-session capture of
-production polling.
-
-1. **`ArchipelagoSingleLiveBlogQuery`** — re-fetched every 30s.
-2. **`SingleLiveBlogChildrensQuery`** — fetched once at SSR; the shell's
-   `childrenMeta` is the source of truth for "new updates" diffing thereafter.
-3. **`LiveBlogUpdateQuery`** — fetched once per newly-discovered child id in
-   parallel after the diff identifies new ids.
-
-PoC implementation requirement (not a production-observed behavior): each
-prepended entry must reserve space (min-height / skeleton) so existing entries
-below don't shift. This is the M9 acceptance gate for both apps.
+> **PoC polling design + CLS-on-prepend gate moved out of this file.** RESEARCH.md is scoped to verified production behavior; PoC implementation choices (poll cadence, diff strategy, skeleton reservation) live in each app's docs — see `apps/qwik/docs/ARCHITECTURE.md` § "Live blog polling" for the Qwik implementation. The Astro counterpart will land in `apps/astro/docs/ARCHITECTURE.md` with story-003.
 
 #### Snapshot rotation in the mock-api
 

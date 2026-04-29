@@ -446,3 +446,19 @@ Qwik dev/preview goes through Vite middleware; the perf-harness boots `apps/qwik
 ### Limitation: header passthrough asymmetry
 
 The Astro twin (`apps/astro/src/pages/wp-content/uploads/[...path].ts`) forwards all upstream headers via `new Response(response.body, response)`. Qwik's `server.ts` forwards only `Content-Type` and `Content-Length`. Same behavior for the current 1×1 PNG mock-api fixture, but if M11 swaps in real aljazeera.com upstream, missing `Cache-Control`/`ETag`/`Last-Modified` on the Qwik path could cause repeated full fetches. Revisit in M11.
+
+## sprint-009 — Live blog polling: setInterval inside useVisibleTask$ (2026-04-28)
+
+### Decision
+
+`apps/qwik/src/components/LiveBlogUpdater.tsx` polls the live-blog shell every 30s with a manual `setInterval` armed inside `useVisibleTask$`. `clearInterval` MUST be registered via the visible-task `cleanup` callback (not from inside the `setInterval` callback), so Qwik's QRL teardown invokes it on unmount. `eslint-plugin-qwik/no-use-visible-task` is suppressed at the use site with a rationale comment.
+
+### Rationale
+
+`allowStale` (the v2-shaped equivalent of "return cached, revalidate behind") **does not exist** on `routeLoader$` / `AsyncSignal` in `@qwik.dev/core ~2.0.0-beta.32` — confirmed in this file's "M3 scaffolding > Divergences from apps/qwik/docs/ARCHITECTURE.md", item 3 (NB: the same heading also appears under "M7 article shell" — different topic). `routeLoader$` is also not re-invoked from the client without a navigation, so the loader can't poll itself. Manual `setInterval` inside `useVisibleTask$` is the canonical workaround until `allowStale` lands.
+
+For the rendering-split, fan-out, and `document.hidden` skip details see `apps/qwik/docs/ARCHITECTURE.md` § "Live blog polling" — those are architectural choices, not beta caveats.
+
+### Revisit
+
+When `@qwik.dev/core` bumps a beta (or hits stable) and `allowStale`/equivalent cache-revalidate primitive lands, replace the `useVisibleTask$ + setInterval` shape with the framework primitive and re-measure CWV. Tracked alongside the M3-scaffolding divergences-list item 3 reference above.
