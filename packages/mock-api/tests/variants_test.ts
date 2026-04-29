@@ -10,10 +10,6 @@ Deno.test("resolveFixtureKey: operations without variant rules return plain oper
     resolveFixtureKey("HomePageCuratedFeedQuery", {}),
     "HomePageCuratedFeedQuery",
   );
-  assertEquals(
-    resolveFixtureKey("ArchipelagoBreakingTickerQuery", {}),
-    "ArchipelagoBreakingTickerQuery",
-  );
 });
 
 Deno.test("resolveFixtureKey: ArchipelagoSingleArticleQuery uses variables.name", () => {
@@ -191,6 +187,40 @@ Deno.test("resolveFixtureKey: deps + live-blog op falls back to bare key when no
     },
   );
   assertEquals(key, "ArchipelagoSingleLiveBlogQuery--foo");
+});
+
+Deno.test("resolveFixtureKey: deps + ArchipelagoBreakingTickerQuery (variableless) appends --snapshot-N when fixtures are present", () => {
+  const present = new Set([
+    "ArchipelagoBreakingTickerQuery--snapshot-0",
+    "ArchipelagoBreakingTickerQuery--snapshot-1",
+    "ArchipelagoBreakingTickerQuery--snapshot-2",
+  ]);
+  const key = resolveFixtureKey(
+    "ArchipelagoBreakingTickerQuery",
+    {},
+    {
+      hasFixture: (k) => present.has(k),
+      snapshotIndex: (maxN) => {
+        if (maxN !== 3) throw new Error(`expected maxN=3, got ${maxN}`);
+        return 2;
+      },
+    },
+  );
+  assertEquals(key, "ArchipelagoBreakingTickerQuery--snapshot-2");
+});
+
+Deno.test("resolveFixtureKey: deps + ticker falls back to bare operationName when no --snapshot-N variants exist", () => {
+  const key = resolveFixtureKey(
+    "ArchipelagoBreakingTickerQuery",
+    {},
+    {
+      hasFixture: () => false,
+      snapshotIndex: () => {
+        throw new Error("snapshotIndex must not be called when maxN=0");
+      },
+    },
+  );
+  assertEquals(key, "ArchipelagoBreakingTickerQuery");
 });
 
 Deno.test("resolveFixtureKey: deps + non-snapshotted op (HomePageQuery) bypasses snapshot resolution", () => {

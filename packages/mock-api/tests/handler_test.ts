@@ -444,6 +444,98 @@ Deno.test("handler: LiveBlogUpdateQuery is NOT snapshotted — same id returns s
   assertEquals(a, b);
 });
 
+Deno.test("handler: x-liveblog-snapshot:0 pins ArchipelagoBreakingTickerQuery to the empty (no-banner) snapshot", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoBreakingTickerQuery",
+      variables: {},
+      snapshotHeader: "0",
+    }),
+    { fixtures: realFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  // Every nullable carrier must be null on snapshot-0 — a partial null risks
+  // the banner rendering with an empty headline or a broken link.
+  assertEquals(body.data.breakingNews.post, null);
+  assertEquals(body.data.breakingNews.tickerTitle, null);
+  assertEquals(body.data.breakingNews.tickerText, null);
+  assertEquals(body.data.breakingNews.modified, null);
+  assertEquals(body.data.breakingNews.link, null);
+});
+
+Deno.test("handler: x-liveblog-snapshot:1 pins ArchipelagoBreakingTickerQuery to a populated banner snapshot", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoBreakingTickerQuery",
+      variables: {},
+      snapshotHeader: "1",
+    }),
+    { fixtures: realFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  // The banner needs ALL of: text (the headline), a click target (link), a
+  // freshness signal (modified), the section label (tickerTitle), and the
+  // source post for the click-through. A future fixture edit that drops any
+  // of these would degrade the banner without this assertion.
+  const banner = body.data.breakingNews;
+  assert(typeof banner.tickerText === "string" && banner.tickerText.length > 0);
+  assert(
+    typeof banner.tickerTitle === "string" && banner.tickerTitle.length > 0,
+  );
+  assert(typeof banner.link === "string" && banner.link.length > 0);
+  assert(typeof banner.modified === "string" && banner.modified.length > 0);
+  assert(banner.post !== null && typeof banner.post.id === "string");
+});
+
+Deno.test("handler: x-liveblog-snapshot beyond available count clamps to the last ticker snapshot", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const requested = await handle(
+    buildRequest({
+      operationName: "ArchipelagoBreakingTickerQuery",
+      variables: {},
+      snapshotHeader: "5",
+    }),
+    { fixtures: realFixtures },
+  ).text();
+  const last = await handle(
+    buildRequest({
+      operationName: "ArchipelagoBreakingTickerQuery",
+      variables: {},
+      snapshotHeader: "2",
+    }),
+    { fixtures: realFixtures },
+  ).text();
+  assertEquals(requested, last);
+});
+
+Deno.test("handler: ticker snapshot-1 vs snapshot-2 differ (polling-detects-change substrate)", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const a = await handle(
+    buildRequest({
+      operationName: "ArchipelagoBreakingTickerQuery",
+      variables: {},
+      snapshotHeader: "1",
+    }),
+    { fixtures: realFixtures },
+  ).text();
+  const b = await handle(
+    buildRequest({
+      operationName: "ArchipelagoBreakingTickerQuery",
+      variables: {},
+      snapshotHeader: "2",
+    }),
+    { fixtures: realFixtures },
+  ).text();
+  assert(
+    a !== b,
+    "snapshot-1 and snapshot-2 must differ so polling sees a delta",
+  );
+});
+
 Deno.test("handler: non-live-blog operations are unaffected by x-liveblog-snapshot header (HomePageQuery)", () => {
   const res = handle(
     buildRequest({

@@ -1,7 +1,9 @@
-// Live-blog snapshot rotation. The mock-api ships multiple JSON variants of
-// each live-blog fixture (--snapshot-0, --snapshot-1, ...) so a polling client
-// observes a growing children list over time. Three resolution tiers, in
-// precedence order:
+// Snapshot rotation for snapshotted operations (live-blog + breaking ticker).
+// The mock-api ships multiple JSON variants of each fixture (--snapshot-0,
+// --snapshot-1, ...) so a polling client observes a delta over time — a
+// growing children list for live-blog, an active/inactive toggle plus copy
+// change for the ticker. Env names retain the LIVEBLOG_ prefix for
+// back-compat. Three resolution tiers, in precedence order:
 //
 //   1. Per-request `x-liveblog-snapshot: N` header — used by the perf-harness
 //      and deterministic tests to pin a specific snapshot regardless of clock.

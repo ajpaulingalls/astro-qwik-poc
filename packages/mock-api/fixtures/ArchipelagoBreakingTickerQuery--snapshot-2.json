@@ -1,0 +1,17 @@
+{
+  "data": {
+    "breakingNews": {
+      "post": {
+        "id": "4515247",
+        "title": "UN Security Council meets emergency session on Lebanon escalation",
+        "link": "/news/2026/4/29/un-security-council-emergency-session-lebanon-escalation",
+        "__typename": "Post"
+      },
+      "tickerTitle": "Breaking",
+      "tickerText": "UN Security Council convenes emergency session as Lebanon casualties rise above 50.",
+      "modified": "2026-04-29T11:42:00",
+      "link": "/news/2026/4/29/un-security-council-emergency-session-lebanon-escalation",
+      "__typename": "BreakingNews"
+    }
+  }
+}

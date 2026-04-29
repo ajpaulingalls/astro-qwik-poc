@@ -1,0 +1,17 @@
+{
+  "data": {
+    "breakingNews": {
+      "post": {
+        "id": "4515210",
+        "title": "Lebanon ceasefire collapses; aid corridor closed",
+        "link": "/news/2026/4/29/lebanon-ceasefire-collapses-aid-corridor-closed",
+        "__typename": "Post"
+      },
+      "tickerTitle": "Breaking",
+      "tickerText": "Lebanon ceasefire collapses as Israeli strikes resume across the south.",
+      "modified": "2026-04-29T08:15:00",
+      "link": "/news/2026/4/29/lebanon-ceasefire-collapses-aid-corridor-closed",
+      "__typename": "BreakingNews"
+    }
+  }
+}
