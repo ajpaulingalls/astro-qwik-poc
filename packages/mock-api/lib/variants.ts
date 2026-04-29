@@ -2,11 +2,14 @@ export type Variables = Record<string, unknown>;
 
 interface VariantRule {
   // Returns the suffix appended after the operationName (including the leading
-  // `--`), or null if required variables are missing/wrongly-typed.
+  // `--`), an empty string if the operation has no variables driving the
+  // filename (e.g. ArchipelagoBreakingTickerQuery), or null if required
+  // variables are missing/wrongly-typed.
   suffix: (variables: Variables) => string | null;
   // When true, resolveFixtureKey will look for `--snapshot-N` variants on disk
   // and append `--snapshot-{deps.snapshotIndex(maxN)}` if any exist. Used for
-  // live-blog operations that rotate over time.
+  // live-blog operations that rotate over time AND for variableless ops like
+  // the breaking-news ticker.
   snapshotted?: boolean;
 }
 
@@ -55,6 +58,12 @@ const VARIANT_RULES: Record<string, VariantRule> = {
         ? `--${slugify(v.slug)}--offset-${v.offset}`
         : null,
   },
+
+  // Production sends `variables: {}`; rotation drives the ticker over time.
+  ArchipelagoBreakingTickerQuery: {
+    suffix: () => "",
+    snapshotted: true,
+  },
 };
 
 export interface VariantDeps {
@@ -79,7 +88,8 @@ export function resolveFixtureKey(
   const rule = VARIANT_RULES[operationName];
   if (!rule) return operationName;
   const suffix = rule.suffix(variables);
-  if (!suffix) throw new MissingVariableError(operationName);
+  // "" is a valid variableless suffix; only null signals missing vars.
+  if (suffix === null) throw new MissingVariableError(operationName);
   const baseKey = `${operationName}${suffix}`;
 
   if (deps && rule.snapshotted) {

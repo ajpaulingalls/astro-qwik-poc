@@ -10,8 +10,8 @@
     "preview": "bun --bun vite preview",
     "preview:prod": "bun run server.ts",
     "perf:qwik": "PUBLIC_API_BASE=http://localhost:4456 bun run ../../packages/perf-harness/runner.ts --target=qwik",
-    "test": "PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 PUBLIC_API_BASE=http://localhost:4456 bun run build && LIVEBLOG_SNAPSHOT_INDEX=0 vitest run",
-    "test:acceptance": "PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 PUBLIC_API_BASE=http://localhost:4456 bun run build && LIVEBLOG_SNAPSHOT_INDEX=0 vitest run tests/acceptance.test.ts",
+    "test": "PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 PUBLIC_API_BASE=http://localhost:4456 bun run build && SNAPSHOT_INDEX=0 vitest run",
+    "test:acceptance": "PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 PUBLIC_API_BASE=http://localhost:4456 bun run build && SNAPSHOT_INDEX=0 vitest run tests/acceptance.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

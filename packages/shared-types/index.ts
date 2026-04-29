@@ -101,17 +101,6 @@ export interface LiveBlogUpdate {
   date: string;
 }
 
-// Render-needed projection of LiveBlogShell consumed by LiveBlogHeader in
-// both apps. Qwik's routeLoader projects the shell down to this shape so
-// the larger LiveBlogShell doesn't enter the resume payload; Astro mirrors
-// the projection to keep the component contract identical across apps.
-// Encoded as Pick so a future drift in LiveBlogShell.featuredImage (etc.)
-// propagates here automatically instead of silently desyncing.
-export type LiveBlogHeaderData = Pick<
-  LiveBlogShell,
-  'title' | 'subheading' | 'excerpt' | 'isLive' | 'date' | 'featuredImage'
->;
-
 export type LiveBlogChildrenIds = number[];
 
 // Live-blog poll cadence — both apps' Updaters arm a setInterval at this
@@ -143,6 +132,53 @@ export interface LiveBlogShell {
   children: LiveBlogChildrenIds;
   childrenMeta?: LiveBlogChildMeta[];
 }
+
+// Render-needed projection of LiveBlogShell consumed by LiveBlogHeader in
+// both apps. Qwik's routeLoader projects the shell down to this shape so
+// the larger LiveBlogShell doesn't enter the resume payload; Astro mirrors
+// the projection to keep the component contract identical across apps.
+// Encoded as Pick so a future drift in LiveBlogShell.featuredImage (etc.)
+// propagates here automatically instead of silently desyncing.
+export type LiveBlogHeaderData = Pick<
+  LiveBlogShell,
+  'title' | 'subheading' | 'excerpt' | 'isLive' | 'date' | 'featuredImage'
+>;
+
+// Production response shape for ArchipelagoBreakingTickerQuery (every page
+// polls this). All five carriers nullable: snapshot-0 is the empty no-banner
+// state, populated snapshots set them all. Verified against the
+// ArchipelagoBreakingTickerQuery fixtures under packages/mock-api/fixtures/.
+export interface BreakingTickerPost {
+  id: string;
+  title: string;
+  link: string;
+}
+
+export interface BreakingTicker {
+  post: BreakingTickerPost | null;
+  tickerTitle: string | null;
+  tickerText: string | null;
+  modified: string | null;
+  link: string | null;
+}
+
+// Both apps' BreakingTicker islands arm setInterval at this rate.
+export const TICKER_POLL_INTERVAL_MS = 30_000;
+
+// Banner render gate. Empty or whitespace-only tickerText is treated as
+// inactive (defensive: avoids rendering an empty banner if the API ever
+// returns "" or "   " instead of null). Only the all-null no-banner shape
+// is verified in fixtures; the whitespace branch is a guard, not an
+// observed production behavior.
+export function isBreakingTickerActive(ticker: BreakingTicker | null): boolean {
+  return (
+    ticker !== null && typeof ticker.tickerText === 'string' && ticker.tickerText.trim().length > 0
+  );
+}
+
+// Shared so a copy edit in one app can't silently drift from the other.
+export const LIVEBLOG_DEGRADED_BANNER_TEXT =
+  'Some updates may be missing right now. Refresh to retry.';
 
 // Production routes /{section} as either a geographic section (apps/{astro,
 // qwik}/docs/ARCHITECTURE.md §Section Type Resolution) or a topic page. The

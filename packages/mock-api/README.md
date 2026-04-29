@@ -34,7 +34,9 @@ deno task test   # run the full test suite
 ```
 
 The dev task uses the narrowest viable permission set:
-`--allow-net=0.0.0.0:4455 --allow-read=./fixtures --allow-env=PORT,FIXTURE_DIR,LIVEBLOG_SNAPSHOT_INDEX,LIVEBLOG_SNAPSHOT_INTERVAL_MS`.
+`--allow-net=0.0.0.0:4455 --allow-read=./fixtures --allow-env=PORT,FIXTURE_DIR,SNAPSHOT_INDEX,SNAPSHOT_INTERVAL_MS,LIVEBLOG_SNAPSHOT_INDEX,LIVEBLOG_SNAPSHOT_INTERVAL_MS`
+(both the unprefixed primaries and the `LIVEBLOG_*` back-compat aliases are
+allowed so existing test scripts continue to work).
 
 ## Environment variables
 
@@ -42,9 +44,20 @@ The dev task uses the narrowest viable permission set:
 | ------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
 | `PORT`                          | `4455`       | Server port. Fails loud on non-integer or out-of-range values.                                                                                                         | server                            |
 | `FIXTURE_DIR`                   | `./fixtures` | Directory the loader scans for `*.json` at startup.                                                                                                                    | server                            |
-| `LIVEBLOG_SNAPSHOT_INDEX`       | (unset)      | Pin live-blog `--snapshot-N` selection for the lifetime of the process. Per-request `x-liveblog-snapshot` header overrides this. Captured once at handler module load. | handler                           |
-| `LIVEBLOG_SNAPSHOT_INTERVAL_MS` | `30000`      | Wall-clock auto-rotation interval for live-blog snapshots when neither header nor `LIVEBLOG_SNAPSHOT_INDEX` is set. Captured once at handler module load.              | handler                           |
+| `SNAPSHOT_INDEX`                | (unset)      | Pin `--snapshot-N` selection for the lifetime of the process (governs live-blog AND ticker). Per-request `x-liveblog-snapshot` header overrides this. **Aliases**: `LIVEBLOG_SNAPSHOT_INDEX` (back-compat). | handler                           |
+| `SNAPSHOT_INTERVAL_MS`          | `30000`      | Wall-clock auto-rotation interval when neither header nor `SNAPSHOT_INDEX` is set. See "Snapshot rotation timing" below. **Aliases**: `LIVEBLOG_SNAPSHOT_INTERVAL_MS` (back-compat).                         | handler                           |
 | `WP_SITE`                       | `aje`        | `wp-site` header value used when recording new fixtures from production (`aje` English, `aja` Arabic).                                                                 | `scripts/record-fixtures.sh` only |
+
+### Snapshot rotation timing
+
+Wall-clock auto-rotation is **anchored to server-process start**, not per
+client — concurrent browsers polling the same mock-api process observe the
+same index at any given wall-clock moment. The header path
+(`x-liveblog-snapshot: N`) is the deterministic contract for tests and the
+perf-harness; wall-clock is dev/demo only. Both `SNAPSHOT_INDEX` and
+`SNAPSHOT_INTERVAL_MS` (and their `LIVEBLOG_*` back-compat aliases) are
+captured once at handler module load (re-reading per-request would only
+return the same captured values).
 
 The per-request `wp-site` header is required on every request (missing → 400)
 and validated by the handler. The optional per-request `x-liveblog-snapshot: N`
@@ -83,6 +96,8 @@ production doesn't expose in our scouted query surface:
 | `ArchipelagoSingleArticleQuery--sample-article-with-gallery-embed`   | Hand-crafted. Production `/gallery/*` uses a different `operationName` (out of M7 scope)                                      |
 | `ArchipelagoSingleLiveBlogQuery--…--snapshot-{1,2}`                  | Hand-crafted from `--snapshot-0` (recorded). Each prepends a real production child id + publishedTime to `childrenMeta`.      |
 | `SingleLiveBlogChildrensQuery--…--snapshot-{1,2}`                    | Hand-crafted from `--snapshot-0` (recorded), with the matching real child id prepended to the `children` list (newest-first). |
+| `ArchipelagoBreakingTickerQuery--snapshot-0`                         | Recorded. Production "no breaking news" baseline (all `breakingNews.*` fields null).                                          |
+| `ArchipelagoBreakingTickerQuery--snapshot-{1,2}`                     | Hand-crafted populated banners with different `tickerText` so polling sees a delta. Real-shape `post`/`link`, synthetic copy. |
 
 Synthetic article fixtures are flagged in-band: `title` ends with `(sample)`,
 `id` uses the 9000000-block (e.g. `9001001`, `9002001`), and
@@ -90,7 +105,9 @@ Synthetic article fixtures are flagged in-band: `title` ends with `(sample)`,
 Don't strip these markers — they're how renderers and screenshots stay honest
 about provenance. Live-blog `--snapshot-{1,2}` variants use real production ids
 and content, so no in-band markers apply; the tell is that the entries appear in
-`--snapshot-{1,2}` but not `--snapshot-0` for the same slug.
+`--snapshot-{1,2}` but not `--snapshot-0` for the same slug. Ticker
+`--snapshot-{1,2}` follow the same convention (no in-band marker; they only
+exist as snapshot-1/-2, never as the recorded snapshot-0 baseline).
 
 ## Architecture
 
@@ -98,8 +115,8 @@ and content, so no in-band markers apply; the tell is that the entries appear in
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `server.ts`                  | Bootstrap: env validation, fixture preload, `Deno.serve`. Exports `startServer({port, fixtureDir})` for tests.                                                                                                                                                                              |
 | `lib/handler.ts`             | Pure `handle(req, {fixtures}) → Response`. Enforces GET-only, `wp-site` header, `/graphql` path, OPTIONS preflight.                                                                                                                                                                         |
-| `lib/variants.ts`            | `resolveFixtureKey(operationName, variables, deps?) → string`. Throws `MissingVariableError` (handler converts to 400) when a known operation is called without required variables. When `deps` is supplied and the rule is `snapshotted`, appends `--snapshot-N` for live-blog operations. |
-| `lib/snapshot.ts`            | Pure `resolveSnapshotIndex({headerValue, maxN, envIndex, envInterval}) → number`. Three-tier precedence: `x-liveblog-snapshot` header > `LIVEBLOG_SNAPSHOT_INDEX` env > wall-clock auto-rotate every `LIVEBLOG_SNAPSHOT_INTERVAL_MS` (default 30000ms).                                     |
+| `lib/variants.ts`            | `resolveFixtureKey(operationName, variables, deps?) → string`. Throws `MissingVariableError` (handler converts to 400) when a known operation is called without required variables. When `deps` is supplied and the rule is `snapshotted`, appends `--snapshot-N` (used by live-blog ops + breaking-news ticker). |
+| `lib/snapshot.ts`            | Pure `resolveSnapshotIndex({headerValue, maxN, envIndex, envInterval}) → number`. Three-tier precedence: `x-liveblog-snapshot` header > `SNAPSHOT_INDEX` env (or `LIVEBLOG_SNAPSHOT_INDEX` alias) > wall-clock auto-rotate every `SNAPSHOT_INTERVAL_MS` (or `LIVEBLOG_SNAPSHOT_INTERVAL_MS` alias; default 30000ms).        |
 | `lib/fixtures.ts`            | `loadFixtures(dir) → Map<string, string>`. Validates each fixture via `JSON.parse` at startup; stores raw text for fast response.                                                                                                                                                           |
 | `tests/_helpers.ts`          | `withTempDir`, `withRunningServer`.                                                                                                                                                                                                                                                         |
 | `scripts/record-fixtures.sh` | Re-runnable production capture (curl + jq). See [scripts/README.md](./scripts/README.md).                                                                                                                                                                                                   |

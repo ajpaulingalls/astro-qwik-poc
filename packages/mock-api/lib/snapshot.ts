@@ -1,17 +1,20 @@
-// Live-blog snapshot rotation. The mock-api ships multiple JSON variants of
-// each live-blog fixture (--snapshot-0, --snapshot-1, ...) so a polling client
-// observes a growing children list over time. Three resolution tiers, in
-// precedence order:
+// Snapshot rotation for snapshotted operations (live-blog + breaking ticker).
+// The mock-api ships multiple JSON variants of each fixture (--snapshot-0,
+// --snapshot-1, ...) so a polling client observes a delta over time — a
+// growing children list for live-blog, an active/inactive toggle plus copy
+// change for the ticker. Three resolution tiers, in precedence order:
 //
 //   1. Per-request `x-liveblog-snapshot: N` header — used by the perf-harness
 //      and deterministic tests to pin a specific snapshot regardless of clock.
-//   2. `LIVEBLOG_SNAPSHOT_INDEX` env var — pins a snapshot for the lifetime of
-//      a server process (single-snapshot test runs).
-//   3. Wall-clock auto-rotation — every `LIVEBLOG_SNAPSHOT_INTERVAL_MS`
-//      (default 30000) the index advances by one, wrapping at maxN. Anchored
-//      to *server* start, not per-client; two browsers polling concurrently
-//      observe the same index. The header path is the deterministic contract
-//      for tests / perf-harness — wall-clock is dev/demo only.
+//   2. `SNAPSHOT_INDEX` env var (or its `LIVEBLOG_SNAPSHOT_INDEX` back-compat
+//      alias) — pins a snapshot for the lifetime of a server process
+//      (single-snapshot test runs).
+//   3. Wall-clock auto-rotation — every `SNAPSHOT_INTERVAL_MS` (or the
+//      `LIVEBLOG_SNAPSHOT_INTERVAL_MS` back-compat alias; default 30000) the
+//      index advances by one, wrapping at maxN. Anchored to *server* start,
+//      not per-client; two browsers polling concurrently observe the same
+//      index. The header path is the deterministic contract for tests /
+//      perf-harness — wall-clock is dev/demo only.
 
 const DEFAULT_INTERVAL_MS = 30_000;
 

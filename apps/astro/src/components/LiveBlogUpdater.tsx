@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { LIVEBLOG_POLL_INTERVAL_MS, type LiveBlogUpdate } from '@aje-poc/shared-types';
+import { GraphqlHttpError } from '../lib/graphql';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
@@ -19,8 +20,12 @@ const POLL_INTERVAL_MS = resolvePollIntervalMs(
 // Exported for unit tests. Polls the shell, diffs against currentIds,
 // fetches per-update content for any new ids in parallel, and returns the
 // fulfilled+non-null entries newest-first. allSettled keeps a single
-// no_posts_found from killing the whole batch (production occasionally
-// returns 404 between shell-fetch and update-fetch).
+// no_posts_found from killing the whole batch. Intentionally swallowed:
+// rejected-404 (deleted post) and fulfilled-null (no_posts_found 200).
+// Anything else — 5xx, network, parse — is logged so a transient upstream
+// failure surfaces in the console (the poll site has no UI consumer for a
+// degraded marker today; loadLiveBlogData carries the marker on the SSR
+// path where the route is a credible UI consumer).
 export async function fetchPollUpdate(
   slug: string,
   currentIds: number[],
@@ -31,12 +36,20 @@ export async function fetchPollUpdate(
   const newIds = shell.children.filter((id) => !known.has(id));
   if (newIds.length === 0) return [];
   const settled = await Promise.allSettled(newIds.map(fetchLiveBlogUpdate));
-  return settled
-    .filter(
-      (s): s is PromiseFulfilledResult<LiveBlogUpdate> =>
-        s.status === 'fulfilled' && s.value !== null,
-    )
-    .map((s) => s.value);
+  const entries: LiveBlogUpdate[] = [];
+  for (let i = 0; i < settled.length; i++) {
+    const result = settled[i]!;
+    const id = newIds[i]!;
+    if (result.status === 'fulfilled') {
+      if (result.value !== null) entries.push(result.value);
+      continue;
+    }
+    if (result.reason instanceof GraphqlHttpError && result.reason.status === 404) {
+      continue;
+    }
+    console.error('liveblog-updater: per-update fetch failed:', { id, reason: result.reason });
+  }
+  return entries;
 }
 
 interface Props {
@@ -59,19 +72,38 @@ export function LiveBlogUpdater({ slug, initialChildIds }: Props) {
   // current value without re-arming the interval on every state change.
   const newEntriesRef = useRef<LiveBlogUpdate[]>([]);
   newEntriesRef.current = newEntries;
+  // Concurrency guard: if a fetch from tick N stalls past the 30s
+  // interval, tick N+1 must NOT fire a second concurrent fetch — the
+  // older fetch could resolve last and prepend stale entries above
+  // newer ones. Drop the late tick on the floor; the next tick after
+  // pollingRef clears picks up the latest known ids. Mirrors the Qwik
+  // LiveBlogUpdater guard.
+  const pollingRef = useRef(false);
 
   useEffect(() => {
     sectionRef.current?.setAttribute('data-hydrated', 'true');
     const intervalId = setInterval(async () => {
+      if (pollingRef.current) return;
       // Skip background tabs — no point burning the user's battery (and the
       // server) when entries aren't being read. document is always defined
       // here (this useEffect is browser-only).
       if (document.hidden) return;
-      const polled = newEntriesRef.current.map((e) => Number(e.id));
-      const known = [...polled, ...initialChildIds];
-      const fresh = await fetchPollUpdate(slug, known);
-      if (fresh.length === 0) return;
-      setNewEntries((prev) => [...fresh, ...prev]);
+      pollingRef.current = true;
+      try {
+        const polled = newEntriesRef.current.map((e) => Number(e.id));
+        const known = [...polled, ...initialChildIds];
+        const fresh = await fetchPollUpdate(slug, known);
+        // Early return is safe: finally clears pollingRef.
+        if (fresh.length === 0) return;
+        setNewEntries((prev) => [...fresh, ...prev]);
+      } catch (err) {
+        // fetchLiveBlogShell or any other unhandled awaitable can reject
+        // (5xx, network, parse). Without this catch the rejection becomes
+        // an unhandled promise rejection at every tick.
+        console.error('liveblog-updater: poll tick failed:', err);
+      } finally {
+        pollingRef.current = false;
+      }
     }, POLL_INTERVAL_MS);
     return () => clearInterval(intervalId);
   }, [slug, initialChildIds]);

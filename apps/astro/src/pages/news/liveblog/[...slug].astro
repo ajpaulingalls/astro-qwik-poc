@@ -1,5 +1,5 @@
 ---
-import type { LiveBlogHeaderData } from '@aje-poc/shared-types';
+import { LIVEBLOG_DEGRADED_BANNER_TEXT, type LiveBlogHeaderData } from '@aje-poc/shared-types';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { LiveBlogHeader } from '../../../components/LiveBlogHeader';
 import { LiveBlogEntry } from '../../../components/LiveBlogEntry';
@@ -13,7 +13,15 @@ const result = await loadLiveBlogData(slugLeaf);
 if ('notFound' in result) {
   return new Response(`Live blog not found: ${slugLeaf}`, { status: 404 });
 }
-const { shell, entries } = result;
+const { shell, entries, degraded } = result;
+if (degraded) {
+  // SSR-side log so a transient upstream failure surfaces in deploy logs
+  // alongside the client-visible banner below.
+  console.error('liveblog-route: SSR degraded:', {
+    slug: slugLeaf,
+    failedUpdateIds: degraded.failedUpdateIds,
+  });
+}
 
 // Header receives a projected slice of the shell. Astro doesn't need to trim
 // for serialization (Qwik does — see the routeLoader in
@@ -31,6 +39,17 @@ const header: LiveBlogHeaderData = {
 
 <BaseLayout title={shell.title}>
   <main class="mx-auto max-w-3xl px-4 py-6">
+    {
+      degraded && (
+        <aside
+          data-live-blog-degraded
+          role="status"
+          class="mb-4 rounded border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm text-yellow-900"
+        >
+          {LIVEBLOG_DEGRADED_BANNER_TEXT}
+        </aside>
+      )
+    }
     <LiveBlogHeader header={header} />
     <LiveBlogUpdater client:idle slug={slugLeaf} initialChildIds={shell.children} />
     <section class="live-blog-entries">

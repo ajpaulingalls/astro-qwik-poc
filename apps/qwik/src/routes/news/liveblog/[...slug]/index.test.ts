@@ -112,6 +112,14 @@ describe('loadLiveBlogData', () => {
     expect(result).toMatchObject({ notFound: true, slug: 'missing-blog' });
   });
 
+  it('returns notFound via fail(404) when shell payload is null (production no_posts_found)', async () => {
+    mock = mockFetchSequence([{ body: { data: { article: null } } }]);
+    const ctx = makeCtx('2026/4/22/missing-blog');
+    const result = await loadLiveBlogData(ctx);
+    expect(ctx.fail).toHaveBeenCalledWith(404, { notFound: true, slug: 'missing-blog' });
+    expect(result).toMatchObject({ notFound: true, slug: 'missing-blog' });
+  });
+
   it('shell fetch 500 re-throws (not notFound)', async () => {
     mock = mockFetchSequence([{ status: 500, rawBody: 'oops' }]);
     await expect(loadLiveBlogData(makeCtx('2026/4/22/some-blog'))).rejects.toBeInstanceOf(
@@ -135,6 +143,57 @@ describe('loadLiveBlogData', () => {
     if (!('header' in result)) throw new Error('expected success');
     expect(result.entries).toHaveLength(1);
     expect(result.entries[0]!.id).toBe('4512107');
+  });
+
+  it('drops per-update results whose payload is null (production no_posts_found per id)', async () => {
+    mock = mockFetchSequence([
+      { body: { data: { article: SHELL } } },
+      { body: { data: { posts: null } } },
+      { body: { data: { posts: makeUpdate('4514943', 'Survived') } } },
+      { body: { data: { posts: null } } },
+      { body: { data: { posts: makeUpdate('4512099', 'Also survived') } } },
+      { body: { data: { posts: null } } },
+    ]);
+    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    if (!('header' in result)) throw new Error('expected success');
+    expect(result.entries.map((e) => e.id)).toEqual(['4514943', '4512099']);
+  });
+
+  it('logs and surfaces non-404 per-update rejections via degraded marker', async () => {
+    mock = mockFetchSequence([
+      { body: { data: { article: SHELL } } },
+      { body: { data: { posts: makeUpdate('4514963', 'One') } } },
+      { status: 500, rawBody: 'upstream broken' },
+      { body: { data: { posts: makeUpdate('4512107', 'Three') } } },
+      { body: { data: { posts: makeUpdate('4512099', 'Four') } } },
+      { body: { data: { posts: makeUpdate('4512131', 'Five') } } },
+    ]);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    if (!('header' in result)) throw new Error('expected success');
+
+    expect(result.entries.map((e) => e.id)).toEqual(['4514963', '4512107', '4512099', '4512131']);
+    expect(result.degraded?.failedUpdateIds).toEqual([4514943]);
+    expect(errSpy).toHaveBeenCalledWith(
+      'liveblog-route: per-update fetch failed:',
+      expect.objectContaining({ id: 4514943 }),
+    );
+    errSpy.mockRestore();
+  });
+
+  it('omits degraded marker when only 404s occur (intentional, not a failure)', async () => {
+    mock = mockFetchSequence([
+      { body: { data: { article: SHELL } } },
+      { body: { data: { posts: makeUpdate('4514963', 'One') } } },
+      { status: 404, rawBody: 'no fixture' },
+      { body: { data: { posts: makeUpdate('4512107', 'Three') } } },
+      { body: { data: { posts: makeUpdate('4512099', 'Four') } } },
+      { body: { data: { posts: makeUpdate('4512131', 'Five') } } },
+    ]);
+    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    if (!('header' in result)) throw new Error('expected success');
+    expect(result.degraded).toBeUndefined();
   });
 
   it('handles shells with no childrenMeta (skips per-update fan-out)', async () => {
