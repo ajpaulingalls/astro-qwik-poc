@@ -4,6 +4,7 @@ import {
   type LiveBlogChildrenIds,
   type LiveBlogUpdate,
 } from '@aje-poc/shared-types';
+import { GraphqlHttpError } from '../lib/graphql';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
@@ -22,6 +23,12 @@ const POLL_INTERVAL_MS = resolvePollIntervalMs(
 
 // Exported for unit tests — see LiveBlogUpdater.test.tsx header for the
 // qwikLoader/createDOM rationale that forces helper-extraction.
+//
+// Intentionally swallowed: rejected-404 (deleted post / no_posts_found).
+// Anything else — 5xx, network, parse — is logged so a transient upstream
+// failure surfaces in the console. The poll site has no UI consumer for a
+// degraded marker today; loadLiveBlogData (Astro side) carries the marker
+// on the SSR path where the route is a credible UI consumer.
 export async function fetchPollUpdate(
   slug: string,
   currentIds: LiveBlogChildrenIds,
@@ -31,9 +38,20 @@ export async function fetchPollUpdate(
   const newIds = shell.children.filter((id) => !known.has(id));
   if (newIds.length === 0) return [];
   const settled = await Promise.allSettled(newIds.map(fetchLiveBlogUpdate));
-  return settled
-    .filter((s): s is PromiseFulfilledResult<LiveBlogUpdate> => s.status === 'fulfilled')
-    .map((s) => s.value);
+  const entries: LiveBlogUpdate[] = [];
+  for (let i = 0; i < settled.length; i++) {
+    const result = settled[i]!;
+    const id = newIds[i]!;
+    if (result.status === 'fulfilled') {
+      entries.push(result.value);
+      continue;
+    }
+    if (result.reason instanceof GraphqlHttpError && result.reason.status === 404) {
+      continue;
+    }
+    console.error('liveblog-updater: per-update fetch failed:', { id, reason: result.reason });
+  }
+  return entries;
 }
 
 interface Props {
