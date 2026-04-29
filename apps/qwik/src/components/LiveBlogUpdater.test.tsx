@@ -123,6 +123,23 @@ describe('fetchPollUpdate', () => {
     errSpy.mockRestore();
   });
 
+  it('returns [] when shell payload is null (production no_posts_found)', async () => {
+    mock = mockFetchSequence([{ body: { data: { article: null } } }]);
+    const newEntries = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
+    expect(mock.calls).toHaveLength(1);
+    expect(newEntries).toEqual([]);
+  });
+
+  it('drops per-update results whose payload is null (no_posts_found per id)', async () => {
+    mock = mockFetchSequence([
+      { body: SHELL_WITH_TWO_NEW },
+      { body: { data: { posts: null } } },
+      { body: { data: { posts: makeUpdate('4514943', 'Survived') } } },
+    ]);
+    const newEntries = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
+    expect(newEntries.map((e) => e.id)).toEqual(['4514943']);
+  });
+
   it('logs non-404 per-update rejections to console.error (5xx case)', async () => {
     mock = mockFetchSequence([
       { body: SHELL_WITH_TWO_NEW },

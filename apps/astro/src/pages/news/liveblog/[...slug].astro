@@ -16,10 +16,7 @@ if ('notFound' in result) {
 const { shell, entries, degraded } = result;
 if (degraded) {
   // SSR-side log so a transient upstream failure surfaces in deploy logs
-  // instead of being invisible to operators. The marker is also available
-  // to a future <aside data-live-blog-degraded> banner — TODO: render that
-  // banner once the design lands. Until then, the marker is a server-side
-  // signal only; client-side users see the page with fewer entries.
+  // alongside the client-visible banner below.
   console.error('liveblog-route: SSR degraded:', {
     slug: slugLeaf,
     failedUpdateIds: degraded.failedUpdateIds,
@@ -42,6 +39,17 @@ const header: LiveBlogHeaderData = {
 
 <BaseLayout title={shell.title}>
   <main class="mx-auto max-w-3xl px-4 py-6">
+    {
+      degraded && (
+        <aside
+          data-live-blog-degraded
+          role="status"
+          class="mb-4 rounded border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm text-yellow-900"
+        >
+          Some updates may be missing right now. Refresh to retry.
+        </aside>
+      )
+    }
     <LiveBlogHeader header={header} />
     <LiveBlogUpdater client:idle slug={slugLeaf} initialChildIds={shell.children} />
     <section class="live-blog-entries">

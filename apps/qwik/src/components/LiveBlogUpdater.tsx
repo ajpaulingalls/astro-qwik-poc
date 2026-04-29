@@ -34,6 +34,7 @@ export async function fetchPollUpdate(
   currentIds: LiveBlogChildrenIds,
 ): Promise<LiveBlogUpdate[]> {
   const shell = await fetchLiveBlogShell(slug);
+  if (shell === null) return [];
   const known = new Set(currentIds);
   const newIds = shell.children.filter((id) => !known.has(id));
   if (newIds.length === 0) return [];
@@ -43,7 +44,7 @@ export async function fetchPollUpdate(
     const result = settled[i]!;
     const id = newIds[i]!;
     if (result.status === 'fulfilled') {
-      entries.push(result.value);
+      if (result.value !== null) entries.push(result.value);
       continue;
     }
     if (result.reason instanceof GraphqlHttpError && result.reason.status === 404) {
