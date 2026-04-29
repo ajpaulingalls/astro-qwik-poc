@@ -1,5 +1,6 @@
 import { component$, Slot, useVisibleTask$ } from '@qwik.dev/core';
 import { Navigation } from '../components/Navigation';
+import { BreakingTicker } from '../components/BreakingTicker';
 import { Footer } from '../components/Footer';
 
 export default component$(() => {
@@ -12,6 +13,7 @@ export default component$(() => {
   return (
     <>
       <Navigation />
+      <BreakingTicker />
       <main>
         <Slot />
       </main>
