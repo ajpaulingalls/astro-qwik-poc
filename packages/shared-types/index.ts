@@ -101,17 +101,6 @@ export interface LiveBlogUpdate {
   date: string;
 }
 
-// Render-needed projection of LiveBlogShell consumed by LiveBlogHeader in
-// both apps. Qwik's routeLoader projects the shell down to this shape so
-// the larger LiveBlogShell doesn't enter the resume payload; Astro mirrors
-// the projection to keep the component contract identical across apps.
-// Encoded as Pick so a future drift in LiveBlogShell.featuredImage (etc.)
-// propagates here automatically instead of silently desyncing.
-export type LiveBlogHeaderData = Pick<
-  LiveBlogShell,
-  'title' | 'subheading' | 'excerpt' | 'isLive' | 'date' | 'featuredImage'
->;
-
 export type LiveBlogChildrenIds = number[];
 
 // Live-blog poll cadence — both apps' Updaters arm a setInterval at this
@@ -143,6 +132,17 @@ export interface LiveBlogShell {
   children: LiveBlogChildrenIds;
   childrenMeta?: LiveBlogChildMeta[];
 }
+
+// Render-needed projection of LiveBlogShell consumed by LiveBlogHeader in
+// both apps. Qwik's routeLoader projects the shell down to this shape so
+// the larger LiveBlogShell doesn't enter the resume payload; Astro mirrors
+// the projection to keep the component contract identical across apps.
+// Encoded as Pick so a future drift in LiveBlogShell.featuredImage (etc.)
+// propagates here automatically instead of silently desyncing.
+export type LiveBlogHeaderData = Pick<
+  LiveBlogShell,
+  'title' | 'subheading' | 'excerpt' | 'isLive' | 'date' | 'featuredImage'
+>;
 
 // Production response shape for ArchipelagoBreakingTickerQuery (every page
 // polls this). All five carriers nullable: snapshot-0 is the empty no-banner
