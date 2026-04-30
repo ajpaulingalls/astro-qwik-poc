@@ -91,10 +91,12 @@ describe('buildPageList', () => {
   it('article pages declare a per-app jsBytes budget', () => {
     const astroArticle = buildPageList('astro').find((p) => p.name === 'article')!;
     expect(astroArticle.budgets!.jsBytes).toBe(30 * 1024);
-    // Qwik routes share the framework-dominated homepage ceiling — see
-    // QWIK_HOMEPAGE_JS_BUDGET comment for the sprint-009 capstone re-anchor.
+    // Qwik article was re-anchored at sprint-010 capstone (story-005) to
+    // its own 184KB ceiling after consecutive runs measured 175.7KB then
+    // 181.4KB without code change — qwik 2 beta-line drift documented in
+    // QWIK_LIVEBLOG_JS_BUDGET comment.
     const qwikArticle = buildPageList('qwik').find((p) => p.name === 'article')!;
-    expect(qwikArticle.budgets!.jsBytes).toBe(176 * 1024);
+    expect(qwikArticle.budgets!.jsBytes).toBe(184 * 1024);
   });
 
   it('qwik index declares a 176KB jsBytes budget (sprint-009 capstone re-anchor)', () => {
@@ -144,15 +146,16 @@ describe('buildPageList', () => {
     expect(liveblog!.budgets!.jsBytes).toBe(17 * 1024);
   });
 
-  // Story-004 originally had a per-route 171KB budget; sprint-009 capstone
-  // re-anchored Qwik routes to share the homepage 176KB ceiling because
-  // per-app-code differences (~500B for the Updater QRL chunk) are in the
-  // noise floor of beta-line framework drift.
-  it('exposes a qwik liveblog page under /news/liveblog/ that shares the 176KB ceiling', () => {
+  // Story-004 originally had a per-route 171KB budget; sprint-009 re-anchored
+  // to the shared 176KB homepage ceiling. Sprint-010 capstone (story-005)
+  // re-anchored to a per-route 184KB budget because liveblog ships TWO
+  // polling islands (LiveBlogUpdater + BreakingTicker) — see
+  // QWIK_LIVEBLOG_JS_BUDGET comment for the sizing rationale.
+  it('exposes a qwik liveblog page under /news/liveblog/ with a 184KB ceiling', () => {
     const liveblog = buildPageList('qwik').find((p) => p.name === 'liveblog');
     expect(liveblog).toBeDefined();
     expect(liveblog!.path.startsWith('/news/liveblog/')).toBe(true);
-    expect(liveblog!.budgets!.jsBytes).toBe(176 * 1024);
+    expect(liveblog!.budgets!.jsBytes).toBe(184 * 1024);
   });
 });
 
