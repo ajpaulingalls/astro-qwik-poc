@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer-core';
+import puppeteer, { TimeoutError } from 'puppeteer-core';
 import type { Metric } from 'web-vitals';
 
 export interface LcpElementSummary {
@@ -57,11 +57,22 @@ export async function collectWebVitals(url: string, port: number): Promise<Enric
     // Per-page meaningful interactions (LoadMore, dismiss) belong in
     // acceptance.ts, not here.
     await page.keyboard.press('Tab');
-    await page.waitForFunction(
-      () => (globalThis as WebVitalsGlobal).__webVitals?.some((m) => m.name === 'INP'),
-      { timeout: SHIM_READY_TIMEOUT_MS },
-    );
-    await new Promise((r) => setTimeout(r, POST_LCP_TAIL_MS));
+    // INP is enrichment on top of LCP; if the wait times out (no
+    // PerformanceEventTiming, suppressed Tab handler, etc.) we still want the
+    // LCP samples we already captured. Aggregator emits MISSING for the INP
+    // slot. Only TimeoutError is swallowed — re-throw anything else so page
+    // crashes or browser disconnects surface honestly. The 500ms tail runs
+    // alongside the wait so a timed-out INP doesn't add 500ms on top of 5s.
+    const inpWait = page
+      .waitForFunction(
+        () => (globalThis as WebVitalsGlobal).__webVitals?.some((m) => m.name === 'INP'),
+        { timeout: SHIM_READY_TIMEOUT_MS },
+      )
+      .catch((err: unknown) => {
+        if (!(err instanceof TimeoutError)) throw err;
+      });
+    const tail = new Promise((r) => setTimeout(r, POST_LCP_TAIL_MS));
+    await Promise.all([inpWait, tail]);
     const samples = await page.evaluate(enrichSamples);
     await page.close();
     return samples;

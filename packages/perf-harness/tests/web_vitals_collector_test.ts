@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { TimeoutError } from 'puppeteer-core';
 
 const { connectMock, browserMock, pageMock } = vi.hoisted(() => {
   const keyboardMock = { press: vi.fn() };
@@ -17,16 +18,24 @@ const { connectMock, browserMock, pageMock } = vi.hoisted(() => {
   return { connectMock, browserMock, pageMock };
 });
 
-vi.mock('puppeteer-core', () => ({
-  default: { connect: connectMock },
-}));
+vi.mock('puppeteer-core', async () => {
+  // Re-export the real TimeoutError class so production-code instanceof checks
+  // work in tests; only the default export's connect method is faked.
+  const actual = await vi.importActual<typeof import('puppeteer-core')>('puppeteer-core');
+  return {
+    default: { connect: connectMock },
+    TimeoutError: actual.TimeoutError,
+  };
+});
 
 import { collectWebVitals } from '../web_vitals_collector.ts';
 
 describe('collectWebVitals', () => {
   beforeEach(() => {
     pageMock.goto.mockReset();
-    pageMock.waitForFunction.mockReset();
+    // Default to a resolved promise — collectWebVitals chains .catch on the
+    // INP wait, which would explode on undefined.
+    pageMock.waitForFunction.mockReset().mockResolvedValue(undefined);
     pageMock.keyboard.press.mockReset();
     pageMock.evaluate.mockReset();
     pageMock.close.mockReset();
@@ -92,6 +101,31 @@ describe('collectWebVitals', () => {
     pageMock.waitForFunction.mockRejectedValueOnce(new Error('TimeoutError'));
 
     await expect(collectWebVitals('http://localhost:8080/', 9876)).rejects.toThrow(/TimeoutError/);
+    expect(browserMock.disconnect).toHaveBeenCalled();
+  });
+
+  it('swallows INP-wait timeout so LCP samples still surface (MISSING aggregator path)', async () => {
+    // INP is enrichment on top of LCP; an INP-wait timeout must not lose
+    // the LCP samples we already captured. Aggregator handles MISSING.
+    pageMock.waitForFunction
+      .mockResolvedValueOnce(undefined) // LCP wait succeeds
+      .mockRejectedValueOnce(new TimeoutError('5000ms exceeded')); // INP wait times out
+    pageMock.evaluate.mockResolvedValueOnce([{ name: 'LCP', value: 800 }]);
+
+    const samples = await collectWebVitals('http://localhost:8080/', 9876);
+
+    expect(samples).toEqual([{ name: 'LCP', value: 800 }]);
+    expect(browserMock.disconnect).toHaveBeenCalled();
+  });
+
+  it('re-throws non-timeout errors from the INP wait (page crash, browser disconnect)', async () => {
+    // Narrow catch: only TimeoutError is enrichment-can-fail. Other errors
+    // would mean the page is degraded, so honest failure beats silent partial data.
+    pageMock.waitForFunction
+      .mockResolvedValueOnce(undefined) // LCP wait succeeds
+      .mockRejectedValueOnce(new Error('Target closed')); // not a TimeoutError
+
+    await expect(collectWebVitals('http://localhost:8080/', 9876)).rejects.toThrow(/Target closed/);
     expect(browserMock.disconnect).toHaveBeenCalled();
   });
 
