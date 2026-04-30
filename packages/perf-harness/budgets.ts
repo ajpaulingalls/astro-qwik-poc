@@ -18,8 +18,9 @@ export interface PageBudgets {
   /** Real-browser LCP median ceiling, milliseconds. */
   lcp?: number;
   /** Real-browser INP median ceiling, milliseconds. Provoked by the
-   *  body-click probe in collectWebVitals; MISSING when the click → INP-fire
-   *  path didn't complete (skipped per the LCP missing-data convention). */
+   *  keyboard.press('Tab') probe in collectWebVitals; MISSING when the
+   *  press → INP-fire path didn't complete (skipped per the LCP
+   *  missing-data convention). */
   inp?: number;
   /** Lighthouse-throttled CLS median ceiling, unitless 0-1. */
   cls?: number;
