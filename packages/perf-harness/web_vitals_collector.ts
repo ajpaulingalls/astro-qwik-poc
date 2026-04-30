@@ -44,6 +44,17 @@ export async function collectWebVitals(url: string, port: number): Promise<Enric
       () => (globalThis as WebVitalsGlobal).__webVitals?.some((m) => m.name === 'LCP'),
       { timeout: SHIM_READY_TIMEOUT_MS },
     );
+    // INP requires at least one interaction to fire. Click document.body so
+    // the slowest-interaction-during-page-lifetime measurement records a
+    // value. Body-click is the deliberately-minimal probe: measures the
+    // runtime's input-handling overhead (Astro: near-zero; Qwik: includes
+    // any QRL resolution that fires on first click). Per-page meaningful
+    // interactions (LoadMore, dismiss) belong in acceptance.ts, not here.
+    await page.click('body');
+    await page.waitForFunction(
+      () => (globalThis as WebVitalsGlobal).__webVitals?.some((m) => m.name === 'INP'),
+      { timeout: SHIM_READY_TIMEOUT_MS },
+    );
     await new Promise((r) => setTimeout(r, POST_LCP_TAIL_MS));
     const samples = await page.evaluate(enrichSamples);
     await page.close();

@@ -4,6 +4,7 @@ const { connectMock, browserMock, pageMock } = vi.hoisted(() => {
   const pageMock = {
     goto: vi.fn(),
     waitForFunction: vi.fn(),
+    click: vi.fn(),
     evaluate: vi.fn(),
     close: vi.fn(),
   };
@@ -25,6 +26,7 @@ describe('collectWebVitals', () => {
   beforeEach(() => {
     pageMock.goto.mockReset();
     pageMock.waitForFunction.mockReset();
+    pageMock.click.mockReset();
     pageMock.evaluate.mockReset();
     pageMock.close.mockReset();
     browserMock.newPage.mockClear();
@@ -49,6 +51,33 @@ describe('collectWebVitals', () => {
       { name: 'LCP', value: 800 },
       { name: 'CLS', value: 0.001 },
     ]);
+  });
+
+  it('clicks the page body between the LCP wait and the INP wait', async () => {
+    pageMock.evaluate.mockResolvedValueOnce([]);
+    await collectWebVitals('http://localhost:8080/', 9876);
+    expect(pageMock.click).toHaveBeenCalledWith('body');
+    // INP can only fire AFTER an interaction. The runtime contract is
+    // strict: wait-LCP, click, wait-INP. Asserting both bounds (click
+    // after first wait AND before second wait) catches a refactor that
+    // moves the click below both waits — that would mock-pass with only
+    // a one-sided check but timeout in production because the INP wait
+    // would never resolve.
+    const [firstWait, secondWait] = pageMock.waitForFunction.mock.invocationCallOrder;
+    const [click] = pageMock.click.mock.invocationCallOrder;
+    expect(click).toBeGreaterThan(firstWait);
+    expect(click).toBeLessThan(secondWait);
+  });
+
+  it('waits twice (LCP then INP) before returning', async () => {
+    pageMock.evaluate.mockResolvedValueOnce([]);
+    await collectWebVitals('http://localhost:8080/', 9876);
+    // Two waitForFunction calls: first LCP arrival, second INP arrival.
+    // Discriminating which metric each call waits for would require
+    // matching the predicate's source string — brittle to bundler /
+    // minification transforms. The runner aggregation tests (next chunk)
+    // will fail loudly if INP samples never arrive.
+    expect(pageMock.waitForFunction).toHaveBeenCalledTimes(2);
   });
 
   it('returns the page-evaluated samples (empty array fallback handled in-page)', async () => {
