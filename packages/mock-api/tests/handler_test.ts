@@ -287,3 +287,93 @@ Deno.test("handler: ArchipelagoSingleArticleQuery resolves all on-disk slug vari
     seenBodies.add(body);
   }
 });
+
+// Production rejects wrong/missing postType for live-blog ops with a soft
+// GraphQL error (200 + null data + no_posts_found). Mock previously ignored
+// postType, so apps that omitted it (Qwik liveblog pre-fix) appeared green
+// in CI then 404'd against live. These tests pin the production-fidelity
+// envelope so the same drift fails fast at the unit boundary.
+
+const liveBlogFixtures = new Map<string, string>([
+  [
+    "ArchipelagoSingleLiveBlogQuery--my-blog",
+    JSON.stringify({ data: { article: { id: "1", slug: "my-blog" } } }),
+  ],
+  [
+    "LiveBlogUpdateQuery--4099",
+    JSON.stringify({ data: { posts: { id: "4099", title: "Update" } } }),
+  ],
+]);
+
+Deno.test("handler: ArchipelagoSingleLiveBlogQuery without postType returns production no_posts_found shape", async () => {
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoSingleLiveBlogQuery",
+      variables: { name: "my-blog", preview: "" },
+    }),
+    { fixtures: liveBlogFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data, { article: null });
+  assertEquals(body.errors, [{ message: "no_posts_found", extensions: {} }]);
+});
+
+Deno.test("handler: ArchipelagoSingleLiveBlogQuery with wrong postType returns production no_posts_found shape", async () => {
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoSingleLiveBlogQuery",
+      variables: { name: "my-blog", postType: "post", preview: "" },
+    }),
+    { fixtures: liveBlogFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data, { article: null });
+  assertEquals(body.errors, [{ message: "no_posts_found", extensions: {} }]);
+});
+
+Deno.test("handler: ArchipelagoSingleLiveBlogQuery with correct postType returns the fixture", async () => {
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoSingleLiveBlogQuery",
+      variables: { name: "my-blog", postType: "liveblog", preview: "" },
+    }),
+    { fixtures: liveBlogFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data.article, { id: "1", slug: "my-blog" });
+});
+
+Deno.test("handler: LiveBlogUpdateQuery with wrong postType returns production no_posts_found shape (data.posts:null)", async () => {
+  const res = handle(
+    buildRequest({
+      operationName: "LiveBlogUpdateQuery",
+      variables: { postID: 4099, postType: "post", preview: "", isAmp: false },
+    }),
+    { fixtures: liveBlogFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data, { posts: null });
+  assertEquals(body.errors, [{ message: "no_posts_found", extensions: {} }]);
+});
+
+Deno.test("handler: LiveBlogUpdateQuery with correct postType returns the fixture", async () => {
+  const res = handle(
+    buildRequest({
+      operationName: "LiveBlogUpdateQuery",
+      variables: {
+        postID: 4099,
+        postType: "liveblog-update",
+        preview: "",
+        isAmp: false,
+      },
+    }),
+    { fixtures: liveBlogFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data.posts, { id: "4099", title: "Update" });
+});

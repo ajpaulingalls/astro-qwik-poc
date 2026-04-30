@@ -1,6 +1,7 @@
 import { type FixtureMap } from "./fixtures.ts";
 import { resolveSnapshotIndex } from "./snapshot.ts";
 import {
+  getRequiredPostType,
   MissingVariableError,
   resolveFixtureKey,
   type Variables,
@@ -164,6 +165,11 @@ export function handle(req: Request, deps: HandlerDeps): Response {
     }
   }
 
+  const requiredPostType = getRequiredPostType(operationName);
+  if (requiredPostType && variables.postType !== requiredPostType.value) {
+    return noPostsFoundEnvelope(requiredPostType.nullDataKey);
+  }
+
   const snapshotHeader = req.headers.get("x-liveblog-snapshot");
 
   let key: string;
@@ -204,6 +210,19 @@ function text(status: number, body: string): Response {
     status,
     headers: { ...CORS_HEADERS, "content-type": "text/plain" },
   });
+}
+
+function noPostsFoundEnvelope(nullDataKey: string): Response {
+  return new Response(
+    JSON.stringify({
+      data: { [nullDataKey]: null },
+      errors: [{ message: "no_posts_found", extensions: {} }],
+    }),
+    {
+      status: 200,
+      headers: { ...CORS_HEADERS, "content-type": "application/json" },
+    },
+  );
 }
 
 // Production WordPress backend serves /wp-content/uploads/* with optional
