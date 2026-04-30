@@ -92,6 +92,7 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
       const report: AggregatedReport = {
         page: page.name,
         target: args.target,
+        runs: args.runs,
         metrics: aggregateRuns(samples, args.runs),
         webVitals: {
           samples: wvSamples,

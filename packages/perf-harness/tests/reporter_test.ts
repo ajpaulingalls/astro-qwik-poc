@@ -5,6 +5,7 @@ import type { EnrichedMetric } from '../web_vitals_collector.ts';
 const fixture: AggregatedReport = {
   page: 'home',
   target: 'astro',
+  runs: 5,
   metrics: {
     lcp: { median: 800, n: 5 },
     cls: { median: 0.001, n: 5 },
@@ -39,6 +40,7 @@ describe('formatReport', () => {
         '    }',
         '  },',
         '  "page": "home",',
+        '  "runs": 5,',
         '  "target": "astro",',
         '  "webVitals": {',
         '    "aggregated": {',
@@ -148,7 +150,7 @@ describe('formatReport', () => {
 
   it('emits MISSING markdown line and preserves median:null in JSON when aggregated.lcp.n === 0', () => {
     const withMissing: AggregatedReport = {
-      ...fixture, // metrics.lcp.n === 5 → denominator for "0/5 runs"
+      ...fixture, // runs === 5 → denominator for "0/5 runs"
       webVitals: {
         samples: [],
         aggregated: { lcp: { median: null, n: 0 }, inp: { median: null, n: 0 } },
@@ -159,5 +161,26 @@ describe('formatReport', () => {
     expect(markdown).not.toContain('real-browser lcp median: null');
     const parsed = JSON.parse(json);
     expect(parsed.webVitals.aggregated.lcp).toEqual({ median: null, n: 0 });
+  });
+
+  it('uses report.runs as MISSING denominator independent of metric n drift', () => {
+    const driftReport: AggregatedReport = {
+      ...fixture,
+      runs: 7,
+      metrics: {
+        lcp: { median: 800, n: 3 }, // partial failure simulated
+        cls: { median: 0.001, n: 5 },
+        lhPerf: { median: 99, n: 5 },
+        jsBytes: { median: 12345, n: 5 },
+      },
+      webVitals: {
+        samples: [],
+        aggregated: { lcp: { median: null, n: 0 }, inp: { median: null, n: 0 } },
+      },
+    };
+    const { markdown } = formatReport(driftReport);
+    expect(markdown).toContain('# perf report — astro/home (n=7)');
+    expect(markdown).toContain('real-browser lcp median: MISSING (0/7 runs)');
+    expect(markdown).toContain('real-browser inp median: MISSING (0/7 runs)');
   });
 });

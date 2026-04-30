@@ -6,6 +6,7 @@ function reportFixture(overrides: Partial<AggregatedReport['metrics']> = {}): Ag
   return {
     page: 'index',
     target: 'astro',
+    runs: 5,
     metrics: {
       lcp: { median: 800, n: 5 },
       cls: { median: 0.02, n: 5 },
