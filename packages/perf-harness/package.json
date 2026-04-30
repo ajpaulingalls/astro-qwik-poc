@@ -11,6 +11,7 @@
     "run": "bun run runner.ts",
     "test": "vitest run",
     "test:acceptance": "bun run --cwd ../../apps/astro test:acceptance && bun run --cwd ../../apps/qwik test:acceptance",
+    "test:smoke": "PERF_SMOKE=1 vitest run tests/web_vitals_collector_smoke_test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
