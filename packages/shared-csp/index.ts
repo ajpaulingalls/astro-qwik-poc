@@ -36,7 +36,7 @@ export const DEFAULT_API_BASE = 'http://localhost:4455';
 // RFC 3986 but would corrupt CSP if smuggled in — reject defensively.
 const APIBASE_INJECTION_CHARS = /[\s;,'"<>\\]/;
 
-function assertSafeApiBase(apiBase: string): void {
+export function assertSafeApiBase(apiBase: string): void {
   if (APIBASE_INJECTION_CHARS.test(apiBase)) {
     throw new Error(
       `apiBase contains characters that would corrupt CSP: ${JSON.stringify(apiBase)}`,

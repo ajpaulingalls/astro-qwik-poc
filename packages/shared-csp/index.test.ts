@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  assertSafeApiBase,
   buildAstroCspConfig,
   buildQwikCsp,
   DEFAULT_API_BASE,
@@ -126,6 +127,17 @@ describe('DEFAULT_API_BASE', () => {
   it('passes the apiBase safety guard so consumers can use it without try/catch', () => {
     expect(() => buildQwikCsp(DEFAULT_API_BASE)).not.toThrow();
     expect(() => buildAstroCspConfig(DEFAULT_API_BASE)).not.toThrow();
+  });
+});
+
+describe('assertSafeApiBase (direct)', () => {
+  it('returns void on a safe apiBase', () => {
+    expect(() => assertSafeApiBase(DEFAULT_API_BASE)).not.toThrow();
+    expect(() => assertSafeApiBase('https://www.aljazeera.com')).not.toThrow();
+  });
+
+  it('rejects injection chars independently of any builder', () => {
+    expect(() => assertSafeApiBase('http://x;script-src *')).toThrow(/apiBase contains/);
   });
 });
 
