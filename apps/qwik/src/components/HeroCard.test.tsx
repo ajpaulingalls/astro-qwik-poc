@@ -3,13 +3,15 @@ import { createDOM } from '@qwik.dev/core/testing';
 import { HeroCard } from './HeroCard';
 import { getByHeading } from '../test-utils/dom';
 import { resolveImageUrl } from '../lib/image-url';
-import type { HomepagePost } from '@aje-poc/shared-types';
+import { LIVEBLOG_DATE_PREFIX, type HomepagePost } from '@aje-poc/shared-types';
+
+const HERO_LINK = `/news/liveblog/${LIVEBLOG_DATE_PREFIX}/iran-war-live`;
 
 const post: HomepagePost = {
   id: '4511785',
   title: 'Iran war live: Trump says ceasefire extended',
   excerpt: 'Lebanon raises death toll from weeks of Israeli attacks.',
-  link: '/news/liveblog/2026/4/22/iran-war-live',
+  link: HERO_LINK,
   postType: 'liveblog',
   isLive: true,
   featuredImage: {
@@ -26,7 +28,7 @@ describe('HeroCard', () => {
     await render(<HeroCard post={post} />);
     expect(getByHeading(screen, 2, /Iran war live/i)).toBeTruthy();
     const link = screen.querySelector('a')!;
-    expect(link.getAttribute('href')).toBe('/news/liveblog/2026/4/22/iran-war-live');
+    expect(link.getAttribute('href')).toBe(HERO_LINK);
   });
 
   it('renders the featuredImage with eager loading + fetchpriority high (LCP element)', async () => {

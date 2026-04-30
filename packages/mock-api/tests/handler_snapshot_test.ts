@@ -1,7 +1,7 @@
 import { assert, assertEquals } from "@std/assert";
 import { handle } from "../lib/handler.ts";
 import { loadFixtures } from "../lib/fixtures.ts";
-import { buildRequest, LIVE_BLOG_SLUG } from "./_helpers.ts";
+import { buildRequest, LIVEBLOG_SLUG } from "./_helpers.ts";
 
 // Loaded once at module level. Every snapshot test reads from the same
 // on-disk fixture set; reloading per test multiplies the JSON parse cost
@@ -18,7 +18,7 @@ const homepageFixtures = new Map<string, string>([
 ]);
 
 Deno.test("handler: x-liveblog-snapshot header pins live-blog shell to the requested snapshot", async () => {
-  const slug = LIVE_BLOG_SLUG;
+  const slug = LIVEBLOG_SLUG;
   const res = handle(
     buildRequest({
       operationName: "ArchipelagoSingleLiveBlogQuery",
@@ -33,7 +33,7 @@ Deno.test("handler: x-liveblog-snapshot header pins live-blog shell to the reque
 });
 
 Deno.test("handler: x-liveblog-snapshot header also pins SingleLiveBlogChildrensQuery", async () => {
-  const slug = LIVE_BLOG_SLUG;
+  const slug = LIVEBLOG_SLUG;
   const res = handle(
     buildRequest({
       operationName: "SingleLiveBlogChildrensQuery",
@@ -48,7 +48,7 @@ Deno.test("handler: x-liveblog-snapshot header also pins SingleLiveBlogChildrens
 });
 
 Deno.test("handler: live-blog ops without snapshot header resolve via wall-clock fallback within available snapshots", async () => {
-  const slug = LIVE_BLOG_SLUG;
+  const slug = LIVEBLOG_SLUG;
   const res = handle(
     buildRequest({
       operationName: "ArchipelagoSingleLiveBlogQuery",
@@ -62,7 +62,7 @@ Deno.test("handler: live-blog ops without snapshot header resolve via wall-clock
 });
 
 Deno.test("handler: snapshot-N children list grows strictly across snapshots (polling-diff substrate)", async () => {
-  const slug = LIVE_BLOG_SLUG;
+  const slug = LIVEBLOG_SLUG;
   const lengths: number[] = [];
   for (const snap of ["0", "1", "2"]) {
     const res = handle(
@@ -87,7 +87,7 @@ Deno.test("handler: snapshot-2 childrenMeta is descending by publishedTime (prod
   const res = handle(
     buildRequest({
       operationName: "ArchipelagoSingleLiveBlogQuery",
-      variables: { name: LIVE_BLOG_SLUG, postType: "liveblog", preview: "" },
+      variables: { name: LIVEBLOG_SLUG, postType: "liveblog", preview: "" },
       snapshotHeader: "2",
     }),
     { fixtures: realFixtures },
@@ -115,7 +115,7 @@ Deno.test("handler: shell.children matches childrenMeta ids within each live-blo
     const res = handle(
       buildRequest({
         operationName: "ArchipelagoSingleLiveBlogQuery",
-        variables: { name: LIVE_BLOG_SLUG, postType: "liveblog", preview: "" },
+        variables: { name: LIVEBLOG_SLUG, postType: "liveblog", preview: "" },
         snapshotHeader: snap,
       }),
       { fixtures: realFixtures },

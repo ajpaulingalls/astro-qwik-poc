@@ -47,7 +47,8 @@ export const SECTION_VARIANTS: SectionVariant[] = [
   { name: 'topic', slug: 'opinion', expectedTitle: 'Opinion' },
 ];
 
-export { LIVEBLOG_SLUG, LIVEBLOG_PATH } from '../fixtures.ts';
+export { LIVEBLOG_SLUG } from '@aje-poc/shared-types';
+export { LIVEBLOG_PATH } from '../fixtures.ts';
 
 export const MIN_RELATED = 4;
 export const MAX_RELATED = 6;

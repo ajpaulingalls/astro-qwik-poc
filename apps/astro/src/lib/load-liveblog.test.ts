@@ -1,13 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockFetchSequence } from '@aje-poc/shared-test-helpers';
+import { LIVEBLOG_DATE_PREFIX, LIVEBLOG_SLUG as SLUG } from '@aje-poc/shared-types';
 import { loadLiveBlogData, type LiveBlogPageData, type LiveBlogNotFound } from './load-liveblog';
 
 function expectFound(result: LiveBlogPageData | LiveBlogNotFound): LiveBlogPageData {
   if ('notFound' in result) throw new Error('expected loadLiveBlogData to return page data');
   return result;
 }
-
-const SLUG = 'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
 
 interface ShellChildMeta {
   id: string;
@@ -21,7 +20,7 @@ function shellResponse(childMeta: ShellChildMeta[]) {
         article: {
           id: '4511785',
           title: 'Iran war live',
-          link: `/news/liveblog/2026/4/22/${SLUG}`,
+          link: `/news/liveblog/${LIVEBLOG_DATE_PREFIX}/${SLUG}`,
           slug: SLUG,
           date: '2026-04-22T00:00:00',
           content: '<ul><li>Summary bullet</li></ul>',
@@ -43,7 +42,7 @@ function updateResponse(id: string, title: string) {
       data: {
         posts: {
           id,
-          link: `/news/liveblog/2026/4/22/${SLUG}`,
+          link: `/news/liveblog/${LIVEBLOG_DATE_PREFIX}/${SLUG}`,
           postType: 'liveblog-update',
           title,
           content: `<p>${title}</p>`,

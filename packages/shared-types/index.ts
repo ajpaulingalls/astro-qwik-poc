@@ -109,13 +109,19 @@ export type LiveBlogChildrenIds = number[];
 export const LIVEBLOG_POLL_INTERVAL_MS = 30_000;
 
 // Test-fixture slug — the live-blog fixture filename suffix (last segment
-// of the production URL). Single source of truth for mock-api tests
-// (packages/mock-api/tests/_helpers.ts) and shared-types tests
-// (packages/shared-types/liveblog-shell.test.ts), both of which load the
-// matching ArchipelagoSingleLiveBlogQuery--{slug}--snapshot-0.json fixture.
-// NOT used by application code; production resolves slugs via routing.
-export const LIVE_BLOG_SLUG =
+// of the production URL). Single source of truth across mock-api tests,
+// shared-types tests, perf-harness fixtures.ts, and apps/astro tests — all
+// load the matching ArchipelagoSingleLiveBlogQuery--{slug}--snapshot-0.json
+// fixture or pass the slug as the GraphQL `name` argument. NOT used by
+// application code; production resolves slugs via routing.
+export const LIVEBLOG_SLUG =
   'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
+
+// Date prefix matching the recorded liveblog fixture's production URL. Both
+// apps' route handlers extract the slug's last segment, so the prefix is
+// presentation only — but every test that constructs a `/news/liveblog/...`
+// URL needs to use this prefix to round-trip through the route loaders.
+export const LIVEBLOG_DATE_PREFIX = '2026/4/22';
 
 // Stop polling after this many consecutive empty fetchPollUpdate responses.
 // Guards against indefinite polling when the live blog is deleted or
