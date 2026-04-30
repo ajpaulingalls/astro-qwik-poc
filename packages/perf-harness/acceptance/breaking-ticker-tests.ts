@@ -13,11 +13,11 @@ import {
   type AcceptanceContext,
   CLS_PREPEND_BUDGET,
   KNOWN_ARTICLE_SLUG,
+  LIVEBLOG_PATH,
+  SECTION_VARIANTS,
   appHttpBase,
   installClsObserver,
 } from './shared.ts';
-import { LIVEBLOG_PATH } from './live-blog-tests.ts';
-import { SECTION_VARIANTS } from './section-tests.ts';
 
 const TICKER_PAGE_TYPES: { name: string; path: string }[] = [
   { name: 'homepage', path: '/' },

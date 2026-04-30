@@ -8,19 +8,10 @@ import {
   type AcceptanceContext,
   DESKTOP,
   LCP_IMAGE_PRELOAD_RE,
+  SECTION_VARIANTS,
   appHttpBase,
   expectSingleMain,
 } from './shared.ts';
-
-interface SectionVariant {
-  name: 'geographic' | 'topic';
-  slug: string;
-  expectedTitle: string;
-}
-export const SECTION_VARIANTS: SectionVariant[] = [
-  { name: 'geographic', slug: 'middle-east', expectedTitle: 'Middle East' },
-  { name: 'topic', slug: 'opinion', expectedTitle: 'Opinion' },
-];
 
 // Click → DOM-mutation budget. Pragmatic INP proxy: measures the same UX
 // semantic (user clicks → user sees the result) rather than relying on

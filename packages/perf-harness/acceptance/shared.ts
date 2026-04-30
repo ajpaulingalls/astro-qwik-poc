@@ -34,6 +34,23 @@ export interface AcceptanceContext {
 export const KNOWN_ARTICLE_SLUG =
   'features/2026/4/24/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries';
 
+// Shared identifiers consumed by multiple capstone files (the breaking-ticker
+// page-types matrix references the section + liveblog routes). Living in
+// shared.ts so each per-capstone file depends only on shared.ts.
+export interface SectionVariant {
+  name: 'geographic' | 'topic';
+  slug: string;
+  expectedTitle: string;
+}
+export const SECTION_VARIANTS: SectionVariant[] = [
+  { name: 'geographic', slug: 'middle-east', expectedTitle: 'Middle East' },
+  { name: 'topic', slug: 'opinion', expectedTitle: 'Opinion' },
+];
+
+export const LIVEBLOG_SLUG =
+  '2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
+export const LIVEBLOG_PATH = `/news/liveblog/${LIVEBLOG_SLUG}`;
+
 export const MIN_RELATED = 4;
 export const MAX_RELATED = 6;
 

@@ -18,13 +18,10 @@ import { it, expect } from 'vitest';
 import {
   type AcceptanceContext,
   CLS_PREPEND_BUDGET,
+  LIVEBLOG_PATH,
   appHttpBase,
   installClsObserver,
 } from './shared.ts';
-
-export const LIVEBLOG_SLUG =
-  '2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
-export const LIVEBLOG_PATH = `/news/liveblog/${LIVEBLOG_SLUG}`;
 
 export function registerLiveBlogTests(ctx: AcceptanceContext): void {
   // The Updater island must poll, prepend new entries, and not break the
