@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { EventEmitter } from 'node:events';
-import { killService } from '../spawn.ts';
+import { deriveAllowNet, killService } from '../spawn.ts';
 
 // Pins killService invariants — proc.exitCode is read once, kill is sent once.
 
@@ -78,5 +78,38 @@ describe('killService', () => {
       if (spy.count() === 0) killSkipped++;
     }
     expect(killSkipped).toBe(0);
+  });
+});
+
+describe('deriveAllowNet', () => {
+  // Pinned mock-api default: see spawn.ts MOCK_API_PORT.astro = 4455.
+  it('defaults to localhost:4455 when PUBLIC_API_BASE is unset', () => {
+    expect(deriveAllowNet(undefined, 8080)).toBe('0.0.0.0:8080,localhost:4455');
+  });
+
+  it('preserves localhost when PUBLIC_API_BASE explicitly points at the mock', () => {
+    expect(deriveAllowNet('http://localhost:4455', 8080)).toBe('0.0.0.0:8080,localhost:4455');
+  });
+
+  it('derives https default port (443) when PUBLIC_API_BASE has no explicit port', () => {
+    expect(deriveAllowNet('https://www.aljazeera.com', 8080)).toBe(
+      '0.0.0.0:8080,www.aljazeera.com:443',
+    );
+  });
+
+  it('honors explicit port in PUBLIC_API_BASE over the scheme default', () => {
+    expect(deriveAllowNet('http://example.com:9000', 8080)).toBe('0.0.0.0:8080,example.com:9000');
+  });
+
+  it('derives http default port (80) when PUBLIC_API_BASE has no explicit port', () => {
+    expect(deriveAllowNet('http://example.com', 8080)).toBe('0.0.0.0:8080,example.com:80');
+  });
+
+  it('throws naming the bad value when PUBLIC_API_BASE is malformed', () => {
+    expect(() => deriveAllowNet('not-a-url', 8080)).toThrow(/not-a-url/);
+  });
+
+  it('rejects PUBLIC_API_BASE with whitespace via assertSafeApiBase', () => {
+    expect(() => deriveAllowNet(' http://x.com', 8080)).toThrow(/apiBase contains/);
   });
 });

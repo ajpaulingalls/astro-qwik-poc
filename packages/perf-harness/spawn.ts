@@ -6,6 +6,7 @@
 import { spawn, type ChildProcess } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { assertSafeApiBase, DEFAULT_API_BASE } from '@aje-poc/shared-csp';
 import { type Target } from './cli_helpers.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -67,12 +68,29 @@ export const ASTRO_ALLOWED_ENV = [
   'npm_package_config_libvips',
 ].join(',');
 
+// Maps PUBLIC_API_BASE → comma-joined Deno --allow-net argument so the Astro
+// SSR runtime can reach both the listening app port and whatever upstream the
+// operator pointed the GraphQL client at. Default mirrors the historical
+// hardcoded mock-api 4455 so existing perf flows are byte-identical.
+export function deriveAllowNet(apiBase: string | undefined, appPort: number): string {
+  const base = apiBase && apiBase.length > 0 ? apiBase : DEFAULT_API_BASE;
+  assertSafeApiBase(base);
+  let url: URL;
+  try {
+    url = new URL(base);
+  } catch {
+    throw new Error(`apiBase is not a parseable URL: ${JSON.stringify(base)}`);
+  }
+  const port = url.port || (url.protocol === 'https:' ? '443' : '80');
+  return `0.0.0.0:${appPort},${url.hostname}:${port}`;
+}
+
 export function spawnAstro(): ChildProcess {
   return spawn(
     'deno',
     [
       'run',
-      `--allow-net=0.0.0.0:${APP_PORT.astro},localhost:${MOCK_API_PORT.astro}`,
+      `--allow-net=${deriveAllowNet(process.env.PUBLIC_API_BASE, APP_PORT.astro)}`,
       '--allow-read=apps/astro/dist',
       `--allow-env=${ASTRO_ALLOWED_ENV}`,
       'apps/astro/dist/server/entry.mjs',
