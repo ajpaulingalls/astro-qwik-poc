@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { EventEmitter } from 'node:events';
-import { deriveAllowNet, killService } from '../spawn.ts';
+import { deriveAllowNet, killService, qwikSpawnEnv } from '../spawn.ts';
 
 // Pins killService invariants — proc.exitCode is read once, kill is sent once.
 
@@ -111,5 +111,29 @@ describe('deriveAllowNet', () => {
 
   it('rejects PUBLIC_API_BASE with whitespace via assertSafeApiBase', () => {
     expect(() => deriveAllowNet(' http://x.com', 8080)).toThrow(/apiBase contains/);
+  });
+});
+
+describe('qwikSpawnEnv', () => {
+  it('defaults PUBLIC_API_BASE to localhost:4456 when caller env is unset', () => {
+    const env = qwikSpawnEnv({ FOO: 'bar' });
+    expect(env.PUBLIC_API_BASE).toBe('http://localhost:4456');
+    expect(env.HOST).toBe('127.0.0.1');
+    expect(env.PORT).toBe('4173');
+    expect(env.FOO).toBe('bar'); // caller env passes through
+  });
+
+  it('honors caller PUBLIC_API_BASE', () => {
+    const env = qwikSpawnEnv({ PUBLIC_API_BASE: 'https://www.aljazeera.com' });
+    expect(env.PUBLIC_API_BASE).toBe('https://www.aljazeera.com');
+  });
+
+  it('treats empty PUBLIC_API_BASE as unset and falls back to localhost', () => {
+    const env = qwikSpawnEnv({ PUBLIC_API_BASE: '' });
+    expect(env.PUBLIC_API_BASE).toBe('http://localhost:4456');
+  });
+
+  it('rejects PUBLIC_API_BASE with whitespace via assertSafeApiBase (parity with deriveAllowNet)', () => {
+    expect(() => qwikSpawnEnv({ PUBLIC_API_BASE: ' http://x.com' })).toThrow(/apiBase contains/);
   });
 });

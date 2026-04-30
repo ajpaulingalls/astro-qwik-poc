@@ -99,21 +99,33 @@ export function spawnAstro(): ChildProcess {
   );
 }
 
+// Caller PUBLIC_API_BASE wins; unset/empty defaults to the Qwik mock-api port.
+// Validates at the harness boundary (parity with deriveAllowNet) so a
+// malformed env fails fast here instead of crashing inside the spawned child.
+export function qwikSpawnEnv(callerEnv: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  const callerApiBase = callerEnv.PUBLIC_API_BASE;
+  const apiBase =
+    callerApiBase && callerApiBase.length > 0
+      ? callerApiBase
+      : `http://localhost:${MOCK_API_PORT.qwik}`;
+  assertSafeApiBase(apiBase);
+  return {
+    ...callerEnv,
+    HOST: '127.0.0.1',
+    PORT: String(APP_PORT.qwik),
+    PUBLIC_API_BASE: apiBase,
+  };
+}
+
 export function spawnQwik(): ChildProcess {
   // Production-bundled handler via bun wrapper, not `vite preview` —
   // matches spawnAstro's raw-runtime methodology (no Vite in front).
   // See apps/qwik/server.ts for why a wrapper is needed (entry.preview.js
-  // exports middleware, not a listener). PUBLIC_API_BASE injects the
-  // Qwik-target mock-api port so source DEFAULT_API_BASE stays 4455.
+  // exports middleware, not a listener).
   return spawn('bun', ['run', 'server.ts'], {
     cwd: resolve(REPO_ROOT, 'apps/qwik'),
     stdio: 'ignore',
-    env: {
-      ...process.env,
-      HOST: '127.0.0.1',
-      PORT: String(APP_PORT.qwik),
-      PUBLIC_API_BASE: `http://localhost:${MOCK_API_PORT.qwik}`,
-    },
+    env: qwikSpawnEnv(process.env),
   });
 }
 
