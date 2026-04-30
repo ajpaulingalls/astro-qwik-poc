@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createServer, type Server } from 'node:http';
-import { AddressInfo } from 'node:net';
+import { startTestServer } from '@aje-poc/shared-test-helpers';
 import {
   parseDuration,
   runBench,
@@ -10,25 +9,6 @@ import {
   buildTargetUrl,
   type ThroughputReport,
 } from '../throughput.ts';
-
-async function startServer(
-  handler: (count: number) => { status: number; body: string },
-): Promise<{ url: string; close: () => Promise<void> }> {
-  let count = 0;
-  const server: Server = createServer((_req, res) => {
-    count += 1;
-    const { status, body } = handler(count);
-    res.writeHead(status, { 'content-type': 'text/plain' });
-    res.end(body);
-  });
-  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-  const port = (server.address() as AddressInfo).port;
-  return {
-    url: `http://127.0.0.1:${port}/`,
-    close: () =>
-      new Promise((resolve, reject) => server.close((err) => (err ? reject(err) : resolve()))),
-  };
-}
 
 describe('parseDuration', () => {
   it('parses seconds suffix', () => {
@@ -65,7 +45,7 @@ describe('parseDuration', () => {
 
 describe('runBench', () => {
   it('drives concurrent GETs against an in-process server and reports honest req/s + latency', async () => {
-    const { url, close } = await startServer(() => ({ status: 200, body: 'ok' }));
+    const { url, close } = await startTestServer(() => ({ status: 200, body: 'ok' }));
     try {
       const concurrency = 4;
       const durationMs = 300;
@@ -88,7 +68,7 @@ describe('runBench', () => {
   });
 
   it('counts non-2xx responses as errors and excludes them from latency aggregates', async () => {
-    const { url, close } = await startServer((n) =>
+    const { url, close } = await startTestServer((n) =>
       n % 2 === 0 ? { status: 500, body: 'fail' } : { status: 200, body: 'ok' },
     );
     try {
