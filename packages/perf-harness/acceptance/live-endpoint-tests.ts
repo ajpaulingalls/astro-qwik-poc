@@ -67,10 +67,10 @@ async function findLivePaths(ctx: AcceptanceContext): Promise<FirstLivePaths> {
 }
 
 // Errors that signal "the route's data fetch failed" — the upstream
-// drift scenario this live suite is designed to catch. Distinct from
-// noisy third-party scripts on aljazeera.com (analytics, etc.) so the
-// regex is narrow.
-const RUNTIME_ERROR_RE = /Failed to fetch|GraphQL error/i;
+// drift scenario this live suite is designed to catch. Pattern matches
+// the ACQ wording verbatim so a console error like "GraphQL response
+// missing data" still trips the regex.
+const RUNTIME_ERROR_RE = /Failed to fetch|GraphQL/i;
 
 async function navigateAndCaptureErrors(
   ctx: AcceptanceContext,
@@ -83,7 +83,10 @@ async function navigateAndCaptureErrors(
     page.on('console', (msg) => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
+    const response = await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
+    // ACQ requires HTTP 200 on every page-type route. networkidle2 alone
+    // resolves on 4xx/5xx too — assert the status explicitly.
+    expect(response?.status(), `expected HTTP 200 from ${url}`).toBe(200);
     await assert(page);
   });
   return errors.filter((m) => RUNTIME_ERROR_RE.test(m));
@@ -110,18 +113,28 @@ export function registerLiveEndpointTests(ctx: AcceptanceContext): void {
     const skipIfDisabled = it.skipIf(process.env.LIVE_ENDPOINT !== '1');
 
     skipIfDisabled('homepage renders against aljazeera.com', async () => {
-      const html = await fetch(appHttpBase(ctx.target)).then((r) => r.text());
-      expectSingleMain(html, 'live homepage');
-      const articleCount = (html.match(/<article\b/g) ?? []).length;
-      expect(articleCount).toBeGreaterThan(0);
+      const fatal = await navigateAndCaptureErrors(ctx, appHttpBase(ctx.target), async (page) => {
+        const html = await page.content();
+        expectSingleMain(html, 'live homepage');
+        const articleCount = (html.match(/<article\b/g) ?? []).length;
+        expect(articleCount).toBeGreaterThan(0);
+      });
+      expect(fatal, `runtime errors on homepage: ${fatal.join(' | ')}`).toEqual([]);
     });
 
     skipIfDisabled('geographic section /middle-east renders against aljazeera.com', async () => {
-      const html = await fetch(`${appHttpBase(ctx.target)}/middle-east`).then((r) => r.text());
-      expectSingleMain(html, 'live /middle-east');
-      expect(html).toMatch(/<h1\b/);
-      const articleCount = (html.match(/<article\b/g) ?? []).length;
-      expect(articleCount).toBeGreaterThan(0);
+      const fatal = await navigateAndCaptureErrors(
+        ctx,
+        `${appHttpBase(ctx.target)}/middle-east`,
+        async (page) => {
+          const html = await page.content();
+          expectSingleMain(html, 'live /middle-east');
+          expect(html).toMatch(/<h1\b/);
+          const articleCount = (html.match(/<article\b/g) ?? []).length;
+          expect(articleCount).toBeGreaterThan(0);
+        },
+      );
+      expect(fatal, `runtime errors on /middle-east: ${fatal.join(' | ')}`).toEqual([]);
     });
 
     skipIfDisabled('article (discovered slug) renders against aljazeera.com', async () => {
