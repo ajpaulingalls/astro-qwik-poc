@@ -5,7 +5,8 @@
   "description": "Shared Lighthouse performance harness for the AJE Astro and Qwik PoCs",
   "type": "module",
   "exports": {
-    "./acceptance": "./acceptance.ts"
+    "./acceptance": "./acceptance.ts",
+    "./spawn": "./spawn.ts"
   },
   "scripts": {
     "run": "bun run runner.ts",
