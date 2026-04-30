@@ -1,5 +1,11 @@
+import type { ChildProcess } from 'node:child_process';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { percentile } from './aggregator.ts';
 import { MISSING_METRIC, formatJson, type AggregatedMetric } from './reporter.ts';
+import { buildPageList, parseFlagMap, waitForPort, type Target } from './cli_helpers.ts';
+import { spawnApp, spawnMockApi, killService, MOCK_API_PORT, APP_PORT } from './spawn.ts';
 
 export interface BenchOptions {
   url: string;
@@ -119,4 +125,94 @@ export function parseDuration(s: string): number {
   }
   const value = Number.parseInt(match[1], 10);
   return match[2] === 's' ? value * 1000 : value;
+}
+
+export interface ParsedThroughputArgs {
+  target: Target;
+  page: string;
+  durationMs: number;
+  concurrency: number;
+}
+
+export function parseArgv(argv: readonly string[]): ParsedThroughputArgs {
+  const flags = parseFlagMap(argv);
+
+  const target = flags.get('target');
+  if (target !== 'astro' && target !== 'qwik') {
+    throw new Error(`parseArgv: --target must be astro or qwik, got ${JSON.stringify(target)}`);
+  }
+  const page = flags.get('page');
+  if (!page) throw new Error('parseArgv: --page=<name> is required');
+  const duration = flags.get('duration');
+  if (!duration) throw new Error('parseArgv: --duration=<e.g. 10s> is required');
+  const concurrencyRaw = flags.get('concurrency');
+  if (!concurrencyRaw) throw new Error('parseArgv: --concurrency=<positive int> is required');
+  const concurrency = Number.parseInt(concurrencyRaw, 10);
+  if (!Number.isInteger(concurrency) || concurrency <= 0) {
+    throw new Error(
+      `parseArgv: --concurrency must be a positive integer, got ${JSON.stringify(concurrencyRaw)}`,
+    );
+  }
+  return { target, page, durationMs: parseDuration(duration), concurrency };
+}
+
+export function buildTargetUrl(target: Target, pageName: string): string {
+  const page = buildPageList(target).find((p) => p.name === pageName);
+  if (!page) {
+    const known = buildPageList(target)
+      .map((p) => p.name)
+      .join(', ');
+    throw new Error(
+      `buildTargetUrl: unknown page "${pageName}" for target ${target}. Known: ${known}`,
+    );
+  }
+  return `http://localhost:${APP_PORT[target]}${page.path}`;
+}
+
+const REPORTS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'reports');
+
+export async function main(argv: readonly string[]): Promise<void> {
+  const args = parseArgv(argv);
+  const url = buildTargetUrl(args.target, args.page);
+  const mockApi = spawnMockApi(args.target);
+  let app: ChildProcess | null = null;
+  try {
+    await waitForPort(MOCK_API_PORT[args.target], { timeoutMs: 30_000 });
+    app = spawnApp(args.target);
+    await waitForPort(APP_PORT[args.target], { timeoutMs: 60_000 });
+
+    const result = await runBench({
+      url,
+      durationMs: args.durationMs,
+      concurrency: args.concurrency,
+    });
+
+    const report: ThroughputReport = {
+      target: args.target,
+      page: args.page,
+      durationMs: args.durationMs,
+      concurrency: args.concurrency,
+      totalRequests: result.totalRequests,
+      errors: result.errors,
+      actualDurationSeconds: result.actualDurationSeconds,
+      reqPerSecond: result.reqPerSecond,
+      latencyMs: result.latencyMs,
+    };
+
+    mkdirSync(REPORTS_DIR, { recursive: true });
+    const stem = path.join(REPORTS_DIR, `${args.target}-${args.page}-throughput`);
+    writeFileSync(`${stem}.json`, formatThroughputJson(report));
+    writeFileSync(`${stem}.md`, formatThroughputMarkdown(report));
+    process.stdout.write(`wrote ${stem}.json + ${stem}.md\n`);
+  } finally {
+    if (app) await killService(app);
+    await killService(mockApi);
+  }
+}
+
+if (import.meta.main) {
+  main(process.argv.slice(2)).catch((err) => {
+    process.stderr.write(`throughput: ${err instanceof Error ? err.message : String(err)}\n`);
+    process.exit(1);
+  });
 }

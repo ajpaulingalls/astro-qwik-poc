@@ -6,6 +6,8 @@ import {
   runBench,
   formatThroughputJson,
   formatThroughputMarkdown,
+  parseArgv,
+  buildTargetUrl,
   type ThroughputReport,
 } from '../throughput.ts';
 
@@ -177,5 +179,82 @@ describe('formatThroughputMarkdown', () => {
     const md = formatThroughputMarkdown(allErrors);
     expect(md).toMatch(/latency p50.*MISSING/);
     expect(md).toMatch(/latency p95.*MISSING/);
+  });
+});
+
+describe('parseArgv', () => {
+  it('parses all four required flags', () => {
+    expect(
+      parseArgv(['--target=astro', '--page=index', '--duration=10s', '--concurrency=20']),
+    ).toEqual({
+      target: 'astro',
+      page: 'index',
+      durationMs: 10_000,
+      concurrency: 20,
+    });
+  });
+
+  it('accepts qwik as a target', () => {
+    const args = parseArgv([
+      '--target=qwik',
+      '--page=index',
+      '--duration=500ms',
+      '--concurrency=4',
+    ]);
+    expect(args.target).toBe('qwik');
+    expect(args.durationMs).toBe(500);
+  });
+
+  it('rejects missing target', () => {
+    expect(() => parseArgv(['--page=index', '--duration=10s', '--concurrency=20'])).toThrow(
+      /target/i,
+    );
+  });
+
+  it('rejects unknown target', () => {
+    expect(() =>
+      parseArgv(['--target=svelte', '--page=index', '--duration=10s', '--concurrency=20']),
+    ).toThrow(/target/i);
+  });
+
+  it('rejects missing page', () => {
+    expect(() => parseArgv(['--target=astro', '--duration=10s', '--concurrency=20'])).toThrow(
+      /page/i,
+    );
+  });
+
+  it('rejects missing duration', () => {
+    expect(() => parseArgv(['--target=astro', '--page=index', '--concurrency=20'])).toThrow(
+      /duration/i,
+    );
+  });
+
+  it('rejects missing concurrency', () => {
+    expect(() => parseArgv(['--target=astro', '--page=index', '--duration=10s'])).toThrow(
+      /concurrency/i,
+    );
+  });
+
+  it('rejects non-positive concurrency', () => {
+    expect(() =>
+      parseArgv(['--target=astro', '--page=index', '--duration=10s', '--concurrency=0']),
+    ).toThrow(/concurrency/i);
+  });
+});
+
+describe('buildTargetUrl', () => {
+  it('builds an Astro URL on APP_PORT.astro for a known page', () => {
+    const url = buildTargetUrl('astro', 'index');
+    expect(url).toMatch(/^http:\/\/localhost:\d+\//);
+    expect(url).toContain(':8080');
+  });
+
+  it('builds a Qwik URL on APP_PORT.qwik for a known page', () => {
+    const url = buildTargetUrl('qwik', 'index');
+    expect(url).toContain(':4173');
+  });
+
+  it('throws on unknown page name', () => {
+    expect(() => buildTargetUrl('astro', 'nonexistent-page-xyz')).toThrow(/page/i);
   });
 });
