@@ -12,6 +12,7 @@
     "perf:qwik": "PUBLIC_API_BASE=http://localhost:4456 bun run ../../packages/perf-harness/runner.ts --target=qwik",
     "test": "PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 PUBLIC_API_BASE=http://localhost:4456 bun run build && SNAPSHOT_INDEX=0 vitest run",
     "test:acceptance": "PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 PUBLIC_API_BASE=http://localhost:4456 bun run build && SNAPSHOT_INDEX=0 vitest run tests/acceptance.test.ts",
+    "test:acceptance:live": "PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 PUBLIC_API_BASE=https://www.aljazeera.com bun run build && SNAPSHOT_INDEX=0 LIVE_ENDPOINT=1 PUBLIC_API_BASE=https://www.aljazeera.com vitest run tests/acceptance.test.ts -t live-endpoint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

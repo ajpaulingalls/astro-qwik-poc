@@ -25,6 +25,10 @@ export interface AcceptanceContext {
     fn: (page: Page) => Promise<T>,
     url?: string,
   ) => Promise<T>;
+  // Like withPage but does NOT navigate. Use when listeners (page.on
+  // 'console' / 'pageerror') must attach before page.goto so events fired
+  // during initial navigation aren't missed. Caller owns the goto.
+  withFreshPage: <T>(viewport: Viewport, fn: (page: Page) => Promise<T>) => Promise<T>;
   waitUntilHydrated: (page: Page, selector: string, timeoutMs?: number) => Promise<void>;
   waitForBannerText: (page: Page, text: string, timeoutMs?: number) => Promise<void>;
 }

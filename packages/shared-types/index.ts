@@ -123,6 +123,15 @@ export const LIVEBLOG_SLUG =
 // URL needs to use this prefix to round-trip through the route loaders.
 export const LIVEBLOG_DATE_PREFIX = '2026/4/22';
 
+// Route path prefixes (production aljazeera.com + both PoC apps' routes).
+// Single source of truth so URL parsing across the perf-harness, tests, and
+// future tooling can't drift from the real route shape. NEWS_PATH_PREFIX
+// matches every article URL; LIVEBLOG_PATH_PREFIX is the strict subpath for
+// liveblog URLs (note: it ends with '/' so a startsWith check correctly
+// rejects '/news/liveblog' as an article path).
+export const NEWS_PATH_PREFIX = '/news/';
+export const LIVEBLOG_PATH_PREFIX = '/news/liveblog/';
+
 // Stop polling after this many consecutive empty fetchPollUpdate responses.
 // Guards against indefinite polling when the live blog is deleted or
 // otherwise stops producing new entries — server returns [] forever, costing
