@@ -7,10 +7,10 @@ const fixture: AggregatedReport = {
   target: 'astro',
   runs: 5,
   metrics: {
-    lcp: { median: 800, n: 5 },
-    cls: { median: 0.001, n: 5 },
-    lhPerf: { median: 99, n: 5 },
-    jsBytes: { median: 12345, n: 5 },
+    lcp: { median: 800, p95: 850, n: 5 },
+    cls: { median: 0.001, p95: 0.002, n: 5 },
+    lhPerf: { median: 99, p95: 99, n: 5 },
+    jsBytes: { median: 12345, p95: 13000, n: 5 },
   },
   webVitals: { samples: [], aggregated: { lcp: MISSING_METRIC, inp: MISSING_METRIC } },
 };
@@ -24,19 +24,23 @@ describe('formatReport', () => {
         '  "metrics": {',
         '    "cls": {',
         '      "median": 0.001,',
-        '      "n": 5',
+        '      "n": 5,',
+        '      "p95": 0.002',
         '    },',
         '    "jsBytes": {',
         '      "median": 12345,',
-        '      "n": 5',
+        '      "n": 5,',
+        '      "p95": 13000',
         '    },',
         '    "lcp": {',
         '      "median": 800,',
-        '      "n": 5',
+        '      "n": 5,',
+        '      "p95": 850',
         '    },',
         '    "lhPerf": {',
         '      "median": 99,',
-        '      "n": 5',
+        '      "n": 5,',
+        '      "p95": 99',
         '    }',
         '  },',
         '  "page": "home",',
@@ -46,11 +50,13 @@ describe('formatReport', () => {
         '    "aggregated": {',
         '      "inp": {',
         '        "median": null,',
-        '        "n": 0',
+        '        "n": 0,',
+        '        "p95": null',
         '      },',
         '      "lcp": {',
         '        "median": null,',
-        '        "n": 0',
+        '        "n": 0,',
+        '        "p95": null',
         '      }',
         '    },',
         '    "samples": []',
@@ -66,12 +72,12 @@ describe('formatReport', () => {
       [
         '# perf report — astro/home (n=5)',
         '',
-        '| metric  | median |',
-        '| ------- | ------ |',
-        '| cls     |  0.001 |',
-        '| jsBytes |  12345 |',
-        '| lcp     |    800 |',
-        '| lhPerf  |     99 |',
+        '| metric  | median |   p95 |',
+        '| ------- | ------ | ----- |',
+        '| cls     |  0.001 | 0.002 |',
+        '| jsBytes |  12345 | 13000 |',
+        '| lcp     |    800 |   850 |',
+        '| lhPerf  |     99 |    99 |',
         '',
         'web-vitals samples: 0',
         'real-browser lcp median: MISSING (0/5 runs)',
@@ -92,7 +98,7 @@ describe('formatReport', () => {
     const { json } = formatReport(fixture);
     const parsed = JSON.parse(json);
     expect(Object.keys(parsed.metrics).sort()).toEqual(['cls', 'jsBytes', 'lcp', 'lhPerf']);
-    expect(parsed.metrics.lcp).toEqual({ median: 800, n: 5 });
+    expect(parsed.metrics.lcp).toEqual({ median: 800, p95: 850, n: 5 });
   });
 
   it('emits lcp element line in markdown when first sample has lcpElement', () => {
@@ -123,16 +129,20 @@ describe('formatReport', () => {
     expect(markdown).not.toContain('lcp element:');
   });
 
-  it('emits real-browser lcp median line in markdown when webVitals.aggregated.lcp present', () => {
+  it('emits real-browser lcp median+p95 line in markdown when webVitals.aggregated.lcp present', () => {
     const withAgg: AggregatedReport = {
       ...fixture,
       webVitals: {
         samples: [],
-        aggregated: { lcp: { median: 72, n: 10 }, inp: { median: 18, n: 10 } },
+        aggregated: {
+          lcp: { median: 72, p95: 88, n: 10 },
+          inp: { median: 18, p95: 24, n: 10 },
+        },
       },
     };
     const { markdown } = formatReport(withAgg);
-    expect(markdown).toContain('real-browser lcp median: 72ms (n=10)');
+    expect(markdown).toContain('real-browser lcp median: 72ms p95: 88ms (n=10)');
+    expect(markdown).toContain('real-browser inp median: 18ms p95: 24ms (n=10)');
   });
 
   it('includes webVitals.aggregated.lcp in JSON when present', () => {
@@ -140,27 +150,30 @@ describe('formatReport', () => {
       ...fixture,
       webVitals: {
         samples: [],
-        aggregated: { lcp: { median: 56.5, n: 10 }, inp: { median: 22.5, n: 10 } },
+        aggregated: {
+          lcp: { median: 56.5, p95: 70.5, n: 10 },
+          inp: { median: 22.5, p95: 30.5, n: 10 },
+        },
       },
     };
     const { json } = formatReport(withAgg);
     const parsed = JSON.parse(json);
-    expect(parsed.webVitals.aggregated.lcp).toEqual({ median: 56.5, n: 10 });
+    expect(parsed.webVitals.aggregated.lcp).toEqual({ median: 56.5, p95: 70.5, n: 10 });
   });
 
-  it('emits MISSING markdown line and preserves median:null in JSON when aggregated.lcp.n === 0', () => {
+  it('emits MISSING markdown line and preserves median+p95 null in JSON when aggregated.lcp.n === 0', () => {
     const withMissing: AggregatedReport = {
       ...fixture, // runs === 5 → denominator for "0/5 runs"
       webVitals: {
         samples: [],
-        aggregated: { lcp: { median: null, n: 0 }, inp: { median: null, n: 0 } },
+        aggregated: { lcp: MISSING_METRIC, inp: MISSING_METRIC },
       },
     };
     const { markdown, json } = formatReport(withMissing);
     expect(markdown).toContain('real-browser lcp median: MISSING (0/5 runs)');
     expect(markdown).not.toContain('real-browser lcp median: null');
     const parsed = JSON.parse(json);
-    expect(parsed.webVitals.aggregated.lcp).toEqual({ median: null, n: 0 });
+    expect(parsed.webVitals.aggregated.lcp).toEqual({ median: null, p95: null, n: 0 });
   });
 
   it('uses report.runs as MISSING denominator independent of metric n drift', () => {
@@ -168,14 +181,14 @@ describe('formatReport', () => {
       ...fixture,
       runs: 7,
       metrics: {
-        lcp: { median: 800, n: 3 }, // partial failure simulated
-        cls: { median: 0.001, n: 5 },
-        lhPerf: { median: 99, n: 5 },
-        jsBytes: { median: 12345, n: 5 },
+        lcp: { median: 800, p95: 900, n: 3 }, // partial failure simulated
+        cls: { median: 0.001, p95: 0.002, n: 5 },
+        lhPerf: { median: 99, p95: 99, n: 5 },
+        jsBytes: { median: 12345, p95: 13000, n: 5 },
       },
       webVitals: {
         samples: [],
-        aggregated: { lcp: { median: null, n: 0 }, inp: { median: null, n: 0 } },
+        aggregated: { lcp: MISSING_METRIC, inp: MISSING_METRIC },
       },
     };
     const { markdown } = formatReport(driftReport);

@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { median } from './aggregator.ts';
+import { median, percentile } from './aggregator.ts';
 import { withChrome } from './chrome.ts';
 import { runLighthouseAudit, type RawMetrics } from './lighthouse.ts';
 import {
@@ -19,7 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPORTS_DIR = resolve(__dirname, 'reports');
 
 function aggMetric(values: number[], n: number): AggregatedMetric {
-  return { median: median(values), n };
+  return { median: median(values), p95: percentile(values, 0.95), n };
 }
 
 function aggregateRuns(runs: RawMetrics[], n: number): AggregatedReport['metrics'] {
