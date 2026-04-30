@@ -1,0 +1,15 @@
+{
+  "actualDurationSeconds": 10.005,
+  "concurrency": 4,
+  "durationMs": 10000,
+  "errors": 0,
+  "latencyMs": {
+    "median": 8,
+    "n": 4875,
+    "p95": 11
+  },
+  "page": "section-geo",
+  "reqPerSecond": 487.2563718140929,
+  "target": "astro",
+  "totalRequests": 4875
+}
