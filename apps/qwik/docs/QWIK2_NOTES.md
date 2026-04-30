@@ -2,6 +2,48 @@
 
 Live log of beta-specific workarounds, missing features, and divergences from the architecture doc. Updated as items are encountered.
 
+## M12 Consolidated Audit — framework-floor characterization & beta-blocker summary (2026-04-30)
+
+End-of-M11 audit consolidated for M-13 input. The beta blockers, framework-floor measurement, and LH-Perf floor relaxation rationale are summarized here; the detailed entries that produced these findings remain below as the chronological log. Cross-references point to those entries by date/section header.
+
+### Beta blockers landed
+
+Five beta-specific workarounds shipped during the PoC. None are app bugs; each is a missing or broken feature in `@qwik.dev/core` 2.0.0-beta.32 / `@qwik.dev/router` 2.0.0-beta.32 that the PoC routed around.
+
+1. **Vite 7 pin** (see _M3 scaffolding § Vite version pin_ below for failure mode). Pinned `vite ^7.3.2` in `apps/qwik/package.json:35` — Vite 8 ships rolldown which breaks the Qwik router SSR pass. Recheck on every beta bump.
+2. **`allowStale` missing** (see _M3 scaffolding § Divergences_ entry 3 + _sprint-009 live-blog polling_ deeper in the log). The architecture doc references `allowStale` for breaking-ticker and live-blog polling; beta.32 only exposes `serializationStrategy`, which controls _whether_ data is sent, not _staleness_. Workaround: manual `setInterval` inside `useVisibleTask$` — see `apps/qwik/src/components/LiveBlogUpdater.tsx:71` and `apps/qwik/src/components/BreakingTicker.tsx:22`.
+3. **`useVisibleTask$` test-hang** (see _sprint-007 § Beta friction encountered_ items 1 + 3). `createDOM()` does not bootstrap qwikLoader, so `useVisibleTask$` registers but never settles in unit tests. Switched cross-island bootstrap pattern to `useOnDocument('qvisible', $(...))` (also unit-untestable, but now documented as deferring side-effect verification to e2e). Component-level tests verify rendered markup only.
+4. **CSP `'unsafe-inline'` requirement** (see _story-008 — CSP `'unsafe-inline'` requirement_ below for empirical failure mode). Qwik 2 beta has no auto-hash equivalent to Astro's `scriptDirective`/`styleDirective`, so `packages/shared-csp/index.ts:104-115:buildQwikCsp` allows `'unsafe-inline'` on both `script-src` and `style-src`. Lands in M-13 as the headline Qwik-vs-Astro security trade-off. Revisit when Qwik 2 stable ships an auto-hash story.
+5. **Leaf-component convention** (see _M3 scaffolding § Leaf component convention_ + _sprint-008 leaf conversions_ deeper in the log). Stateless leaves (no signals, no `$()` handlers, no `Slot`) use plain functions, not `component$`, to avoid the per-call-site QRL serialization boundary + chunk overhead. Post-sprint-008 leaf conversions of HeroCard / MostPopular / CuratedCollection / Footer (executed in sprint-009) landed −558 bytes / −4 chunks. **Exception**: leaves rendered inside reactive `signal.value.map(...)` (StoryCard via LoadMoreButton) keep `component$` because plain-function leaves break the reactive append.
+
+### Framework-floor characterization
+
+Story-009's chunk inventory (see _sprint-009 § What landed (this session)_ item 1 below for the authoritative table with hashed chunk IDs and per-byte sizes) names the irreducible Qwik 2 beta runtime cost: ~102 KB Qwik core, ~12 KB router + zod, ~7 KB router internals, ~5 KB qwikLoader, ~5 KB preloader, ~5.5 KB web-vitals = **~136 KB framework cost before any app symbol**.
+
+The +15 KB regression observed sprint-006 → post-sprint-008 (156 → 171 KB on the homepage) is fully attributable to framework + router growth across the beta line as more loaders/routes shipped — no reversible app-code culprit was found. Production Qwik 1 (`qwik.dev`) ships the same `core` chunk at 54.6 KB, so Qwik 2 beta.32 is **+86%** larger on the framework floor.
+
+### LH-Perf floor relaxation rationale
+
+`packages/perf-harness/cli_helpers.ts:50-59` defines `QWIK_LH_PERF_FLOOR = 80`. The stretch ≥98 LH-Perf budget is **unmeetable on beta.32**: sprint-012 story-003's n=10 sweep measured per-page Lighthouse-Perf median in the 83–93 range (index 83, article 89, section-geo 91, section-topic 93, liveblog 91.5). The framework runtime drift is the cause — qwik/index dropped from 85 to 81 between sprint-008 and sprint-009 with no homepage code changes (see _sprint-009 § What landed (this session)_ item 4 below), attributable to framework growth in the beta line.
+
+The 80 floor sits 1pt below the lowest measured median (83) so the gate stops false-failing on framework variance while still firing on a real ~5pt regression. Per SMM constraint `d77dd7b4007e` (perf budget honesty), this is the **documented honest failure path** — the stretch budget is not silently raised, the per-target relaxation is recorded with measured numbers, and Astro routes still hold the stretch ≥98. Re-evaluate when Qwik 2 stable ships its size-optimization pass.
+
+### Budgets at n=10
+
+Sprint-012 story-003 n=10 measurements vs the budget anchors in `packages/perf-harness/cli_helpers.ts`:
+
+| page          | budget anchor (B) | measured median jsBytes | headroom    |
+| ------------- | ----------------- | ----------------------- | ----------- |
+| index         | 180 224 (176 KB)  | 177 431 B               | ~1.5% under |
+| article       | 188 416 (184 KB)  | 170 065 B               | ~9.7% under |
+| section-geo   | 180 224 (176 KB)  | 174 572 B               | ~3.1% under |
+| section-topic | 180 224 (176 KB)  | 174 572 B               | ~3.1% under |
+| liveblog      | 188 416 (184 KB)  | 170 065 B               | ~9.7% under |
+
+The n=10 sweep confirms every current budget anchor still holds (anchors were last re-revised at sprint-010 capstone — index 175→176 KB, article 168→184 KB, liveblog 171→184 KB — for the framework-line drift documented in `cli_helpers.ts`). Per-page CWV (CLS, real-LCP, real-INP) all pass stretch. Full numbers live in `packages/perf-harness/reports/RUN_NOTES.md` (Measured outcomes table).
+
+See detailed entries below for the full decision context, measurement logs, and bisect histories that produced this consolidation.
+
 ## sprint-009 — story-005 outcome + JS budget revision (165→175 / 155→168 KB) (2026-04-28)
 
 Story-005 ("Qwik article JS budget reduction 165KB→<155KB, LH 83/87→≥98") closed in this cleanup session. The original metric goal was not met; the story is closed because the audit + bisect + leaf-refactor work cumulatively answered the underlying question (**can Qwik 2 beta.32 hit `<155KB`?**) honestly: **no, not on beta.32.** Levers exhausted within the leaf-component convention; remainder is framework runtime + router infrastructure, which is irreducible without an upstream Qwik release.
