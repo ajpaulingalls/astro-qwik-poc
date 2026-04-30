@@ -4,10 +4,12 @@ import { AddressInfo } from 'node:net';
 import { parseDuration, runBench } from '../throughput.ts';
 
 async function startServer(
-  handler: () => { status: number; body: string },
+  handler: (count: number) => { status: number; body: string },
 ): Promise<{ url: string; close: () => Promise<void> }> {
+  let count = 0;
   const server: Server = createServer((_req, res) => {
-    const { status, body } = handler();
+    count += 1;
+    const { status, body } = handler(count);
     res.writeHead(status, { 'content-type': 'text/plain' });
     res.end(body);
   });
@@ -72,6 +74,24 @@ describe('runBench', () => {
       expect(result.latencyMs.median).not.toBeNull();
       expect(result.latencyMs.p95).not.toBeNull();
       expect(result.actualDurationSeconds * 1000).toBeGreaterThanOrEqual(durationMs);
+    } finally {
+      await close();
+    }
+  });
+
+  it('counts non-2xx responses as errors and excludes them from latency aggregates', async () => {
+    const { url, close } = await startServer((n) =>
+      n % 2 === 0 ? { status: 500, body: 'fail' } : { status: 200, body: 'ok' },
+    );
+    try {
+      const result = await runBench({ url, durationMs: 300, concurrency: 4 });
+
+      expect(result.totalRequests).toBeGreaterThan(0);
+      expect(result.errors).toBeGreaterThan(0);
+      // Honest invariant: errored requests do not contribute to latency samples
+      expect(result.latencyMs.n + result.errors).toBe(result.totalRequests);
+      expect(result.latencyMs.median).not.toBeNull();
+      expect(result.latencyMs.p95).not.toBeNull();
     } finally {
       await close();
     }
