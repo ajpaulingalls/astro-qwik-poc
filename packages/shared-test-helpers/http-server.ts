@@ -1,5 +1,4 @@
 import { createServer, type Server } from 'node:http';
-import type { AddressInfo } from 'node:net';
 
 export interface TestServerResponse {
   status: number;
@@ -27,8 +26,13 @@ export async function startTestServer(
     res.end(body);
   });
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-  // listen(0, '127.0.0.1', cb) is guaranteed to yield AddressInfo with a port.
-  const port = (server.address() as AddressInfo).port;
+  const addr = server.address();
+  if (!addr || typeof addr === 'string') {
+    throw new Error(
+      `startTestServer: server.address() returned ${JSON.stringify(addr)}; expected AddressInfo with port`,
+    );
+  }
+  const port = addr.port;
   return {
     url: `http://127.0.0.1:${port}/`,
     close: () =>
