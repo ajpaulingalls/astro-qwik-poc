@@ -40,6 +40,23 @@ describe('checkBudgets', () => {
     expect(v[0]).toContain('[astro/index]');
   });
 
+  it('reports a violation when real-browser INP exceeds budget', () => {
+    const r = reportFixture();
+    r.webVitals.aggregated.inp = { median: 150, n: 5 };
+    const v = checkBudgets(r, { inp: 100 }, 'qwik', 'liveblog');
+    expect(v).toHaveLength(1);
+    expect(v[0]).toContain('INP 150ms');
+    expect(v[0]).toContain('100ms');
+    expect(v[0]).toContain('[qwik/liveblog]');
+  });
+
+  it('skips INP check when real-browser median is null (missing data)', () => {
+    const r = reportFixture();
+    // Fixture default already has inp: MISSING_METRIC.
+    const v = checkBudgets(r, { inp: 100 }, 'astro', 'index');
+    expect(v).toEqual([]);
+  });
+
   it('reports a violation when CLS exceeds budget', () => {
     const v = checkBudgets(
       reportFixture({ cls: { median: 0.1, n: 5 } }),
