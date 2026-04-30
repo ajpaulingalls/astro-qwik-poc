@@ -1,19 +1,19 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
+import { LIVE_BLOG_SLUG } from './index';
 
-const LIVEBLOG_SLUG = 'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
 const FIXTURES_DIR = join(__dirname, '..', 'mock-api', 'fixtures');
 // Live-blog fixtures are snapshot-rotated on disk; snapshot-0 is the recorded
 // production baseline. Pinned here so type/shape conformance tests stay
 // deterministic as new snapshots (1, 2, …) land.
 const FIXTURE_PATH = join(
   FIXTURES_DIR,
-  `ArchipelagoSingleLiveBlogQuery--${LIVEBLOG_SLUG}--snapshot-0.json`,
+  `ArchipelagoSingleLiveBlogQuery--${LIVE_BLOG_SLUG}--snapshot-0.json`,
 );
 const CHILDREN_FIXTURE_PATH = join(
   FIXTURES_DIR,
-  `SingleLiveBlogChildrensQuery--${LIVEBLOG_SLUG}--snapshot-0.json`,
+  `SingleLiveBlogChildrensQuery--${LIVE_BLOG_SLUG}--snapshot-0.json`,
 );
 
 describe('LiveBlogShell fixture shape (runtime validation)', () => {
