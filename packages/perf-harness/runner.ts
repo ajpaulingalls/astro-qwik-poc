@@ -12,7 +12,11 @@ import {
 } from './reporter.ts';
 import { buildPageList, parseArgs, waitForPort, type Target } from './cli_helpers.ts';
 import { checkBudgets } from './budgets.ts';
-import { collectWebVitals, type EnrichedMetric } from './web_vitals_collector.ts';
+import {
+  collectWebVitals,
+  type EnrichedMetric,
+  type SerializedCspViolation,
+} from './web_vitals_collector.ts';
 import { APP_PORT, MOCK_API_PORT, killService, spawnApp, spawnMockApi } from './spawn.ts';
 
 function aggMetric(values: number[], n: number): AggregatedMetric {
@@ -71,10 +75,13 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
       const url = `http://localhost:${APP_PORT[args.target]}${page.path}`;
       const samples: RawMetrics[] = [];
       const wvSamples: EnrichedMetric[] = [];
+      const cspViolations: SerializedCspViolation[] = [];
       for (let i = 0; i < args.runs; i++) {
         process.stderr.write(`[${args.target}/${page.name}] run ${i + 1}/${args.runs}\n`);
         samples.push(await runLighthouseAudit(url));
-        wvSamples.push(...(await withChrome((port) => collectWebVitals(url, port))));
+        const wv = await withChrome((port) => collectWebVitals(url, port));
+        wvSamples.push(...wv.samples);
+        cspViolations.push(...wv.cspViolations);
       }
       // n = sample count, not run count. They match in practice (collectWebVitals
       // resolves once per nav with 1 LCP + 1 INP entry), but if web-vitals ever
@@ -95,6 +102,7 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
           samples: wvSamples,
           aggregated: { lcp: aggregatedLcp, inp: aggregatedInp },
         },
+        cspViolations,
       };
       const formatted = formatReport(report);
       writeReports(args.target, page.name, formatted);

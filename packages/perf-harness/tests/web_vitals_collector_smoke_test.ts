@@ -58,7 +58,7 @@ describe.skipIf(!SMOKE_ENABLED)('collectWebVitals smoke (real Chrome)', () => {
   // TimeoutError swallow is what makes this test resolve at all. So the test
   // also implicitly proves that swallow path against real Chrome.
   it('returns an LCP sample from real Chrome (puppeteer→CDP→PerformanceObserver chain)', async () => {
-    const samples = await withChrome((port) => collectWebVitals(handle.url, port));
-    expect(samples.map((s) => s.name)).toContain('LCP');
+    const result = await withChrome((port) => collectWebVitals(handle.url, port));
+    expect(result.samples.map((s) => s.name)).toContain('LCP');
   }, 15_000);
 });

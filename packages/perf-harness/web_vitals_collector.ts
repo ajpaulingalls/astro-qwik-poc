@@ -51,8 +51,17 @@ export function enrichSamples(): EnrichedMetric[] {
   });
 }
 
-export async function collectWebVitals(url: string, port: number): Promise<EnrichedMetric[]> {
+export interface CollectWebVitalsResult {
+  samples: EnrichedMetric[];
+  // Empty in M0a/M0b — listener wires in M0c. The field is present so runner
+  // populates AggregatedReport.cspViolations consistently across the rollout
+  // without conditional logic at the call site.
+  cspViolations: SerializedCspViolation[];
+}
+
+export async function collectWebVitals(url: string, port: number): Promise<CollectWebVitalsResult> {
   const browser = await puppeteer.connect({ browserURL: `http://127.0.0.1:${port}` });
+  const cspViolations: SerializedCspViolation[] = [];
   try {
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle2', timeout: NAV_TIMEOUT_MS });
@@ -91,7 +100,7 @@ export async function collectWebVitals(url: string, port: number): Promise<Enric
     await Promise.all([inpWait, tail]);
     const samples = await page.evaluate(enrichSamples);
     await page.close();
-    return samples;
+    return { samples, cspViolations };
   } finally {
     await browser.disconnect();
   }

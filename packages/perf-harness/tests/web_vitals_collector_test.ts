@@ -50,17 +50,19 @@ describe('collectWebVitals', () => {
       { name: 'CLS', value: 0.001 },
     ]);
 
-    const samples = await collectWebVitals('http://localhost:8080/', 9876);
+    const result = await collectWebVitals('http://localhost:8080/', 9876);
 
     expect(connectMock).toHaveBeenCalledWith({ browserURL: 'http://127.0.0.1:9876' });
     expect(pageMock.goto).toHaveBeenCalledWith(
       'http://localhost:8080/',
       expect.objectContaining({ waitUntil: 'networkidle2' }),
     );
-    expect(samples).toEqual([
+    expect(result.samples).toEqual([
       { name: 'LCP', value: 800 },
       { name: 'CLS', value: 0.001 },
     ]);
+    // No violation events fired during this navigation → empty array.
+    expect(result.cspViolations).toEqual([]);
   });
 
   it('presses Tab between the LCP wait and the INP wait', async () => {
@@ -93,8 +95,9 @@ describe('collectWebVitals', () => {
 
   it('returns the page-evaluated samples (empty array fallback handled in-page)', async () => {
     pageMock.evaluate.mockResolvedValueOnce([]);
-    const samples = await collectWebVitals('http://localhost:8080/', 9876);
-    expect(samples).toEqual([]);
+    const result = await collectWebVitals('http://localhost:8080/', 9876);
+    expect(result.samples).toEqual([]);
+    expect(result.cspViolations).toEqual([]);
   });
 
   it('disconnects browser even if waitForFunction throws (timeout)', async () => {
@@ -112,9 +115,9 @@ describe('collectWebVitals', () => {
       .mockRejectedValueOnce(new TimeoutError('5000ms exceeded')); // INP wait times out
     pageMock.evaluate.mockResolvedValueOnce([{ name: 'LCP', value: 800 }]);
 
-    const samples = await collectWebVitals('http://localhost:8080/', 9876);
+    const result = await collectWebVitals('http://localhost:8080/', 9876);
 
-    expect(samples).toEqual([{ name: 'LCP', value: 800 }]);
+    expect(result.samples).toEqual([{ name: 'LCP', value: 800 }]);
     expect(browserMock.disconnect).toHaveBeenCalled();
   });
 
