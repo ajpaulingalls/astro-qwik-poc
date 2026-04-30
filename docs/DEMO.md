@@ -38,6 +38,11 @@ the same-origin uploads proxy target) then launches the production
 runtime. Open the printed URL — the homepage, sections, and articles
 render from live data.
 
+If you prefer a persistent setting over `export`, copy
+`apps/astro/.env.example` and `apps/qwik/.env.example` to `.env` in
+each app and uncomment the live-endpoint line. The `.env.example`
+files document the same flag plus a CORS note.
+
 To go back to mock data, unset the env (or set it to
 `http://localhost:4455`) and re-run; in mock mode you also need to
 boot the mock API in another shell:
@@ -59,9 +64,9 @@ boot from `PUBLIC_API_BASE`:
   `assertSafeApiBase` in `@aje-poc/shared-csp` before the URL parses.
 - `--allow-read=apps/astro/dist` — only the built bundle.
 - `--allow-env=<audited list>` — see
-  `packages/perf-harness/spawn.ts:ASTRO_ALLOWED_ENV` for the JSDoc
-  explaining each key (Astro/Vite core, picocolors color detection,
-  sharp probe).
+  `packages/perf-harness/spawn.ts:ASTRO_ALLOWED_ENV` for the inline
+  comments explaining each key (Astro/Vite core, picocolors color
+  detection, sharp probe).
 
 Qwik's runtime is plain `bun apps/qwik/server.ts` — no sandboxing
 flags; bun reads `PUBLIC_API_BASE` from the parent env directly.
@@ -117,7 +122,7 @@ sources:
   blow the LCP ≤1.5s / INP ≤100ms / LH ≥98 stretch budgets within
   measurement noise.
 
-Don't conflate the two. If you want to verify a perf hypothesis
-against live, the live-endpoint acceptance suite (story-005,
-`bun --filter aje-poc-* test:acceptance:live`) is the supported
-boundary — and it asserts render correctness, not CWV thresholds.
+Don't conflate the two. A live-endpoint acceptance suite that asserts
+render correctness against the live API (without CWV gating) is
+planned as sprint-011 story-005; once it lands, that will be the
+supported boundary for verifying behavior against live.
