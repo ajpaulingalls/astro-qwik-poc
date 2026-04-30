@@ -3,13 +3,15 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/preact';
 import { HeroCard } from './HeroCard';
 import { resolveImageUrl } from '../lib/image-url';
-import type { HomepagePost } from '@aje-poc/shared-types';
+import { LIVEBLOG_DATE_PREFIX, type HomepagePost } from '@aje-poc/shared-types';
+
+const HERO_LINK = `/news/liveblog/${LIVEBLOG_DATE_PREFIX}/iran-war-live`;
 
 const post: HomepagePost = {
   id: '4511785',
   title: 'Iran war live: Trump says ceasefire extended',
   excerpt: 'Lebanon raises death toll from weeks of Israeli attacks.',
-  link: '/news/liveblog/2026/4/22/iran-war-live',
+  link: HERO_LINK,
   postType: 'liveblog',
   isLive: true,
   featuredImage: {
@@ -26,7 +28,7 @@ describe('HeroCard', () => {
   it('renders the post title as h2 and links to post.link', () => {
     const { getByRole } = render(<HeroCard post={post} />);
     const link = getByRole('link', { name: /Iran war live/i });
-    expect(link.getAttribute('href')).toBe('/news/liveblog/2026/4/22/iran-war-live');
+    expect(link.getAttribute('href')).toBe(HERO_LINK);
     const heading = getByRole('heading', { level: 2, name: /Iran war live/i });
     expect(heading).toBeTruthy();
   });

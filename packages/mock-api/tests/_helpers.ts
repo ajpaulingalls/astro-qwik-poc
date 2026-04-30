@@ -1,10 +1,10 @@
 import { startServer } from "../server.ts";
 
 // Re-exported from shared-types via the deno.json import map so the slug has
-// a single SoT across the bun-side shared-types tests and the Deno-side
-// mock-api tests; see packages/shared-types/index.ts for the canonical
-// declaration.
-export { LIVE_BLOG_SLUG } from "@aje-poc/shared-types";
+// a single SoT across the bun-side consumers (perf-harness fixtures, apps/astro
+// liveblog tests, shared-types tests) and the Deno-side mock-api tests; see
+// packages/shared-types/index.ts for the canonical declaration.
+export { LIVEBLOG_SLUG } from "@aje-poc/shared-types";
 
 export function buildRequest(opts: {
   method?: string;

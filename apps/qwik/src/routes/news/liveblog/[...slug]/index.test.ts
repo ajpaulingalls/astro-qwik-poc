@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { RequestEventLoader } from '@qwik.dev/router';
 import { mockFetchSequence, type MockedFetch } from '@aje-poc/shared-test-helpers';
-import { LIVEBLOG_INITIAL_ENTRY_COUNT } from '@aje-poc/shared-types';
+import { LIVEBLOG_DATE_PREFIX, LIVEBLOG_INITIAL_ENTRY_COUNT } from '@aje-poc/shared-types';
 import { GraphqlHttpError } from '../../../../lib/graphql';
 import { loadLiveBlogData } from './index';
 
@@ -19,7 +19,7 @@ function makeCtx(slug: string): LoaderCtx {
 const SHELL = {
   id: '12345',
   title: 'Iran war live: ceasefire extended',
-  link: '/news/liveblog/2026/4/22/iran-war-live',
+  link: `/news/liveblog/${LIVEBLOG_DATE_PREFIX}/iran-war-live`,
   slug: 'iran-war-live',
   date: '2026-04-22T00:00:00',
   content: '',
@@ -69,7 +69,7 @@ describe('loadLiveBlogData', () => {
       { body: { data: { posts: makeUpdate('4512099', 'Even older') } } },
       { body: { data: { posts: makeUpdate('4512131', 'Oldest') } } },
     ]);
-    const ctx = makeCtx('2026/4/22/iran-war-live');
+    const ctx = makeCtx(`${LIVEBLOG_DATE_PREFIX}/iran-war-live`);
     const result = await loadLiveBlogData(ctx);
 
     expect(mock.calls).toHaveLength(6);
@@ -104,7 +104,7 @@ describe('loadLiveBlogData', () => {
 
   it('returns notFound via fail(404) when shell fetch 404s', async () => {
     mock = mockFetchSequence([{ status: 404, rawBody: 'No fixture' }]);
-    const ctx = makeCtx('2026/4/22/missing-blog');
+    const ctx = makeCtx(`${LIVEBLOG_DATE_PREFIX}/missing-blog`);
     const result = await loadLiveBlogData(ctx);
     expect(ctx.fail).toHaveBeenCalledWith(404, {
       notFound: true,
@@ -115,7 +115,7 @@ describe('loadLiveBlogData', () => {
 
   it('returns notFound via fail(404) when shell payload is null (production no_posts_found)', async () => {
     mock = mockFetchSequence([{ body: { data: { article: null } } }]);
-    const ctx = makeCtx('2026/4/22/missing-blog');
+    const ctx = makeCtx(`${LIVEBLOG_DATE_PREFIX}/missing-blog`);
     const result = await loadLiveBlogData(ctx);
     expect(ctx.fail).toHaveBeenCalledWith(404, { notFound: true, slug: 'missing-blog' });
     expect(result).toMatchObject({ notFound: true, slug: 'missing-blog' });
@@ -123,9 +123,9 @@ describe('loadLiveBlogData', () => {
 
   it('shell fetch 500 re-throws (not notFound)', async () => {
     mock = mockFetchSequence([{ status: 500, rawBody: 'oops' }]);
-    await expect(loadLiveBlogData(makeCtx('2026/4/22/some-blog'))).rejects.toBeInstanceOf(
-      GraphqlHttpError,
-    );
+    await expect(
+      loadLiveBlogData(makeCtx(`${LIVEBLOG_DATE_PREFIX}/some-blog`)),
+    ).rejects.toBeInstanceOf(GraphqlHttpError);
   });
 
   it('skips per-update 404s gracefully (Promise.allSettled)', async () => {
@@ -140,7 +140,7 @@ describe('loadLiveBlogData', () => {
       { status: 404, rawBody: 'no fixture' },
       { status: 404, rawBody: 'no fixture' },
     ]);
-    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    const result = await loadLiveBlogData(makeCtx(`${LIVEBLOG_DATE_PREFIX}/iran-war-live`));
     if (!('header' in result)) throw new Error('expected success');
     expect(result.entries).toHaveLength(1);
     expect(result.entries[0]!.id).toBe('4512107');
@@ -155,7 +155,7 @@ describe('loadLiveBlogData', () => {
       { body: { data: { posts: makeUpdate('4512099', 'Also survived') } } },
       { body: { data: { posts: null } } },
     ]);
-    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    const result = await loadLiveBlogData(makeCtx(`${LIVEBLOG_DATE_PREFIX}/iran-war-live`));
     if (!('header' in result)) throw new Error('expected success');
     expect(result.entries.map((e) => e.id)).toEqual(['4514943', '4512099']);
   });
@@ -171,7 +171,7 @@ describe('loadLiveBlogData', () => {
     ]);
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    const result = await loadLiveBlogData(makeCtx(`${LIVEBLOG_DATE_PREFIX}/iran-war-live`));
     if (!('header' in result)) throw new Error('expected success');
 
     expect(result.entries.map((e) => e.id)).toEqual(['4514963', '4512107', '4512099', '4512131']);
@@ -192,7 +192,7 @@ describe('loadLiveBlogData', () => {
       { body: { data: { posts: makeUpdate('4512099', 'Four') } } },
       { body: { data: { posts: makeUpdate('4512131', 'Five') } } },
     ]);
-    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    const result = await loadLiveBlogData(makeCtx(`${LIVEBLOG_DATE_PREFIX}/iran-war-live`));
     if (!('header' in result)) throw new Error('expected success');
     expect(result.degraded).toBeUndefined();
   });
@@ -201,7 +201,7 @@ describe('loadLiveBlogData', () => {
     mock = mockFetchSequence([
       { body: { data: { article: { ...SHELL, children: [], childrenMeta: undefined } } } },
     ]);
-    const result = await loadLiveBlogData(makeCtx('2026/4/22/iran-war-live'));
+    const result = await loadLiveBlogData(makeCtx(`${LIVEBLOG_DATE_PREFIX}/iran-war-live`));
     if (!('header' in result)) throw new Error('expected success');
     expect(result.entries).toEqual([]);
     expect(result.initialChildIds).toEqual([]);
