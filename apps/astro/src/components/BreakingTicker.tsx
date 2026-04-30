@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import {
+  createPollLoop,
+  MAX_CONSECUTIVE_EMPTY_POLLS,
   TICKER_POLL_INTERVAL_MS,
   type BreakingTicker as BreakingTickerData,
   isBreakingTickerActive,
@@ -16,30 +18,31 @@ export function BreakingTicker() {
   const [ticker, setTicker] = useState<BreakingTickerData | null>(null);
   const [dismissed, setDismissed] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-  // Mirrors the LiveBlogUpdater concurrency guard.
-  const pollingRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
-    const tick = async () => {
-      if (pollingRef.current) return;
-      if (document.hidden) return;
-      pollingRef.current = true;
-      try {
-        const fresh = await fetchBreakingTicker();
-        if (!cancelled) setTicker(fresh);
-      } catch (err) {
-        console.error('breaking-ticker: poll tick failed:', err);
-      } finally {
-        pollingRef.current = false;
-      }
-    };
     sectionRef.current?.setAttribute('data-hydrated', 'true');
-    tick();
-    const intervalId = setInterval(tick, POLL_INTERVAL_MS);
+    const { stop } = createPollLoop<BreakingTickerData>({
+      tick: () => fetchBreakingTicker(),
+      onResult: (fresh) => {
+        if (!cancelled) setTicker(fresh);
+      },
+      // active→null transition: clear the displayed banner. Without this
+      // the helper short-circuits null and the previously-set active banner
+      // would stay on screen forever.
+      onEmpty: () => {
+        if (!cancelled) setTicker(null);
+      },
+      onError: (err) => console.error('breaking-ticker: poll tick failed:', err),
+      shouldSkip: () => document.hidden,
+      intervalMs: POLL_INTERVAL_MS,
+      maxConsecutiveEmpty: MAX_CONSECUTIVE_EMPTY_POLLS,
+      label: 'breaking-ticker',
+      immediate: true,
+    });
     return () => {
       cancelled = true;
-      clearInterval(intervalId);
+      stop();
     };
   }, []);
 

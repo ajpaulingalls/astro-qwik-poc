@@ -8,7 +8,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, waitFor } from '@testing-library/preact';
 import { mockFetchSequence } from '@aje-poc/shared-test-helpers';
-import { LIVEBLOG_POLL_INTERVAL_MS } from '@aje-poc/shared-types';
+import { LIVEBLOG_POLL_INTERVAL_MS, MAX_CONSECUTIVE_EMPTY_POLLS } from '@aje-poc/shared-types';
 import { LiveBlogUpdater, fetchPollUpdate } from './LiveBlogUpdater';
 
 const SLUG = 'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
@@ -179,6 +179,28 @@ describe('LiveBlogUpdater', () => {
     } finally {
       globalThis.fetch = originalFetch;
     }
+  });
+
+  it('stops polling after MAX_CONSECUTIVE_EMPTY_POLLS empty responses (deletion/quiet-blog guard)', async () => {
+    // Shell returns the same children every poll → fetchPollUpdate returns
+    // []. After MAX consecutive empties the interval should clear; one more
+    // interval tick must NOT trigger a new fetch.
+    const emptyShell = shellResponse([4001, 4002]);
+    const sequence = Array.from({ length: MAX_CONSECUTIVE_EMPTY_POLLS + 5 }, () => emptyShell);
+    mock = mockFetchSequence(sequence);
+    render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001, 4002]} />);
+
+    for (let i = 0; i < MAX_CONSECUTIVE_EMPTY_POLLS; i++) {
+      await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+    }
+    // All N empty polls fired (one shell fetch each).
+    await waitFor(() => expect(mock.calls.length).toBe(MAX_CONSECUTIVE_EMPTY_POLLS));
+
+    const callsAtThreshold = mock.calls.length;
+    // Past the threshold: interval should be cleared. Two more cadences must
+    // not produce additional shell fetches.
+    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS * 2);
+    expect(mock.calls.length).toBe(callsAtThreshold);
   });
 
   it('polls every 30s, prepends fetched updates, and inserts newest at the top', async () => {
