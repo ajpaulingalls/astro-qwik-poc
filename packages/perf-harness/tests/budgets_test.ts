@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { checkBudgets, type PageBudgets } from '../budgets.ts';
-import type { AggregatedReport } from '../reporter.ts';
+import { MISSING_METRIC, type AggregatedReport } from '../reporter.ts';
 
 function reportFixture(overrides: Partial<AggregatedReport['metrics']> = {}): AggregatedReport {
   return {
@@ -15,7 +15,7 @@ function reportFixture(overrides: Partial<AggregatedReport['metrics']> = {}): Ag
     },
     webVitals: {
       samples: [],
-      aggregated: { lcp: { median: 1200, n: 5 } },
+      aggregated: { lcp: { median: 1200, n: 5 }, inp: MISSING_METRIC },
     },
   };
 }
@@ -38,6 +38,23 @@ describe('checkBudgets', () => {
     expect(v[0]).toContain('LCP 2000ms');
     expect(v[0]).toContain('1500ms');
     expect(v[0]).toContain('[astro/index]');
+  });
+
+  it('reports a violation when real-browser INP exceeds budget', () => {
+    const r = reportFixture();
+    r.webVitals.aggregated.inp = { median: 150, n: 5 };
+    const v = checkBudgets(r, { inp: 100 }, 'qwik', 'liveblog');
+    expect(v).toHaveLength(1);
+    expect(v[0]).toContain('INP 150ms');
+    expect(v[0]).toContain('100ms');
+    expect(v[0]).toContain('[qwik/liveblog]');
+  });
+
+  it('skips INP check when real-browser median is null (missing data)', () => {
+    const r = reportFixture();
+    // Fixture default already has inp: MISSING_METRIC.
+    const v = checkBudgets(r, { inp: 100 }, 'astro', 'index');
+    expect(v).toEqual([]);
   });
 
   it('reports a violation when CLS exceeds budget', () => {

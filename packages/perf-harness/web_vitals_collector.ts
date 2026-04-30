@@ -44,6 +44,23 @@ export async function collectWebVitals(url: string, port: number): Promise<Enric
       () => (globalThis as WebVitalsGlobal).__webVitals?.some((m) => m.name === 'LCP'),
       { timeout: SHIM_READY_TIMEOUT_MS },
     );
+    // INP requires at least one interaction to fire. Press Tab so the
+    // slowest-interaction-during-page-lifetime measurement records a value.
+    // Tab is the deliberately-minimal probe: measures the runtime's
+    // input-handling overhead (Astro: near-zero; Qwik: includes any QRL
+    // resolution that fires on first interaction). Synthetic puppeteer
+    // mouse clicks (page.click, page.mouse.click) do NOT generate
+    // PerformanceEventTiming entries in headless Chrome (observed in
+    // chrome-launcher's bundled Chrome + puppeteer-core 24.x); only real
+    // keyboard events do. If a future Chrome release starts emitting
+    // event-timing for synthetic clicks, this Tab probe still works.
+    // Per-page meaningful interactions (LoadMore, dismiss) belong in
+    // acceptance.ts, not here.
+    await page.keyboard.press('Tab');
+    await page.waitForFunction(
+      () => (globalThis as WebVitalsGlobal).__webVitals?.some((m) => m.name === 'INP'),
+      { timeout: SHIM_READY_TIMEOUT_MS },
+    );
     await new Promise((r) => setTimeout(r, POST_LCP_TAIL_MS));
     const samples = await page.evaluate(enrichSamples);
     await page.close();

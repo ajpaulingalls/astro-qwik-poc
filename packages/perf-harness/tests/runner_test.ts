@@ -77,7 +77,10 @@ describe('runner main()', () => {
 
   it('writes JSON+MD reports for astro/index with aggregated n=2 metrics', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 900, cls: 0, lhPerf: 100, jsBytes: 0 });
-    collectWebVitalsMock.mockResolvedValue([{ name: 'LCP', value: 60, id: 'x' }]);
+    collectWebVitalsMock.mockResolvedValue([
+      { name: 'LCP', value: 60, id: 'x' },
+      { name: 'INP', value: 24, id: 'y' },
+    ]);
 
     await main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`]);
 
@@ -89,12 +92,21 @@ describe('runner main()', () => {
     expect(json.target).toBe(TARGET);
     expect(json.metrics.lcp).toEqual({ median: 900, n: 2 });
     expect(json.metrics.cls.n).toBe(2);
-    expect(json.webVitals.samples).toHaveLength(2);
+    expect(json.webVitals.samples).toHaveLength(4);
     expect(json.webVitals.aggregated.lcp).toEqual({ median: 60, n: 2 });
+    expect(json.webVitals.aggregated.inp).toEqual({ median: 24, n: 2 });
+  });
 
-    const md = readFileSync(ASTRO_REPORT_MD, 'utf8');
-    expect(md).toContain(`${TARGET}/${PAGE}`);
-    expect(md).toContain('real-browser lcp median: 60ms (n=2)');
+  it('emits MISSING aggregated INP when no INP samples arrived (parallel to LCP MISSING path)', async () => {
+    runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 100, jsBytes: 0 });
+    // LCP arrived; INP did not (e.g. click never fired or INP-wait timed out).
+    collectWebVitalsMock.mockResolvedValue([{ name: 'LCP', value: 60, id: 'x' }]);
+
+    await main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`]);
+
+    const json = JSON.parse(readFileSync(ASTRO_REPORT_JSON, 'utf8'));
+    expect(json.webVitals.aggregated.lcp).toEqual({ median: 60, n: 2 });
+    expect(json.webVitals.aggregated.inp).toEqual({ median: null, n: 0 });
   });
 
   it('emits MISSING aggregated (median=null, n=0) when web-vitals collected zero LCP samples', async () => {

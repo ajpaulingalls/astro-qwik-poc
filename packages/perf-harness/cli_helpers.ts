@@ -23,7 +23,7 @@ export interface Page {
 //   qwik/liveblog <171KB (story-004 close: measured 169.2KB + 1.85KB headroom)
 // `russian-oil-...` is the article fixture chosen for perf — has a Twitter
 // embed so the run exercises mixed text + provider-script content.
-const STRETCH_CWV = { lcp: 1500, cls: 0.05, lhPerf: 98 } as const;
+const STRETCH_CWV = { lcp: 1500, inp: 100, cls: 0.05, lhPerf: 98 } as const;
 const ARTICLE_PATH = '/news/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries';
 // Live blog fixture path — slug's last segment matches the snapshot fixtures.
 // The slug parents (year/month/day) mirror production URL shape but the

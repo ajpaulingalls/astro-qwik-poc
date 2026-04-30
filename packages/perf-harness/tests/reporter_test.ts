@@ -11,7 +11,7 @@ const fixture: AggregatedReport = {
     lhPerf: { median: 99, n: 5 },
     jsBytes: { median: 12345, n: 5 },
   },
-  webVitals: { samples: [], aggregated: { lcp: MISSING_METRIC } },
+  webVitals: { samples: [], aggregated: { lcp: MISSING_METRIC, inp: MISSING_METRIC } },
 };
 
 describe('formatReport', () => {
@@ -42,6 +42,10 @@ describe('formatReport', () => {
         '  "target": "astro",',
         '  "webVitals": {',
         '    "aggregated": {',
+        '      "inp": {',
+        '        "median": null,',
+        '        "n": 0',
+        '      },',
         '      "lcp": {',
         '        "median": null,',
         '        "n": 0',
@@ -69,6 +73,7 @@ describe('formatReport', () => {
         '',
         'web-vitals samples: 0',
         'real-browser lcp median: MISSING (0/5 runs)',
+        'real-browser inp median: MISSING (0/5 runs)',
         '',
       ].join('\n'),
     );
@@ -104,7 +109,7 @@ describe('formatReport', () => {
             lcpElement: { tagName: 'IMG', id: 'hero-img', src: 'https://cdn.example/hero.jpg' },
           } as EnrichedMetric,
         ],
-        aggregated: { lcp: MISSING_METRIC },
+        aggregated: { lcp: MISSING_METRIC, inp: MISSING_METRIC },
       },
     };
     const { markdown } = formatReport(withLcp);
@@ -121,7 +126,7 @@ describe('formatReport', () => {
       ...fixture,
       webVitals: {
         samples: [],
-        aggregated: { lcp: { median: 72, n: 10 } },
+        aggregated: { lcp: { median: 72, n: 10 }, inp: { median: 18, n: 10 } },
       },
     };
     const { markdown } = formatReport(withAgg);
@@ -133,7 +138,7 @@ describe('formatReport', () => {
       ...fixture,
       webVitals: {
         samples: [],
-        aggregated: { lcp: { median: 56.5, n: 10 } },
+        aggregated: { lcp: { median: 56.5, n: 10 }, inp: { median: 22.5, n: 10 } },
       },
     };
     const { json } = formatReport(withAgg);
@@ -146,7 +151,7 @@ describe('formatReport', () => {
       ...fixture, // metrics.lcp.n === 5 → denominator for "0/5 runs"
       webVitals: {
         samples: [],
-        aggregated: { lcp: { median: null, n: 0 } },
+        aggregated: { lcp: { median: null, n: 0 }, inp: { median: null, n: 0 } },
       },
     };
     const { markdown, json } = formatReport(withMissing);

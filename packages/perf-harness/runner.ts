@@ -79,20 +79,23 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
         samples.push(await runLighthouseAudit(url));
         wvSamples.push(...(await withChrome((port) => collectWebVitals(url, port))));
       }
-      // n = LCP sample count, not run count. They match in practice (collectWebVitals
-      // resolves once per nav with 1 LCP entry), but if web-vitals ever reports multiple
-      // LCP candidates per page the sample count diverges from args.runs.
+      // n = sample count, not run count. They match in practice (collectWebVitals
+      // resolves once per nav with 1 LCP + 1 INP entry), but if web-vitals ever
+      // reports multiple candidates per page the sample count diverges from args.runs.
       const lcpValues = wvSamples.filter((s) => s.name === 'LCP').map((s) => s.value);
-      // MISSING_METRIC keeps real-browser LCP gaps visible — see AggregatedMetric (SMM be23cb2d0a70).
+      const inpValues = wvSamples.filter((s) => s.name === 'INP').map((s) => s.value);
+      // MISSING_METRIC keeps real-browser gaps visible — see AggregatedMetric (SMM be23cb2d0a70).
       const aggregatedLcp =
         lcpValues.length > 0 ? aggMetric(lcpValues, lcpValues.length) : MISSING_METRIC;
+      const aggregatedInp =
+        inpValues.length > 0 ? aggMetric(inpValues, inpValues.length) : MISSING_METRIC;
       const report: AggregatedReport = {
         page: page.name,
         target: args.target,
         metrics: aggregateRuns(samples, args.runs),
         webVitals: {
           samples: wvSamples,
-          aggregated: { lcp: aggregatedLcp },
+          aggregated: { lcp: aggregatedLcp, inp: aggregatedInp },
         },
       };
       const formatted = formatReport(report);

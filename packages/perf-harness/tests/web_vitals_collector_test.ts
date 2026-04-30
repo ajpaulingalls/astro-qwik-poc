@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const { connectMock, browserMock, pageMock } = vi.hoisted(() => {
+  const keyboardMock = { press: vi.fn() };
   const pageMock = {
     goto: vi.fn(),
     waitForFunction: vi.fn(),
+    keyboard: keyboardMock,
     evaluate: vi.fn(),
     close: vi.fn(),
   };
@@ -25,6 +27,7 @@ describe('collectWebVitals', () => {
   beforeEach(() => {
     pageMock.goto.mockReset();
     pageMock.waitForFunction.mockReset();
+    pageMock.keyboard.press.mockReset();
     pageMock.evaluate.mockReset();
     pageMock.close.mockReset();
     browserMock.newPage.mockClear();
@@ -49,6 +52,34 @@ describe('collectWebVitals', () => {
       { name: 'LCP', value: 800 },
       { name: 'CLS', value: 0.001 },
     ]);
+  });
+
+  it('presses Tab between the LCP wait and the INP wait', async () => {
+    pageMock.evaluate.mockResolvedValueOnce([]);
+    await collectWebVitals('http://localhost:8080/', 9876);
+    expect(pageMock.keyboard.press).toHaveBeenCalledWith('Tab');
+    // INP can only fire AFTER an interaction. The runtime contract is
+    // strict: wait-LCP, press Tab, wait-INP. Asserting both bounds catches
+    // a refactor that moves the press below both waits — that would
+    // mock-pass with only a one-sided check but timeout in production
+    // because the INP wait would never resolve. Synthetic puppeteer mouse
+    // clicks (page.click, page.mouse.click) don't generate event-timing
+    // entries in headless Chrome; keyboard.press('Tab') does.
+    const [firstWait, secondWait] = pageMock.waitForFunction.mock.invocationCallOrder;
+    const [press] = pageMock.keyboard.press.mock.invocationCallOrder;
+    expect(press).toBeGreaterThan(firstWait);
+    expect(press).toBeLessThan(secondWait);
+  });
+
+  it('waits twice (LCP then INP) before returning', async () => {
+    pageMock.evaluate.mockResolvedValueOnce([]);
+    await collectWebVitals('http://localhost:8080/', 9876);
+    // Two waitForFunction calls: first LCP arrival, second INP arrival.
+    // Discriminating which metric each call waits for would require
+    // matching the predicate's source string — brittle to bundler /
+    // minification transforms. The runner aggregation tests (next chunk)
+    // will fail loudly if INP samples never arrive.
+    expect(pageMock.waitForFunction).toHaveBeenCalledTimes(2);
   });
 
   it('returns the page-evaluated samples (empty array fallback handled in-page)', async () => {

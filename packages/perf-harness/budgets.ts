@@ -17,6 +17,11 @@ import type { Target } from './cli_helpers.ts';
 export interface PageBudgets {
   /** Real-browser LCP median ceiling, milliseconds. */
   lcp?: number;
+  /** Real-browser INP median ceiling, milliseconds. Provoked by the
+   *  keyboard.press('Tab') probe in collectWebVitals; MISSING when the
+   *  press → INP-fire path didn't complete (skipped per the LCP
+   *  missing-data convention). */
+  inp?: number;
   /** Lighthouse-throttled CLS median ceiling, unitless 0-1. */
   cls?: number;
   /** Lighthouse Performance score floor, 0-100. */
@@ -38,6 +43,11 @@ export function checkBudgets(
   const lcp = report.webVitals.aggregated.lcp;
   if (budgets.lcp !== undefined && lcp.median !== null && lcp.median > budgets.lcp) {
     violations.push(`${prefix} real-browser LCP ${lcp.median}ms > budget ${budgets.lcp}ms`);
+  }
+
+  const inp = report.webVitals.aggregated.inp;
+  if (budgets.inp !== undefined && inp.median !== null && inp.median > budgets.inp) {
+    violations.push(`${prefix} real-browser INP ${inp.median}ms > budget ${budgets.inp}ms`);
   }
 
   const cls = report.metrics.cls;
