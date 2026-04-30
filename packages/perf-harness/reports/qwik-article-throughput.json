@@ -1,0 +1,15 @@
+{
+  "actualDurationSeconds": 10.026,
+  "concurrency": 4,
+  "durationMs": 10000,
+  "errors": 0,
+  "latencyMs": {
+    "median": 26,
+    "n": 1633,
+    "p95": 33
+  },
+  "page": "article",
+  "reqPerSecond": 162.87652104528226,
+  "target": "qwik",
+  "totalRequests": 1633
+}

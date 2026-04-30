@@ -1,0 +1,15 @@
+{
+  "actualDurationSeconds": 10.008,
+  "concurrency": 4,
+  "durationMs": 10000,
+  "errors": 0,
+  "latencyMs": {
+    "median": 9,
+    "n": 4367,
+    "p95": 12
+  },
+  "page": "liveblog",
+  "reqPerSecond": 436.35091926458836,
+  "target": "qwik",
+  "totalRequests": 4367
+}

@@ -1,0 +1,15 @@
+{
+  "actualDurationSeconds": 10.011,
+  "concurrency": 4,
+  "durationMs": 10000,
+  "errors": 0,
+  "latencyMs": {
+    "median": 9,
+    "n": 4618,
+    "p95": 11
+  },
+  "page": "liveblog",
+  "reqPerSecond": 461.29257816401963,
+  "target": "astro",
+  "totalRequests": 4618
+}
