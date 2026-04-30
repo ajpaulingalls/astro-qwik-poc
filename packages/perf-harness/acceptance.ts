@@ -104,13 +104,15 @@ export function runAcceptanceSuite(target: Target): void {
       );
     }
 
-    // Waits for the BreakingTicker banner's text content to include the given
-    // string. Used by the snapshot-1 assertion + polling-detects-change probe.
+    // Waits for the BreakingTicker banner's text content to equal the given
+    // string (trimmed). Used by the snapshot-1 assertion + polling-detects-
+    // change probe. Equality (not substring) so a future fixture where one
+    // snapshot's text contains another's as a prefix can't false-pass.
     async function waitForBannerText(page: Page, text: string, timeoutMs = 10_000): Promise<void> {
       await page.waitForFunction(
         (txt: string) => {
           const el = document.querySelector('[data-breaking-ticker-banner] .breaking-ticker-text');
-          return !!el && (el.textContent ?? '').includes(txt);
+          return !!el && (el.textContent ?? '').trim() === txt;
         },
         { timeout: timeoutMs },
         text,
