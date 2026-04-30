@@ -1,0 +1,26 @@
+/* Fixed-position so the appear/dismiss cycle never shifts content (CLS budget).
+ * var(--color-aj-orange) comes from each app's @theme. */
+.breaking-ticker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+.breaking-ticker-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-aj-orange);
+  color: #fff;
+}
+.breaking-ticker-dismiss {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+}

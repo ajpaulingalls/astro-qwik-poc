@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@aje-poc/shared-csp": "workspace:*",
+    "@aje-poc/shared-styles": "workspace:*",
     "@aje-poc/shared-types": "workspace:*",
     "@astrojs/preact": "^5.0.0",
     "@deno/astro-adapter": "^0.4.0",

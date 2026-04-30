@@ -62,9 +62,10 @@ function formatMarkdown(report: AggregatedReport): string {
   }
   lines.push('');
   lines.push(`web-vitals samples: ${report.webVitals.samples.length}`);
+  // n is the per-page run count; reuse it as the MISSING denominator below.
   const aggLcp = report.webVitals.aggregated.lcp;
   if (aggLcp.n === 0) {
-    lines.push(`real-browser lcp median: MISSING (0/${report.metrics.lcp.n} runs)`);
+    lines.push(`real-browser lcp median: MISSING (0/${n} runs)`);
   } else {
     lines.push(`real-browser lcp median: ${aggLcp.median}ms (n=${aggLcp.n})`);
   }
@@ -74,7 +75,7 @@ function formatMarkdown(report: AggregatedReport): string {
   // didn't complete.
   const aggInp = report.webVitals.aggregated.inp;
   if (aggInp.n === 0) {
-    lines.push(`real-browser inp median: MISSING (0/${report.metrics.lcp.n} runs)`);
+    lines.push(`real-browser inp median: MISSING (0/${n} runs)`);
   } else {
     lines.push(`real-browser inp median: ${aggInp.median}ms (n=${aggInp.n})`);
   }

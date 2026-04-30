@@ -9,6 +9,7 @@
     "apps/qwik",
     "packages/perf-harness",
     "packages/shared-csp",
+    "packages/shared-styles",
     "packages/shared-test-helpers",
     "packages/shared-types"
   ],

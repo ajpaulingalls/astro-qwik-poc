@@ -95,6 +95,13 @@ describe('runner main()', () => {
     expect(json.webVitals.samples).toHaveLength(4);
     expect(json.webVitals.aggregated.lcp).toEqual({ median: 60, n: 2 });
     expect(json.webVitals.aggregated.inp).toEqual({ median: 24, n: 2 });
+
+    // Markdown coverage parity: the rewrite for INP support kept JSON
+    // assertions but dropped the MD-line checks. Without these, a future
+    // refactor could break the MD success path silently.
+    const md = readFileSync(ASTRO_REPORT_MD, 'utf8');
+    expect(md).toContain('real-browser lcp median: 60ms (n=2)');
+    expect(md).toContain('real-browser inp median: 24ms (n=2)');
   });
 
   it('emits MISSING aggregated INP when no INP samples arrived (parallel to LCP MISSING path)', async () => {
@@ -107,6 +114,8 @@ describe('runner main()', () => {
     const json = JSON.parse(readFileSync(ASTRO_REPORT_JSON, 'utf8'));
     expect(json.webVitals.aggregated.lcp).toEqual({ median: 60, n: 2 });
     expect(json.webVitals.aggregated.inp).toEqual({ median: null, n: 0 });
+    const md = readFileSync(ASTRO_REPORT_MD, 'utf8');
+    expect(md).toContain('real-browser inp median: MISSING (0/2 runs)');
   });
 
   it('emits MISSING aggregated (median=null, n=0) when web-vitals collected zero LCP samples', async () => {
