@@ -5,6 +5,13 @@
 //   (Tailwind 4 + resumability) and inline resumability bootstrap scripts
 //   must be allowed via 'unsafe-inline'. See apps/qwik/docs/QWIK2_NOTES.md.
 
+// Inline-style attribute sanitization paired with the CSP above. CMS HTML
+// rendered via dangerouslySetInnerHTML must be sanitized before insertion
+// because style-src-attr falls back to default-src 'self', which neither
+// app's CSP allows. See strip-inline-styles.ts for the rationale and the
+// sprint-012 story-004 audit trail.
+export { stripInlineStyles } from './strip-inline-styles.ts';
+
 export const FRAME_SRC_ORIGINS: readonly string[] = [
   'https://platform.twitter.com',
   'https://syndication.twitter.com',

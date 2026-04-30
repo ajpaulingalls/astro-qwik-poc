@@ -105,4 +105,15 @@ describe('ArticleBody', () => {
     expect(embed).toBeTruthy();
     expect(embed?.querySelector('video-js')).toBeTruthy();
   });
+
+  it('strips inline style="" attributes from html segments before render (CSP pin)', () => {
+    // Astro CSP blocks style-src-attr; if stripInlineStyles is removed from the
+    // html-segment branch of ArticleBody, this test catches the regression
+    // before it reaches the M9 audit.
+    const html =
+      '<div style="width: 770px" class="wp-caption"><img src="x.jpg" style="display:block"></div>';
+    const { container } = render(<ArticleBody content={html} />);
+    const styledNodes = container.querySelectorAll('article [style]');
+    expect(styledNodes.length).toBe(0);
+  });
 });

@@ -1,3 +1,4 @@
+import { stripInlineStyles } from '@aje-poc/shared-csp';
 import { parseEmbeds } from '../lib/parse-embeds';
 import { TwitterEmbed } from './embeds/TwitterEmbed';
 import { InstagramEmbed } from './embeds/InstagramEmbed';
@@ -15,7 +16,9 @@ interface Props {
 
 // Content is trusted CMS HTML; CSP enforces script policy app-side (M5/M7).
 // Embeds are dispatched by parseEmbeds; remaining text segments render
-// verbatim via dangerouslySetInnerHTML.
+// verbatim via dangerouslySetInnerHTML AFTER stripInlineStyles removes any
+// `style=""` attributes (CSP style-src-attr falls back to default-src 'self'
+// and would block inline styles at runtime — see strip-inline-styles.ts).
 export function ArticleBody({ content, transformContent }: Props) {
   const html = transformContent ? transformContent(content) : content;
   const segments = parseEmbeds(html);
@@ -23,7 +26,7 @@ export function ArticleBody({ content, transformContent }: Props) {
     <article class="article-body prose max-w-none">
       {segments.map((seg, i) => {
         if (seg.kind === 'html') {
-          return <div key={i} dangerouslySetInnerHTML={{ __html: seg.html }} />;
+          return <div key={i} dangerouslySetInnerHTML={{ __html: stripInlineStyles(seg.html) }} />;
         }
         switch (seg.type) {
           case 'twitter':
