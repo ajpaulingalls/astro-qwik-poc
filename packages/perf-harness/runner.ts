@@ -1,12 +1,12 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { median, percentile } from './aggregator.ts';
 import { withChrome } from './chrome.ts';
 import { runLighthouseAudit, type RawMetrics } from './lighthouse.ts';
 import {
   formatReport,
   MISSING_METRIC,
+  REPORTS_DIR,
   type AggregatedMetric,
   type AggregatedReport,
 } from './reporter.ts';
@@ -14,9 +14,6 @@ import { buildPageList, parseArgs, waitForPort, type Target } from './cli_helper
 import { checkBudgets } from './budgets.ts';
 import { collectWebVitals, type EnrichedMetric } from './web_vitals_collector.ts';
 import { APP_PORT, MOCK_API_PORT, killService, spawnApp, spawnMockApi } from './spawn.ts';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const REPORTS_DIR = resolve(__dirname, 'reports');
 
 function aggMetric(values: number[], n: number): AggregatedMetric {
   return { median: median(values), p95: percentile(values, 0.95), n };
@@ -120,7 +117,7 @@ export async function main(argv: readonly string[] = process.argv.slice(2)): Pro
   }
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (import.meta.main) {
   main().catch((err) => {
     process.stderr.write(`perf-harness: ${err instanceof Error ? err.message : String(err)}\n`);
     process.exit(1);

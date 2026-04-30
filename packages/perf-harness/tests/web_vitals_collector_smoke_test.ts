@@ -16,7 +16,7 @@
  * from packages/perf-harness/.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createServer, type Server } from 'node:http';
+import { startTestServer, type TestServerHandle } from '@aje-poc/shared-test-helpers';
 import { withChrome } from '../chrome.ts';
 import { collectWebVitals } from '../web_vitals_collector.ts';
 
@@ -40,31 +40,25 @@ const PAGE = `<!doctype html>
 </body></html>`;
 
 describe.skipIf(!SMOKE_ENABLED)('collectWebVitals smoke (real Chrome)', () => {
-  let server: Server;
-  let url: string;
+  let handle: TestServerHandle;
 
   beforeAll(async () => {
-    server = createServer((_req, res) => {
-      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-      res.end(PAGE);
-    });
-    await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
-    const addr = server.address();
-    if (!addr || typeof addr === 'string') {
-      throw new Error(`server.address() returned ${typeof addr}; expected AddressInfo with port`);
-    }
-    url = `http://127.0.0.1:${addr.port}/`;
+    handle = await startTestServer(() => ({
+      status: 200,
+      body: PAGE,
+      headers: { 'content-type': 'text/html; charset=utf-8' },
+    }));
   });
 
   afterAll(async () => {
-    await new Promise<void>((r, j) => server.close((e) => (e ? j(e) : r())));
+    await handle.close();
   });
 
   // INP wait may time out here (no full web-vitals shim) — collectWebVitals'
   // TimeoutError swallow is what makes this test resolve at all. So the test
   // also implicitly proves that swallow path against real Chrome.
   it('returns an LCP sample from real Chrome (puppeteer→CDP→PerformanceObserver chain)', async () => {
-    const samples = await withChrome((port) => collectWebVitals(url, port));
+    const samples = await withChrome((port) => collectWebVitals(handle.url, port));
     expect(samples.map((s) => s.name)).toContain('LCP');
   }, 15_000);
 });
