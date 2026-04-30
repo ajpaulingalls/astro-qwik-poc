@@ -8,6 +8,7 @@ import {
   type BreakingTicker as Data,
 } from '@aje-poc/shared-types';
 import { BreakingTicker } from './BreakingTicker';
+import { isolateDocumentHidden } from '../test-utils/document-hidden';
 
 const ACTIVE: Data = {
   post: {
@@ -34,6 +35,7 @@ function tickerResponse(ticker: Data | null) {
 
 describe('BreakingTicker', () => {
   let mock: ReturnType<typeof mockFetchOnce> | undefined;
+  isolateDocumentHidden();
 
   beforeEach(() => {
     vi.stubEnv('PUBLIC_API_BASE', '');
@@ -156,11 +158,7 @@ describe('BreakingTicker', () => {
     render(<BreakingTicker />);
     await waitFor(() => expect(mock!.calls).toHaveLength(1));
     Object.defineProperty(document, 'hidden', { value: true, configurable: true });
-    try {
-      await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS);
-      expect(mock!.calls).toHaveLength(1);
-    } finally {
-      Object.defineProperty(document, 'hidden', { value: false, configurable: true });
-    }
+    await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS);
+    expect(mock!.calls).toHaveLength(1);
   });
 });
