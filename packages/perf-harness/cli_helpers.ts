@@ -121,12 +121,17 @@ const PAGES: Record<Target, Page[]> = {
   ],
 };
 
-export function parseArgs(argv: readonly string[]): ParsedArgs {
+export function parseFlagMap(argv: readonly string[]): Map<string, string> {
   const flags = new Map<string, string>();
   for (const arg of argv) {
-    const match = arg.match(/^--([^=]+)=(.*)$/);
+    const match = /^--([^=]+)=(.*)$/.exec(arg);
     if (match) flags.set(match[1], match[2]);
   }
+  return flags;
+}
+
+export function parseArgs(argv: readonly string[]): ParsedArgs {
+  const flags = parseFlagMap(argv);
 
   const target = flags.get('target');
   if (!target) throw new Error('parseArgs: --target=astro|qwik is required');
