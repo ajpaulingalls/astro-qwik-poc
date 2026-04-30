@@ -85,18 +85,25 @@ export function deriveAllowNet(apiBase: string | undefined, appPort: number): st
   return `0.0.0.0:${appPort},${url.hostname}:${port}`;
 }
 
+// Single source of truth for the deno argv that boots the Astro SSR
+// runtime. Both spawnAstro (perf-harness) and scripts/demo-launch-astro.ts
+// (M11 demo) consume this so a flag tweak in one path can't drift from
+// the other. assertSafeApiBase validation runs through deriveAllowNet.
+export function buildAstroDenoArgv(apiBase: string | undefined, appPort: number): string[] {
+  return [
+    'run',
+    `--allow-net=${deriveAllowNet(apiBase, appPort)}`,
+    '--allow-read=apps/astro/dist',
+    `--allow-env=${ASTRO_ALLOWED_ENV}`,
+    'apps/astro/dist/server/entry.mjs',
+  ];
+}
+
 export function spawnAstro(): ChildProcess {
-  return spawn(
-    'deno',
-    [
-      'run',
-      `--allow-net=${deriveAllowNet(process.env.PUBLIC_API_BASE, APP_PORT.astro)}`,
-      '--allow-read=apps/astro/dist',
-      `--allow-env=${ASTRO_ALLOWED_ENV}`,
-      'apps/astro/dist/server/entry.mjs',
-    ],
-    { cwd: REPO_ROOT, stdio: 'ignore' },
-  );
+  return spawn('deno', buildAstroDenoArgv(process.env.PUBLIC_API_BASE, APP_PORT.astro), {
+    cwd: REPO_ROOT,
+    stdio: 'ignore',
+  });
 }
 
 // Caller PUBLIC_API_BASE wins; unset/empty defaults to the Qwik mock-api port.

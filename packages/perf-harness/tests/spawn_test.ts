@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { EventEmitter } from 'node:events';
-import { deriveAllowNet, killService, qwikSpawnEnv } from '../spawn.ts';
+import {
+  ASTRO_ALLOWED_ENV,
+  buildAstroDenoArgv,
+  deriveAllowNet,
+  killService,
+  qwikSpawnEnv,
+} from '../spawn.ts';
 
 // Pins killService invariants — proc.exitCode is read once, kill is sent once.
 
@@ -135,5 +141,29 @@ describe('qwikSpawnEnv', () => {
 
   it('rejects PUBLIC_API_BASE with whitespace via assertSafeApiBase (parity with deriveAllowNet)', () => {
     expect(() => qwikSpawnEnv({ PUBLIC_API_BASE: ' http://x.com' })).toThrow(/apiBase contains/);
+  });
+});
+
+describe('buildAstroDenoArgv', () => {
+  // Single source of truth for the deno argv used by both spawnAstro
+  // (perf-harness) and scripts/demo-launch-astro.ts (M11 demo). Test pins
+  // the shape so a future flag tweak in one consumer can't drift from the
+  // other.
+  it('defaults to mock-api allow-net when apiBase is undefined', () => {
+    const argv = buildAstroDenoArgv(undefined, 8080);
+    expect(argv[0]).toBe('run');
+    expect(argv).toContain('--allow-net=0.0.0.0:8080,localhost:4455');
+    expect(argv).toContain('--allow-read=apps/astro/dist');
+    expect(argv).toContain(`--allow-env=${ASTRO_ALLOWED_ENV}`);
+    expect(argv[argv.length - 1]).toBe('apps/astro/dist/server/entry.mjs');
+  });
+
+  it('substitutes the live host into allow-net when apiBase points at production', () => {
+    const argv = buildAstroDenoArgv('https://www.aljazeera.com', 8080);
+    expect(argv).toContain('--allow-net=0.0.0.0:8080,www.aljazeera.com:443');
+  });
+
+  it('throws via assertSafeApiBase when apiBase is malformed', () => {
+    expect(() => buildAstroDenoArgv(' http://x.com', 8080)).toThrow(/apiBase contains/);
   });
 });

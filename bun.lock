@@ -5,6 +5,7 @@
     "": {
       "name": "aje-poc",
       "devDependencies": {
+        "@aje-poc/perf-harness": "workspace:*",
         "@eslint/js": "^9.39.4",
         "eslint": "^9.39.4",
         "eslint-plugin-astro": "^1.7.0",
