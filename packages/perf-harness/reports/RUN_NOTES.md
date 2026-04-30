@@ -4,6 +4,8 @@
 
 This file captures the environment fingerprint and parameters used for the n=10 performance + SSR throughput sweep that produced every report in this directory. Reproducibility for M-13 (`docs/COMPARISON.md`) depends on the methodology constraints recorded below — measured numbers are honest only against the same harness, runtime versions, and machine class.
 
+**Reports are gitignored.** `packages/perf-harness/.gitignore` excludes `reports/`. The canonical n=10 reports here were force-added (`git add -f`) for M-13 input. New runs of `runner.ts` / `throughput.ts` will overwrite these files but won't appear in `git status` — use `git add -f <file>` to commit fresh measurements. Non-canonical artifacts (`*.baseline.json`, `*.lever1.json` from sprint-007/008) stay untracked.
+
 ## Environment fingerprint
 
 - **Date**: 2026-04-30
