@@ -20,7 +20,7 @@ export interface AggregatedReport {
   metrics: Record<MetricKey, AggregatedMetric>;
   webVitals: {
     samples: EnrichedMetric[];
-    aggregated: { lcp: AggregatedMetric };
+    aggregated: { lcp: AggregatedMetric; inp: AggregatedMetric };
   };
 }
 
@@ -67,6 +67,15 @@ function formatMarkdown(report: AggregatedReport): string {
     lines.push(`real-browser lcp median: MISSING (0/${report.metrics.lcp.n} runs)`);
   } else {
     lines.push(`real-browser lcp median: ${aggLcp.median}ms (n=${aggLcp.n})`);
+  }
+  // INP is single-source (no LH-throttled equivalent — Lighthouse INP is
+  // field-only). The shim's onINP fires after collectWebVitals provokes a
+  // body-click; MISSING here means the click → INP-fire path didn't complete.
+  const aggInp = report.webVitals.aggregated.inp;
+  if (aggInp.n === 0) {
+    lines.push(`real-browser inp median: MISSING (0/${report.metrics.lcp.n} runs)`);
+  } else {
+    lines.push(`real-browser inp median: ${aggInp.median}ms (n=${aggInp.n})`);
   }
   // className intentionally omitted — Tailwind class soup would bloat the line.
   const lcpElement = report.webVitals.samples.find((s) => s.lcpElement)?.lcpElement;

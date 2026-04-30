@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { checkBudgets, type PageBudgets } from '../budgets.ts';
-import type { AggregatedReport } from '../reporter.ts';
+import { MISSING_METRIC, type AggregatedReport } from '../reporter.ts';
 
 function reportFixture(overrides: Partial<AggregatedReport['metrics']> = {}): AggregatedReport {
   return {
@@ -15,7 +15,7 @@ function reportFixture(overrides: Partial<AggregatedReport['metrics']> = {}): Ag
     },
     webVitals: {
       samples: [],
-      aggregated: { lcp: { median: 1200, n: 5 } },
+      aggregated: { lcp: { median: 1200, n: 5 }, inp: MISSING_METRIC },
     },
   };
 }
