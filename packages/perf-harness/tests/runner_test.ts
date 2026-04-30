@@ -1,11 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { MISSING_METRIC } from '../reporter.ts';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const REPORTS_DIR = resolve(__dirname, '../reports');
+import { resolve } from 'node:path';
+import { MISSING_METRIC, REPORTS_DIR } from '../reporter.ts';
 const TARGET = 'astro';
 const PAGE = 'index';
 

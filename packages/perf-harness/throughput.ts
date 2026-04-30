@@ -1,9 +1,8 @@
 import type { ChildProcess } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { percentile } from './aggregator.ts';
-import { MISSING_METRIC, formatJson, type AggregatedMetric } from './reporter.ts';
+import { MISSING_METRIC, REPORTS_DIR, formatJson, type AggregatedMetric } from './reporter.ts';
 import { buildPageList, parseFlagMap, waitForPort, type Target } from './cli_helpers.ts';
 import { spawnApp, spawnMockApi, killService, MOCK_API_PORT, APP_PORT } from './spawn.ts';
 
@@ -171,8 +170,6 @@ export function buildTargetUrl(target: Target, pageName: string): string {
   }
   return `http://localhost:${APP_PORT[target]}${page.path}`;
 }
-
-const REPORTS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'reports');
 
 export async function main(argv: readonly string[]): Promise<void> {
   const args = parseArgv(argv);

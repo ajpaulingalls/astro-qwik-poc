@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { formatReport, MISSING_METRIC, type AggregatedReport } from '../reporter.ts';
+import { formatReport, MISSING_METRIC, REPORTS_DIR, type AggregatedReport } from '../reporter.ts';
 import type { EnrichedMetric } from '../web_vitals_collector.ts';
+
+describe('REPORTS_DIR', () => {
+  it('resolves to packages/perf-harness/reports/', () => {
+    expect(REPORTS_DIR.endsWith('packages/perf-harness/reports')).toBe(true);
+  });
+});
 
 const fixture: AggregatedReport = {
   page: 'home',

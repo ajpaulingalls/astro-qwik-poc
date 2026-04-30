@@ -1,5 +1,11 @@
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { RawMetrics } from './lighthouse.ts';
 import type { EnrichedMetric } from './web_vitals_collector.ts';
+
+// Single source of truth for both runner.ts and throughput.ts; pinned by a
+// reporter_test assertion so a file move can't silently desync the two CLIs.
+export const REPORTS_DIR = resolve(dirname(fileURLToPath(import.meta.url)), 'reports');
 
 // median/p95 both null iff n === 0 — the single missing signal (SMM concern be23cb2d0a70).
 // p95 lands alongside median for stretch-CWV honesty: median + tail-latency shipped
