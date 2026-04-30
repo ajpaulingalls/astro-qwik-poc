@@ -37,7 +37,10 @@ export interface AggregatedReport {
   };
 }
 
-function sortKeys<T>(value: T): T {
+// Recursively sorts object keys for byte-stable JSON output (frozen-key contract:
+// re-running an unchanged report must produce an identical file so PR diffs only
+// reflect real metric changes, not key-order jitter).
+export function sortKeys<T>(value: T): T {
   if (Array.isArray(value)) {
     return value.map(sortKeys) as unknown as T;
   }
@@ -51,8 +54,8 @@ function sortKeys<T>(value: T): T {
   return value;
 }
 
-function formatJson(report: AggregatedReport): string {
-  return JSON.stringify(sortKeys(report), null, 2);
+export function formatJson<T>(value: T): string {
+  return JSON.stringify(sortKeys(value), null, 2);
 }
 
 function formatMarkdown(report: AggregatedReport): string {

@@ -1,5 +1,5 @@
 import { percentile } from './aggregator.ts';
-import { MISSING_METRIC, type AggregatedMetric } from './reporter.ts';
+import { MISSING_METRIC, formatJson, type AggregatedMetric } from './reporter.ts';
 
 export interface BenchOptions {
   url: string;
@@ -56,6 +56,58 @@ export async function runBench(opts: BenchOptions): Promise<BenchResult> {
       ? MISSING_METRIC
       : { median: percentile(latencies, 0.5), p95: percentile(latencies, 0.95), n };
   return { totalRequests, errors, actualDurationSeconds, reqPerSecond, latencyMs };
+}
+
+export interface ThroughputReport {
+  target: string;
+  page: string;
+  durationMs: number;
+  concurrency: number;
+  totalRequests: number;
+  errors: number;
+  actualDurationSeconds: number;
+  reqPerSecond: number;
+  latencyMs: AggregatedMetric;
+}
+
+export function formatThroughputJson(report: ThroughputReport): string {
+  return formatJson(report);
+}
+
+export function formatThroughputMarkdown(report: ThroughputReport): string {
+  const fmt = (v: number | null) => (v === null ? 'MISSING' : String(v));
+  const rows: Array<[string, string]> = [
+    ['target', report.target],
+    ['page', report.page],
+    ['durationMs', String(report.durationMs)],
+    ['concurrency', String(report.concurrency)],
+    ['actualDurationSeconds', String(report.actualDurationSeconds)],
+    ['totalRequests', String(report.totalRequests)],
+    ['errors', String(report.errors)],
+    ['reqPerSecond', String(report.reqPerSecond)],
+    ['latency p50 (ms)', fmt(report.latencyMs.median)],
+    ['latency p95 (ms)', fmt(report.latencyMs.p95)],
+    ['latency n', String(report.latencyMs.n)],
+  ];
+  const keyWidth = Math.max(...rows.map(([k]) => k.length));
+  const valWidth = Math.max(...rows.map(([, v]) => v.length));
+  const lines: string[] = [];
+  lines.push(`# throughput — ${report.target}/${report.page}`);
+  lines.push('');
+  lines.push(
+    '> Durations measured wall-clock; may overshoot --duration by up to one in-flight request.',
+  );
+  lines.push(
+    '> --concurrency is the requested worker count; bun/undici keep-alive may cap actual concurrent sockets.',
+  );
+  lines.push('');
+  lines.push(`| ${'metric'.padEnd(keyWidth)} | ${'value'.padEnd(valWidth)} |`);
+  lines.push(`| ${'-'.repeat(keyWidth)} | ${'-'.repeat(valWidth)} |`);
+  for (const [k, v] of rows) {
+    lines.push(`| ${k.padEnd(keyWidth)} | ${v.padEnd(valWidth)} |`);
+  }
+  lines.push('');
+  return lines.join('\n');
 }
 
 export function parseDuration(s: string): number {
