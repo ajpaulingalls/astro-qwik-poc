@@ -10,6 +10,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { mockFetchOnce, mockFetchSequence, type MockedFetch } from '@aje-poc/shared-test-helpers';
+import { isolateDocumentHidden } from '../test-utils/document-hidden';
 
 // Mock createPollLoop so the wiring-options test can capture what the
 // component passes (label, onError, shouldSkip, immediate, intervalMs,
@@ -172,6 +173,7 @@ describe('LiveBlogUpdater (render shell)', () => {
 // happens — we capture its options arg via vi.mock above.
 describe('LiveBlogUpdater createPollLoop wiring', () => {
   let mock: MockedFetch | undefined;
+  isolateDocumentHidden();
 
   beforeEach(() => {
     vi.stubEnv('PUBLIC_API_BASE', '');

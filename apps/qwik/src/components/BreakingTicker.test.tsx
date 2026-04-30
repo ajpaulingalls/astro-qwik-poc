@@ -8,6 +8,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
 import { mockFetchOnce, type MockedFetch } from '@aje-poc/shared-test-helpers';
+import { isolateDocumentHidden } from '../test-utils/document-hidden';
 
 // Mock createPollLoop so the wiring-options test can capture what the
 // component passes. Default impl runs a single immediate tick (mimicking
@@ -108,6 +109,7 @@ describe('BreakingTicker (render shell)', () => {
 // onEmpty the helper's null short-circuit would leave the prior banner up.
 describe('BreakingTicker createPollLoop wiring', () => {
   let mock: MockedFetch | undefined;
+  isolateDocumentHidden();
 
   beforeEach(() => {
     vi.stubEnv('PUBLIC_API_BASE', '');
