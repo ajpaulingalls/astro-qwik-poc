@@ -1,5 +1,6 @@
 import { connect } from 'node:net';
 import type { PageBudgets } from './budgets.ts';
+import { LIVEBLOG_PATH } from './fixtures.ts';
 
 export type Target = 'astro' | 'qwik';
 
@@ -25,11 +26,6 @@ export interface Page {
 // embed so the run exercises mixed text + provider-script content.
 const STRETCH_CWV = { lcp: 1500, inp: 100, cls: 0.05, lhPerf: 98 } as const;
 const ARTICLE_PATH = '/news/russian-oil-exports-slump-as-ukraine-hammers-ports-and-refineries';
-// Live blog fixture path — slug's last segment matches the snapshot fixtures.
-// The slug parents (year/month/day) mirror production URL shape but the
-// liveblog route only keys off lastSegment().
-const LIVEBLOG_PATH =
-  '/news/liveblog/2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
 
 // Qwik 2 beta.32 routes share a common ~176KB jsBytes ceiling — the
 // resumability runtime + router + shared chunks dominate (~136KB framework

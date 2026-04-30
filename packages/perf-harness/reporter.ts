@@ -17,6 +17,9 @@ export type MetricKey = keyof RawMetrics;
 export interface AggregatedReport {
   page: string;
   target: string;
+  // Operator-supplied --runs count. Tracked separately so MISSING denominators
+  // stay accurate when a partial-failure path drives metric.n below it.
+  runs: number;
   metrics: Record<MetricKey, AggregatedMetric>;
   webVitals: {
     samples: EnrichedMetric[];
@@ -44,7 +47,7 @@ function formatJson(report: AggregatedReport): string {
 
 function formatMarkdown(report: AggregatedReport): string {
   const names = (Object.keys(report.metrics) as MetricKey[]).sort();
-  const n = names.length > 0 ? report.metrics[names[0]].n : 0;
+  const runs = report.runs;
   const nameWidth = Math.max(6, ...names.map((n) => n.length));
   const valueStrings = names.map((name) => {
     const m = report.metrics[name].median;
@@ -53,7 +56,7 @@ function formatMarkdown(report: AggregatedReport): string {
   const valueWidth = Math.max(6, ...valueStrings.map((s) => s.length));
 
   const lines: string[] = [];
-  lines.push(`# perf report — ${report.target}/${report.page} (n=${n})`);
+  lines.push(`# perf report — ${report.target}/${report.page} (n=${runs})`);
   lines.push('');
   lines.push(`| ${'metric'.padEnd(nameWidth)} | ${'median'.padStart(valueWidth)} |`);
   lines.push(`| ${'-'.repeat(nameWidth)} | ${'-'.repeat(valueWidth)} |`);
@@ -62,10 +65,10 @@ function formatMarkdown(report: AggregatedReport): string {
   }
   lines.push('');
   lines.push(`web-vitals samples: ${report.webVitals.samples.length}`);
-  // n is the per-page run count; reuse it as the MISSING denominator below.
+  // runs is the operator-supplied --runs count, the honest MISSING denominator.
   const aggLcp = report.webVitals.aggregated.lcp;
   if (aggLcp.n === 0) {
-    lines.push(`real-browser lcp median: MISSING (0/${n} runs)`);
+    lines.push(`real-browser lcp median: MISSING (0/${runs} runs)`);
   } else {
     lines.push(`real-browser lcp median: ${aggLcp.median}ms (n=${aggLcp.n})`);
   }
@@ -75,7 +78,7 @@ function formatMarkdown(report: AggregatedReport): string {
   // didn't complete.
   const aggInp = report.webVitals.aggregated.inp;
   if (aggInp.n === 0) {
-    lines.push(`real-browser inp median: MISSING (0/${n} runs)`);
+    lines.push(`real-browser inp median: MISSING (0/${runs} runs)`);
   } else {
     lines.push(`real-browser inp median: ${aggInp.median}ms (n=${aggInp.n})`);
   }

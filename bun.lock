@@ -76,6 +76,7 @@
         "puppeteer-core": "^23.0.0",
       },
       "devDependencies": {
+        "@aje-poc/shared-csp": "workspace:*",
         "@aje-poc/shared-types": "workspace:*",
         "@types/node": "^22.0.0",
         "typescript": "^5.9.0",

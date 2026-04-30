@@ -78,6 +78,7 @@ describe('loadLiveBlogData', () => {
     expect(shellUrl.searchParams.get('operationName')).toBe('ArchipelagoSingleLiveBlogQuery');
     expect(JSON.parse(shellUrl.searchParams.get('variables')!)).toEqual({
       name: 'iran-war-live',
+      postType: 'liveblog',
       preview: '',
     });
 

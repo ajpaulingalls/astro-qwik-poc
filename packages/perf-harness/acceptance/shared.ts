@@ -47,9 +47,7 @@ export const SECTION_VARIANTS: SectionVariant[] = [
   { name: 'topic', slug: 'opinion', expectedTitle: 'Opinion' },
 ];
 
-export const LIVEBLOG_SLUG =
-  '2026/4/22/iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
-export const LIVEBLOG_PATH = `/news/liveblog/${LIVEBLOG_SLUG}`;
+export { LIVEBLOG_SLUG, LIVEBLOG_PATH } from '../fixtures.ts';
 
 export const MIN_RELATED = 4;
 export const MAX_RELATED = 6;
