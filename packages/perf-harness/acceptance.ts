@@ -735,6 +735,43 @@ export function runAcceptanceSuite(target: Target): void {
       },
     );
 
+    // CLS regression guard: BreakingTicker is overlaid via position:fixed
+    // (apps/{astro,qwik}/src/styles/global.css .breaking-ticker) so the
+    // banner appearing post-hydration must not push document content. Mirrors
+    // the live-blog Updater CLS gate above. Without this probe a future CSS
+    // change that drops position:fixed could re-introduce the regression that
+    // story-005 measured at CLS 0.081 across article + section-topic.
+    it('breaking-ticker banner appearance does not regress CLS', { timeout: 20_000 }, async () => {
+      await withPageAndHeaders({ 'x-liveblog-snapshot': '1' }, async (page) => {
+        await waitUntilHydrated(page, 'section[data-breaking-ticker]');
+        // Install observer BEFORE the polled banner appears. buffered:false
+        // skips initial-render shifts (font swap, etc.) so we measure only
+        // the appear window.
+        await page.evaluate(() => {
+          const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
+          w.__cls = 0;
+          const obs = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              const ls = entry as PerformanceEntry & {
+                value: number;
+                hadRecentInput: boolean;
+              };
+              if (!ls.hadRecentInput) w.__cls += ls.value;
+            }
+          });
+          obs.observe({ type: 'layout-shift', buffered: false });
+          w.__obs = obs;
+        });
+        await waitForBannerText(page, TICKER_TEXT_SNAPSHOT_1);
+        const cls = await page.evaluate(() => {
+          const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
+          w.__obs.disconnect();
+          return w.__cls;
+        });
+        expect(cls).toBeLessThanOrEqual(CLS_PREPEND_BUDGET);
+      });
+    });
+
     // Capstone article suite (story-008): one navigated DOM probe per
     // fixture variant, asserting the article shell, the embed-specific DOM
     // signature, and the related-stories module. Cross-app divergence here
