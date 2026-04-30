@@ -1,14 +1,17 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, waitFor } from '@testing-library/preact';
-import { mockFetchOnce, mockFetchSequence } from '@aje-poc/shared-test-helpers';
+import {
+  isolateDocumentHidden,
+  mockFetchOnce,
+  mockFetchSequence,
+} from '@aje-poc/shared-test-helpers';
 import {
   MAX_CONSECUTIVE_EMPTY_POLLS,
   TICKER_POLL_INTERVAL_MS,
   type BreakingTicker as Data,
 } from '@aje-poc/shared-types';
 import { BreakingTicker } from './BreakingTicker';
-import { isolateDocumentHidden } from '../test-utils/document-hidden';
 
 const ACTIVE: Data = {
   post: {

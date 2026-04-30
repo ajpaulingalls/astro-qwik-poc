@@ -7,8 +7,11 @@
 // suite, mirroring the LiveBlogUpdater test scope.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
-import { mockFetchOnce, type MockedFetch } from '@aje-poc/shared-test-helpers';
-import { isolateDocumentHidden } from '../test-utils/document-hidden';
+import {
+  isolateDocumentHidden,
+  mockFetchOnce,
+  type MockedFetch,
+} from '@aje-poc/shared-test-helpers';
 
 // Mock createPollLoop so the wiring-options test can capture what the
 // component passes. Default impl runs a single immediate tick (mimicking

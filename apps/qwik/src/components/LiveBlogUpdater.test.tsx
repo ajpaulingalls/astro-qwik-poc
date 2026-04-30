@@ -9,8 +9,12 @@
 // story-004 should NOT be considered M9-complete without that pass.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createDOM } from '@qwik.dev/core/testing';
-import { mockFetchOnce, mockFetchSequence, type MockedFetch } from '@aje-poc/shared-test-helpers';
-import { isolateDocumentHidden } from '../test-utils/document-hidden';
+import {
+  isolateDocumentHidden,
+  mockFetchOnce,
+  mockFetchSequence,
+  type MockedFetch,
+} from '@aje-poc/shared-test-helpers';
 
 // Mock createPollLoop so the wiring-options test can capture what the
 // component passes (label, onError, shouldSkip, immediate, intervalMs,

@@ -5,3 +5,4 @@ export {
   type MockFetchOptions,
   type MockedFetch,
 } from './mock-fetch.ts';
+export { isolateDocumentHidden } from './document-hidden.ts';
