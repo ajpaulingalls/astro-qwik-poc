@@ -32,6 +32,9 @@ export async function runBench(opts: BenchOptions): Promise<BenchResult> {
 
   async function attemptRequest(): Promise<void> {
     const reqStart = Date.now();
+    // totalRequests counts started attempts, not completed — a slow in-flight
+    // fetch at the deadline is included so reqPerSecond stays consistent with
+    // the wall-clock overshoot the MD report documents.
     totalRequests += 1;
     try {
       const res = await fetch(url);
@@ -176,6 +179,20 @@ export async function main(argv: readonly string[]): Promise<void> {
   const url = buildTargetUrl(args.target, args.page);
   const mockApi = spawnMockApi(args.target);
   let app: ChildProcess | null = null;
+
+  // SIGINT/SIGTERM handler: a long bench interrupted with Ctrl-C must release
+  // ports 4455/4456 + 8080/4173 or the next run fails to bind. The handler
+  // body awaits killService to completion before exit(130), so the conventional
+  // "interrupted" code reaches the parent shell after the children are reaped.
+  const onSignal = async (signal: NodeJS.Signals) => {
+    process.stderr.write(`\nthroughput: received ${signal}, cleaning up...\n`);
+    if (app) await killService(app);
+    await killService(mockApi);
+    process.exit(130);
+  };
+  process.once('SIGINT', onSignal);
+  process.once('SIGTERM', onSignal);
+
   try {
     await waitForPort(MOCK_API_PORT[args.target], { timeoutMs: 30_000 });
     app = spawnApp(args.target);
@@ -205,6 +222,8 @@ export async function main(argv: readonly string[]): Promise<void> {
     writeFileSync(`${stem}.md`, formatThroughputMarkdown(report));
     process.stdout.write(`wrote ${stem}.json + ${stem}.md\n`);
   } finally {
+    process.removeListener('SIGINT', onSignal);
+    process.removeListener('SIGTERM', onSignal);
     if (app) await killService(app);
     await killService(mockApi);
   }
