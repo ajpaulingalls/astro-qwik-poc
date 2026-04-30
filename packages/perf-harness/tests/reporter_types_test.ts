@@ -16,3 +16,13 @@ describe('AggregatedReport.metrics type', () => {
     expectTypeOf<keyof AggregatedReport['metrics']>().toEqualTypeOf<MetricKey>();
   });
 });
+
+describe('AggregatedMetric type', () => {
+  it('has median + p95 + n (all required; median/p95 nullable)', () => {
+    expectTypeOf<AggregatedMetric>().toEqualTypeOf<{
+      median: number | null;
+      p95: number | null;
+      n: number;
+    }>();
+  });
+});

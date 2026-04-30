@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { MISSING_METRIC } from '../reporter.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPORTS_DIR = resolve(__dirname, '../reports');
@@ -90,18 +91,18 @@ describe('runner main()', () => {
     const json = JSON.parse(readFileSync(ASTRO_REPORT_JSON, 'utf8'));
     expect(json.page).toBe(PAGE);
     expect(json.target).toBe(TARGET);
-    expect(json.metrics.lcp).toEqual({ median: 900, n: 2 });
+    expect(json.metrics.lcp).toEqual({ median: 900, p95: 900, n: 2 });
     expect(json.metrics.cls.n).toBe(2);
     expect(json.webVitals.samples).toHaveLength(4);
-    expect(json.webVitals.aggregated.lcp).toEqual({ median: 60, n: 2 });
-    expect(json.webVitals.aggregated.inp).toEqual({ median: 24, n: 2 });
+    expect(json.webVitals.aggregated.lcp).toEqual({ median: 60, p95: 60, n: 2 });
+    expect(json.webVitals.aggregated.inp).toEqual({ median: 24, p95: 24, n: 2 });
 
     // Markdown coverage parity: the rewrite for INP support kept JSON
     // assertions but dropped the MD-line checks. Without these, a future
     // refactor could break the MD success path silently.
     const md = readFileSync(ASTRO_REPORT_MD, 'utf8');
-    expect(md).toContain('real-browser lcp median: 60ms (n=2)');
-    expect(md).toContain('real-browser inp median: 24ms (n=2)');
+    expect(md).toContain('real-browser lcp median: 60ms p95: 60ms (n=2)');
+    expect(md).toContain('real-browser inp median: 24ms p95: 24ms (n=2)');
   });
 
   it('emits MISSING aggregated INP when no INP samples arrived (parallel to LCP MISSING path)', async () => {
@@ -112,8 +113,8 @@ describe('runner main()', () => {
     await main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`]);
 
     const json = JSON.parse(readFileSync(ASTRO_REPORT_JSON, 'utf8'));
-    expect(json.webVitals.aggregated.lcp).toEqual({ median: 60, n: 2 });
-    expect(json.webVitals.aggregated.inp).toEqual({ median: null, n: 0 });
+    expect(json.webVitals.aggregated.lcp).toEqual({ median: 60, p95: 60, n: 2 });
+    expect(json.webVitals.aggregated.inp).toEqual(MISSING_METRIC);
     const md = readFileSync(ASTRO_REPORT_MD, 'utf8');
     expect(md).toContain('real-browser inp median: MISSING (0/2 runs)');
   });
@@ -126,7 +127,7 @@ describe('runner main()', () => {
     await main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`]);
 
     const json = JSON.parse(readFileSync(ASTRO_REPORT_JSON, 'utf8'));
-    expect(json.webVitals.aggregated.lcp).toEqual({ median: null, n: 0 });
+    expect(json.webVitals.aggregated.lcp).toEqual(MISSING_METRIC);
     const md = readFileSync(ASTRO_REPORT_MD, 'utf8');
     expect(md).toContain('real-browser lcp median: MISSING (0/2 runs)');
   });

@@ -1,13 +1,23 @@
 import type { RawMetrics } from './lighthouse.ts';
 import type { EnrichedMetric } from './web_vitals_collector.ts';
 
-// median is null iff n === 0 — the single missing signal (SMM concern be23cb2d0a70).
+// median/p95 both null iff n === 0 — the single missing signal (SMM concern be23cb2d0a70).
+// p95 lands alongside median for stretch-CWV honesty: median + tail-latency shipped
+// together (R type 7, see aggregator.percentile).
 export interface AggregatedMetric {
   median: number | null;
+  p95: number | null;
   n: number;
 }
 
-export const MISSING_METRIC: AggregatedMetric = { median: null, n: 0 };
+// Frozen so the missing-signal contract is unforgeable — used as both the
+// runner.ts fallback and the test .toEqual reference; one mutation would
+// silently corrupt every consumer.
+export const MISSING_METRIC: AggregatedMetric = Object.freeze({
+  median: null,
+  p95: null,
+  n: 0,
+}) as AggregatedMetric;
 
 export type MetricKey = keyof RawMetrics;
 
@@ -49,19 +59,23 @@ function formatMarkdown(report: AggregatedReport): string {
   const names = (Object.keys(report.metrics) as MetricKey[]).sort();
   const runs = report.runs;
   const nameWidth = Math.max(6, ...names.map((n) => n.length));
-  const valueStrings = names.map((name) => {
-    const m = report.metrics[name].median;
-    return m === null ? 'MISSING' : String(m);
-  });
-  const valueWidth = Math.max(6, ...valueStrings.map((s) => s.length));
+  const fmt = (v: number | null) => (v === null ? 'MISSING' : String(v));
+  const medianStrings = names.map((name) => fmt(report.metrics[name].median));
+  const p95Strings = names.map((name) => fmt(report.metrics[name].p95));
+  const medianWidth = Math.max(6, ...medianStrings.map((s) => s.length));
+  const p95Width = Math.max(3, ...p95Strings.map((s) => s.length));
 
   const lines: string[] = [];
   lines.push(`# perf report — ${report.target}/${report.page} (n=${runs})`);
   lines.push('');
-  lines.push(`| ${'metric'.padEnd(nameWidth)} | ${'median'.padStart(valueWidth)} |`);
-  lines.push(`| ${'-'.repeat(nameWidth)} | ${'-'.repeat(valueWidth)} |`);
+  lines.push(
+    `| ${'metric'.padEnd(nameWidth)} | ${'median'.padStart(medianWidth)} | ${'p95'.padStart(p95Width)} |`,
+  );
+  lines.push(`| ${'-'.repeat(nameWidth)} | ${'-'.repeat(medianWidth)} | ${'-'.repeat(p95Width)} |`);
   for (let i = 0; i < names.length; i++) {
-    lines.push(`| ${names[i].padEnd(nameWidth)} | ${valueStrings[i].padStart(valueWidth)} |`);
+    lines.push(
+      `| ${names[i].padEnd(nameWidth)} | ${medianStrings[i].padStart(medianWidth)} | ${p95Strings[i].padStart(p95Width)} |`,
+    );
   }
   lines.push('');
   lines.push(`web-vitals samples: ${report.webVitals.samples.length}`);
@@ -70,7 +84,7 @@ function formatMarkdown(report: AggregatedReport): string {
   if (aggLcp.n === 0) {
     lines.push(`real-browser lcp median: MISSING (0/${runs} runs)`);
   } else {
-    lines.push(`real-browser lcp median: ${aggLcp.median}ms (n=${aggLcp.n})`);
+    lines.push(`real-browser lcp median: ${aggLcp.median}ms p95: ${aggLcp.p95}ms (n=${aggLcp.n})`);
   }
   // INP is single-source (no LH-throttled equivalent — Lighthouse INP is
   // field-only). The shim's onINP fires after collectWebVitals provokes a
@@ -80,7 +94,7 @@ function formatMarkdown(report: AggregatedReport): string {
   if (aggInp.n === 0) {
     lines.push(`real-browser inp median: MISSING (0/${runs} runs)`);
   } else {
-    lines.push(`real-browser inp median: ${aggInp.median}ms (n=${aggInp.n})`);
+    lines.push(`real-browser inp median: ${aggInp.median}ms p95: ${aggInp.p95}ms (n=${aggInp.n})`);
   }
   // className intentionally omitted — Tailwind class soup would bloat the line.
   const lcpElement = report.webVitals.samples.find((s) => s.lcpElement)?.lcpElement;
