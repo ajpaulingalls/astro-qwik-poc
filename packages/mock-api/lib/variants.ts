@@ -11,6 +11,17 @@ interface VariantRule {
   // live-blog operations that rotate over time AND for variableless ops like
   // the breaking-news ticker.
   snapshotted?: boolean;
+  // Production discriminates these ops by postType — wrong postType returns
+  // 200 + null data + no_posts_found rather than the fixture. Handler mirrors
+  // that envelope so apps that omit postType fail fast at the unit boundary
+  // instead of slipping through CI and surfacing only against live.
+  requiredPostType?: { value: string; nullDataKey: string };
+}
+
+export function getRequiredPostType(
+  operationName: string,
+): { value: string; nullDataKey: string } | undefined {
+  return VARIANT_RULES[operationName]?.requiredPostType;
 }
 
 const VARIANT_RULES: Record<string, VariantRule> = {
@@ -21,6 +32,7 @@ const VARIANT_RULES: Record<string, VariantRule> = {
   ArchipelagoSingleLiveBlogQuery: {
     suffix: (v) => typeof v.name === "string" ? `--${slugify(v.name)}` : null,
     snapshotted: true,
+    requiredPostType: { value: "liveblog", nullDataKey: "article" },
   },
 
   SingleLiveBlogChildrensQuery: {
@@ -35,6 +47,7 @@ const VARIANT_RULES: Record<string, VariantRule> = {
   // upstream resolver but don't fan out fixtures.
   LiveBlogUpdateQuery: {
     suffix: (v) => typeof v.postID === "number" ? `--${v.postID}` : null,
+    requiredPostType: { value: "liveblog-update", nullDataKey: "posts" },
   },
 
   ArchipelagoSectionQuery: {
