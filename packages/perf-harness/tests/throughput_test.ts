@@ -84,6 +84,23 @@ describe('runBench', () => {
       await close();
     }
   });
+
+  it('routes fetch-throw (connection refused) to errors with no latency recorded', async () => {
+    // Pin the OTHER error path: the previous test exercises catch-via-non-2xx;
+    // this exercises catch-via-fetch-rejection, so the invariant
+    // (latencyMs.n + errors === totalRequests) is pinned across both modes.
+    const { url, close } = await startTestServer(() => ({ status: 200, body: 'ok' }));
+    await close();
+
+    const result = await runBench({ url, durationMs: 200, concurrency: 4 });
+
+    expect(result.totalRequests).toBeGreaterThan(0);
+    expect(result.errors).toBe(result.totalRequests);
+    expect(result.latencyMs.n).toBe(0);
+    expect(result.latencyMs.median).toBeNull();
+    expect(result.latencyMs.p95).toBeNull();
+    expect(result.latencyMs.n + result.errors).toBe(result.totalRequests);
+  });
 });
 
 const sampleReport: ThroughputReport = {

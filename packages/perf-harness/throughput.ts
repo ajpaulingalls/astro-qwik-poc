@@ -12,6 +12,14 @@ export interface BenchOptions {
   concurrency: number;
 }
 
+/**
+ * Result of a throughput bench run.
+ *
+ * Invariant: latencyMs.n + errors === totalRequests. Each started request
+ * contributes to exactly one bucket — `latencyMs.n` for 2xx with a successful
+ * body drain, `errors` for everything else (non-2xx, fetch throw, or
+ * mid-body drain throw routed through the outer catch).
+ */
 export interface BenchResult {
   totalRequests: number;
   errors: number;
