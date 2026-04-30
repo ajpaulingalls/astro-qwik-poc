@@ -43,9 +43,10 @@ export interface AggregatedReport {
   };
   // Concatenation of every securitypolicyviolation event the collector
   // observed across the N runs of this page. Empty array means the listener
-  // ran AND no violation fired. Optional during the M0a → M0c rollout —
-  // becomes required once collectWebVitals starts populating it (M0c).
-  cspViolations?: SerializedCspViolation[];
+  // ran AND no violation fired — distinguishable from a missing listener
+  // because tsc requires the field, so a runner.ts that forgot to populate
+  // it would not compile.
+  cspViolations: SerializedCspViolation[];
 }
 
 // Recursively sorts object keys for byte-stable JSON output (frozen-key contract:
@@ -121,10 +122,9 @@ function formatMarkdown(report: AggregatedReport): string {
   // IS the audit signal SECURITY.md cites. Per-violation detail (directive,
   // blockedURI, sample) lives in the JSON cspViolations array; MD stays
   // a one-line summary so the report scans at a glance.
-  const cspViolations = report.cspViolations ?? [];
-  lines.push(`csp violations: ${cspViolations.length} (across ${runs} runs)`);
-  if (cspViolations.length > 0) {
-    const summary = summarizeCspViolations(cspViolations);
+  lines.push(`csp violations: ${report.cspViolations.length} (across ${runs} runs)`);
+  if (report.cspViolations.length > 0) {
+    const summary = summarizeCspViolations(report.cspViolations);
     for (const line of summary) {
       lines.push(`  ${line}`);
     }

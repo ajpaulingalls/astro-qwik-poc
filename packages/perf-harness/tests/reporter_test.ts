@@ -148,13 +148,6 @@ describe('formatReport', () => {
     expect(markdown).toContain(`script-src ← ${INLINE_BLOCKED_URI_LABEL} × 2`);
   });
 
-  it('renders csp violations as 0 when field is undefined (back-compat)', () => {
-    const { cspViolations: _omit, ...noField } = fixture;
-    void _omit;
-    const { markdown } = formatReport(noField);
-    expect(markdown).toContain('csp violations: 0 (across 5 runs)');
-  });
-
   it('is byte-identical for the same input across calls (determinism gate)', () => {
     const a = formatReport(fixture);
     const b = formatReport(fixture);

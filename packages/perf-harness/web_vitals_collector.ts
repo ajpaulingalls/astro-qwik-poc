@@ -32,6 +32,11 @@ const NAV_TIMEOUT_MS = 30_000;
 const SHIM_READY_TIMEOUT_MS = 5_000;
 const POST_LCP_TAIL_MS = 500;
 
+// Bridge name shared between the Node-side push handler (exposeFunction) and
+// the page-side document listener (evaluateOnNewDocument). Defined once so a
+// rename can't desync the two ends silently.
+const CSP_BRIDGE_NAME = '__cspViolation';
+
 // Extracted as a named function so the test can invoke it directly. page.evaluate
 // serializes the callback to source — no closures over imports — so this only runs
 // in the page context, never in Node at runtime.
@@ -53,9 +58,9 @@ export function enrichSamples(): EnrichedMetric[] {
 
 export interface CollectWebVitalsResult {
   samples: EnrichedMetric[];
-  // Empty in M0a/M0b — listener wires in M0c. The field is present so runner
-  // populates AggregatedReport.cspViolations consistently across the rollout
-  // without conditional logic at the call site.
+  // Every securitypolicyviolation event the page-side listener observed
+  // during this run (see collectWebVitals body for the wiring). Empty array
+  // means the listener attached AND no violation fired.
   cspViolations: SerializedCspViolation[];
 }
 
@@ -64,6 +69,31 @@ export async function collectWebVitals(url: string, port: number): Promise<Colle
   const cspViolations: SerializedCspViolation[] = [];
   try {
     const page = await browser.newPage();
+    // Wire CSP-violation collection BEFORE navigation. exposeFunction
+    // creates a Node-side bridge (`window.__cspViolation`) the page can
+    // call from any context; evaluateOnNewDocument injects the listener
+    // into every document the page navigates to, including the very first
+    // one. Reverse the order and the first-paint violation slips by
+    // because the listener attaches after the document is already parsed.
+    await page.exposeFunction(CSP_BRIDGE_NAME, (v: SerializedCspViolation) => {
+      cspViolations.push(v);
+    });
+    await page.evaluateOnNewDocument((bridgeName: string) => {
+      document.addEventListener('securitypolicyviolation', (e) => {
+        const w = window as unknown as Record<string, (v: unknown) => void>;
+        w[bridgeName]({
+          violatedDirective: e.violatedDirective,
+          effectiveDirective: e.effectiveDirective,
+          blockedURI: e.blockedURI,
+          disposition: e.disposition,
+          documentURI: e.documentURI,
+          sourceFile: e.sourceFile,
+          lineNumber: e.lineNumber,
+          columnNumber: e.columnNumber,
+          sample: e.sample,
+        });
+      });
+    }, CSP_BRIDGE_NAME);
     await page.goto(url, { waitUntil: 'networkidle2', timeout: NAV_TIMEOUT_MS });
     await page.waitForFunction(
       () => (globalThis as WebVitalsGlobal).__webVitals?.some((m) => m.name === 'LCP'),
