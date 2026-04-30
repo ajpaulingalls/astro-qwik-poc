@@ -36,6 +36,7 @@ import {
 import { registerArticleVariantTests } from './acceptance/article-variant-tests.ts';
 import { registerBreakingTickerTests } from './acceptance/breaking-ticker-tests.ts';
 import { registerLiveBlogTests } from './acceptance/live-blog-tests.ts';
+import { registerLiveEndpointTests } from './acceptance/live-endpoint-tests.ts';
 import { registerSectionTests } from './acceptance/section-tests.ts';
 
 export function runAcceptanceSuite(target: Target): void {
@@ -62,6 +63,24 @@ export function runAcceptanceSuite(target: Target): void {
       try {
         await page.setViewport(viewport);
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 30_000 });
+        return await fn(page);
+      } finally {
+        await page.close();
+      }
+    }
+
+    // Same lifecycle guarantees as withPage but does NOT navigate. Caller
+    // owns page.goto so it can attach listeners (page.on 'console',
+    // 'pageerror') before navigation — necessary when the assertion is
+    // about errors fired during initial load, which withPage's pre-baked
+    // goto would mask.
+    async function withFreshPage<T>(
+      viewport: Viewport,
+      fn: (page: Page) => Promise<T>,
+    ): Promise<T> {
+      const page = await browser.newPage();
+      try {
+        await page.setViewport(viewport);
         return await fn(page);
       } finally {
         await page.close();
@@ -169,6 +188,7 @@ export function runAcceptanceSuite(target: Target): void {
       appUrl: APP_URL,
       withPage,
       withPageAndHeaders,
+      withFreshPage,
       waitUntilHydrated,
       waitForBannerText,
     };
@@ -370,5 +390,6 @@ export function runAcceptanceSuite(target: Target): void {
     registerLiveBlogTests(ctx);
     registerBreakingTickerTests(ctx);
     registerArticleVariantTests(ctx);
+    registerLiveEndpointTests(ctx);
   });
 }
