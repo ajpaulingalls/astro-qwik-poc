@@ -10,6 +10,22 @@ export interface LcpElementSummary {
 
 export type EnrichedMetric = Metric & { lcpElement?: LcpElementSummary };
 
+// Subset of DOM SecurityPolicyViolationEvent serialized across the puppeteer
+// boundary. Skips originalPolicy (already in source — bloats reports) and
+// referrer (not actionable for the audit). Captured by the runtime listener
+// the collector attaches before navigation.
+export interface SerializedCspViolation {
+  violatedDirective: string;
+  effectiveDirective: string;
+  blockedURI: string;
+  disposition: 'enforce' | 'report';
+  documentURI: string;
+  sourceFile: string;
+  lineNumber: number;
+  columnNumber: number;
+  sample: string;
+}
+
 type WebVitalsGlobal = { __webVitals?: Metric[] };
 
 const NAV_TIMEOUT_MS = 30_000;
