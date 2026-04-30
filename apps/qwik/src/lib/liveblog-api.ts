@@ -13,7 +13,8 @@ interface LiveBlogUpdateData {
 export async function fetchLiveBlogShell(slug: string): Promise<LiveBlogShell | null> {
   const data = await graphqlFetch<SingleLiveBlogData>({
     operationName: 'ArchipelagoSingleLiveBlogQuery',
-    variables: { name: slug, preview: '' },
+    // postType: 'liveblog' required by production API; omitting returns no_posts_found.
+    variables: { name: slug, postType: 'liveblog', preview: '' },
   });
   return data.article;
 }
