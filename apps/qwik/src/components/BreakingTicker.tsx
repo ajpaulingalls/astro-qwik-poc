@@ -1,41 +1,52 @@
 import { component$, useSignal, useVisibleTask$ } from '@qwik.dev/core';
 import {
+  createPollLoop,
+  MAX_CONSECUTIVE_EMPTY_POLLS,
   TICKER_POLL_INTERVAL_MS,
   type BreakingTicker as BreakingTickerData,
   isBreakingTickerActive,
+  resolvePollIntervalMs,
 } from '@aje-poc/shared-types';
 import { fetchBreakingTicker } from '../lib/ticker-api';
+
+const POLL_INTERVAL_MS = resolvePollIntervalMs(
+  import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
+  TICKER_POLL_INTERVAL_MS,
+);
 
 export const BreakingTicker = component$(() => {
   const ticker = useSignal<BreakingTickerData | null>(null);
   const dismissed = useSignal(false);
   const hydrated = useSignal(false);
 
-  // useVisibleTask$ document-ready strategy + manual setInterval (allowStale
-  // absent in beta.32). cleanup MUST register clearInterval via the callback
-  // so QRL teardown invokes it. Diverges from LiveBlogUpdater: tick() fires
-  // immediately so the banner can populate on first paint instead of waiting
-  // 30s — LiveBlogUpdater is SSR-seeded and only polls.
+  // useVisibleTask$ document-ready strategy + shared createPollLoop helper.
+  // cleanup MUST register stop() via the callback so QRL teardown invokes
+  // it. Diverges from LiveBlogUpdater via immediate:true so the banner can
+  // populate on first paint instead of waiting one full cadence — the ticker
+  // is not SSR-seeded, unlike the live-blog Updater.
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(
     ({ cleanup }) => {
       hydrated.value = true;
-      let polling = false;
-      const tick = async () => {
-        if (polling) return;
-        if (document.hidden) return;
-        polling = true;
-        try {
-          ticker.value = await fetchBreakingTicker();
-        } catch (err) {
-          console.error('breaking-ticker: poll tick failed:', err);
-        } finally {
-          polling = false;
-        }
-      };
-      tick();
-      const intervalId = setInterval(tick, TICKER_POLL_INTERVAL_MS);
-      cleanup(() => clearInterval(intervalId));
+      const { stop } = createPollLoop<BreakingTickerData>({
+        tick: () => fetchBreakingTicker(),
+        onResult: (fresh) => {
+          ticker.value = fresh;
+        },
+        // active→null transition: clear the displayed banner. Without this
+        // the helper short-circuits null and the previously-set active
+        // banner would stay on screen forever.
+        onEmpty: () => {
+          ticker.value = null;
+        },
+        onError: (err) => console.error('breaking-ticker: poll tick failed:', err),
+        shouldSkip: () => document.hidden,
+        intervalMs: POLL_INTERVAL_MS,
+        maxConsecutiveEmpty: MAX_CONSECUTIVE_EMPTY_POLLS,
+        label: 'breaking-ticker',
+        immediate: true,
+      });
+      cleanup(stop);
     },
     { strategy: 'document-ready' },
   );

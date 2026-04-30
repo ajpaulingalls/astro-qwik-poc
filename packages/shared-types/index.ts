@@ -108,6 +108,101 @@ export type LiveBlogChildrenIds = number[];
 // §Live Blog).
 export const LIVEBLOG_POLL_INTERVAL_MS = 30_000;
 
+// Test-fixture slug — the live-blog fixture filename suffix (last segment
+// of the production URL). Single source of truth for mock-api tests
+// (packages/mock-api/tests/_helpers.ts) and shared-types tests
+// (packages/shared-types/liveblog-shell.test.ts), both of which load the
+// matching ArchipelagoSingleLiveBlogQuery--{slug}--snapshot-0.json fixture.
+// NOT used by application code; production resolves slugs via routing.
+export const LIVE_BLOG_SLUG =
+  'iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo';
+
+// Stop polling after this many consecutive empty fetchPollUpdate responses.
+// Guards against indefinite polling when the live blog is deleted or
+// otherwise stops producing new entries — server returns [] forever, costing
+// battery + a request every cadence. 20 cycles ≈ 10 minutes at the 30s
+// production cadence: long enough that a real lull (no new entries during a
+// quiet period) doesn't trip it, short enough to bound waste after deletion.
+export const MAX_CONSECUTIVE_EMPTY_POLLS = 20;
+
+export interface PollLoopOptions<T> {
+  // Returns the polled value, or `null` if "empty" (no new entries / no
+  // active banner). Empty results increment the consecutive-empty counter;
+  // throwing also counts as empty per the deletion-guard intent (perpetual
+  // 5xx is also a signal to stop).
+  tick: () => Promise<T | null>;
+  // Called with the polled value when tick returns non-null. Reset point
+  // for the consecutive-empty counter.
+  onResult: (value: T) => void;
+  // Optional callback for null results — used by callers (e.g. BreakingTicker)
+  // that need to clear displayed state on the active→null transition.
+  // Errors do NOT trigger this (they're typically transient and shouldn't
+  // wipe state); use onError for error logging instead.
+  onEmpty?: () => void;
+  // Optional logger for thrown errors (e.g. to console.error with a prefix).
+  // The thrown error itself increments the empty counter regardless.
+  onError?: (err: unknown) => void;
+  // Optional skip predicate run before each tick (e.g. document.hidden).
+  // When true, the tick is dropped on the floor without incrementing
+  // either counter.
+  shouldSkip?: () => boolean;
+  intervalMs: number;
+  maxConsecutiveEmpty: number;
+  // Used in the single console.info logged when the loop stops.
+  label: string;
+  // Call tick once synchronously before arming setInterval — so callers
+  // that want the first paint populated (e.g. BreakingTicker) don't have
+  // to wait one full cadence for the first result.
+  immediate?: boolean;
+}
+
+// Self-clearing poll loop with built-in concurrency guard, document.hidden
+// honoring (via shouldSkip), and a consecutive-empty / consecutive-error
+// stop heuristic. Used by every polling island (LiveBlogUpdater +
+// BreakingTicker, both apps). Returns a stop() the caller wires to its
+// framework's cleanup callback.
+export function createPollLoop<T>(opts: PollLoopOptions<T>): { stop: () => void } {
+  let polling = false;
+  let consecutiveEmpty = 0;
+  let intervalId: ReturnType<typeof setInterval> | null = null;
+  const stop = (): void => {
+    if (intervalId !== null) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  };
+  const recordEmpty = (): void => {
+    consecutiveEmpty++;
+    if (consecutiveEmpty >= opts.maxConsecutiveEmpty) {
+      console.info(`${opts.label}: stopping poll after ${opts.maxConsecutiveEmpty} empty cycles`);
+      stop();
+    }
+  };
+  const tickOnce = async (): Promise<void> => {
+    if (polling) return;
+    if (opts.shouldSkip?.()) return;
+    polling = true;
+    try {
+      const value = await opts.tick();
+      if (value === null) {
+        opts.onEmpty?.();
+        recordEmpty();
+        return;
+      }
+      consecutiveEmpty = 0;
+      opts.onResult(value);
+    } catch (err) {
+      opts.onError?.(err);
+      recordEmpty();
+    } finally {
+      polling = false;
+    }
+  };
+  if (opts.immediate) void tickOnce();
+  intervalId = setInterval(tickOnce, opts.intervalMs);
+  return { stop };
+}
+
 // Above-the-fold entries the routes fetch in parallel during SSR.
 // Production's iran-war live blog has ~128 children; 5 is what shows above
 // the fold, with "Load older" deferred to a future story.
@@ -164,6 +259,18 @@ export interface BreakingTicker {
 
 // Both apps' BreakingTicker islands arm setInterval at this rate.
 export const TICKER_POLL_INTERVAL_MS = 30_000;
+
+// Build-time poll-cadence override for acceptance tests — Vite inlines
+// import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS at build, so production
+// builds bake the default unless the env is set. Pure helper shared by both
+// LiveBlogUpdater (apps/{astro,qwik}/src/components/LiveBlogUpdater.tsx) and
+// BreakingTicker (apps/{astro,qwik}/src/components/BreakingTicker.tsx); single
+// env var controls both pollers because their cadences are identical (30s).
+// Non-positive / non-finite values fall through to the default.
+export function resolvePollIntervalMs(rawEnv: unknown, defaultMs: number): number {
+  const n = Number(rawEnv);
+  return Number.isFinite(n) && n > 0 ? n : defaultMs;
+}
 
 // Banner render gate. Empty or whitespace-only tickerText is treated as
 // inactive (defensive: avoids rendering an empty banner if the API ever

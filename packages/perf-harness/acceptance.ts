@@ -118,6 +118,33 @@ const LIVEBLOG_PATH = `/news/liveblog/${LIVEBLOG_SLUG}`;
 // CLS-during-prepend gate from execution_plan.json M9 done-state.
 const CLS_PREPEND_BUDGET = 0.05;
 
+// BreakingTicker capstone (story-005, M10): the ticker is the first global
+// addition since the layout — verify it hydrates on every page type and
+// honors the snapshot-pinned active/inactive contract across both apps.
+// Snapshot pinning reuses the x-liveblog-snapshot header proven by the
+// liveblog test below; the mock-api's snapshot rotation is operation-agnostic
+// (variants.ts marks ArchipelagoBreakingTickerQuery as snapshotted: true).
+// The build bakes PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 and BreakingTicker
+// reads the same env var via the shared resolvePollIntervalMs helper, so the
+// polling-detects-change probe sees the next tick within ~1s.
+const TICKER_PAGE_TYPES: { name: string; path: string }[] = [
+  { name: 'homepage', path: '/' },
+  { name: 'article', path: `/news/${KNOWN_ARTICLE_SLUG}` },
+  { name: 'section', path: `/${SECTION_VARIANTS[0].slug}` },
+  { name: 'liveblog', path: LIVEBLOG_PATH },
+];
+// Snapshot fixture text — kept in sync with
+// packages/mock-api/fixtures/ArchipelagoBreakingTickerQuery--snapshot-{1,2}.json.
+// If the fixtures are re-recorded, update these strings.
+const TICKER_TEXT_SNAPSHOT_1 =
+  'Lebanon ceasefire collapses as Israeli strikes resume across the south.';
+const TICKER_TEXT_SNAPSHOT_2 =
+  'UN Security Council convenes emergency session as Lebanon casualties rise above 50.';
+// Wait long enough that one acceptance-build poll cycle has surely fired
+// (PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500 baked into both apps' test:acceptance
+// scripts; 1500ms gives ~3 cycles of headroom for slow CI).
+const POLL_WAIT_MS = 1_500;
+
 // HTML5 forbids nested <main> landmarks. Qwik's layout wraps every route in
 // <main>; per-route components must NOT add another (use <div> with the
 // content-width classes instead). Astro's BaseLayout doesn't add <main>, so
@@ -155,6 +182,55 @@ export function runAcceptanceSuite(target: Target): void {
       } finally {
         await page.close();
       }
+    }
+
+    // Variant for polling-island tests (live-blog, breaking-ticker) where
+    // a snapshot-pinning header must be set BEFORE navigation and the page
+    // never reaches networkidle (continuous polling). Waits on
+    // domcontentloaded + an explicit hydration signal in fn instead.
+    async function withPageAndHeaders<T>(
+      headers: Record<string, string>,
+      fn: (page: Page) => Promise<T>,
+      url: string = APP_URL,
+    ): Promise<T> {
+      const page = await browser.newPage();
+      try {
+        await page.setViewport(DESKTOP);
+        await page.setExtraHTTPHeaders(headers);
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+        return await fn(page);
+      } finally {
+        await page.close();
+      }
+    }
+
+    // Waits for a `data-hydrated="true"` flip on the given selector. Both
+    // apps' islands emit this attribute once their visible task / useEffect
+    // arms — single cross-app signal for "ready to interact." Used by every
+    // post-hydration probe (LoadMore, live-blog Updater, BreakingTicker).
+    async function waitUntilHydrated(
+      page: Page,
+      selector: string,
+      timeoutMs = 10_000,
+    ): Promise<void> {
+      await page.waitForFunction(
+        (sel: string) => document.querySelector(sel)?.getAttribute('data-hydrated') === 'true',
+        { timeout: timeoutMs },
+        selector,
+      );
+    }
+
+    // Waits for the BreakingTicker banner's text content to include the given
+    // string. Used by the snapshot-1 assertion + polling-detects-change probe.
+    async function waitForBannerText(page: Page, text: string, timeoutMs = 10_000): Promise<void> {
+      await page.waitForFunction(
+        (txt: string) => {
+          const el = document.querySelector('[data-breaking-ticker-banner] .breaking-ticker-text');
+          return !!el && (el.textContent ?? '').includes(txt);
+        },
+        { timeout: timeoutMs },
+        text,
+      );
     }
 
     beforeAll(async () => {
@@ -498,91 +574,203 @@ export function runAcceptanceSuite(target: Target): void {
       { timeout: 30_000 },
       async () => {
         const url = `http://127.0.0.1:${APP_PORT[target]}${LIVEBLOG_PATH}`;
-        // Open page manually (not via withPage) so we can install the
-        // x-liveblog-snapshot header BEFORE polling starts — withPage's
-        // goto would race the Updater's first poll. The header is pinned
-        // for the lifetime of this page; production code never sends it.
-        const page = await browser.newPage();
-        try {
-          await page.setViewport(DESKTOP);
-          // setExtraHTTPHeaders applies to ALL outgoing browser requests,
-          // including the navigation request. The header on the SSR
-          // navigation is harmless: the app server hits mock-api with its
-          // own Node fetch (no header forwarding), so SSR resolves at
-          // env-pinned snapshot-0 regardless. Only the browser-originated
-          // polling fetches carry the header — those resolve at snapshot-2.
-          await page.setExtraHTTPHeaders({ 'x-liveblog-snapshot': '2' });
-          // domcontentloaded (not networkidle2) — the Updater starts polling
-          // every 500ms once hydrated, so the network never idles long
-          // enough for networkidle2 to resolve. We wait for hydration via
-          // an explicit waitForFunction below, which is the correct signal
-          // for "Updater is alive" anyway.
-          await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+        // setExtraHTTPHeaders applies to ALL outgoing browser requests,
+        // including the navigation request. The header on the SSR
+        // navigation is harmless: the app server hits mock-api with its
+        // own Node fetch (no header forwarding), so SSR resolves at
+        // env-pinned snapshot-0 regardless. Only the browser-originated
+        // polling fetches carry the header — those resolve at snapshot-2.
+        await withPageAndHeaders(
+          { 'x-liveblog-snapshot': '2' },
+          async (page) => {
+            await waitUntilHydrated(page, 'section[data-live-blog-updater]');
 
-          // Both apps' Updater sections flip data-hydrated false→true once
-          // their visible task / useEffect arms — single cross-app signal.
-          await page.waitForFunction(
-            () =>
-              document
-                .querySelector('section[data-live-blog-updater]')
-                ?.getAttribute('data-hydrated') === 'true',
-            { timeout: 10_000 },
-          );
-
-          // Bootstrap: snapshot initial entry IDs AND install the layout-
-          // shift observer in one round-trip. buffered:false skips shifts
-          // that fired before this point (initial render, font swap) so we
-          // only measure the polling-prepend window.
-          const initialEntryIds = await page.evaluate(() => {
-            const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
-            w.__cls = 0;
-            const obs = new PerformanceObserver((list) => {
-              for (const entry of list.getEntries()) {
-                const ls = entry as PerformanceEntry & {
-                  value: number;
-                  hadRecentInput: boolean;
-                };
-                if (!ls.hadRecentInput) w.__cls += ls.value;
-              }
-            });
-            obs.observe({ type: 'layout-shift', buffered: false });
-            w.__obs = obs;
-            return Array.from(document.querySelectorAll('[data-entry-id]')).map(
-              (el) => el.getAttribute('data-entry-id') ?? '',
-            );
-          });
-
-          // Wait for the Updater to prepend at least one new entry — the
-          // count of [data-entry-id] elements grows because both apps'
-          // Updater section appends polled entries with the same data-
-          // entry-id wrapper as the SSR'd entries below.
-          await page.waitForFunction(
-            (initial: number) => document.querySelectorAll('[data-entry-id]').length > initial,
-            { timeout: 15_000 },
-            initialEntryIds.length,
-          );
-
-          // Teardown: disconnect observer, return CLS + final IDs in one
-          // round-trip.
-          const { cls, finalEntryIds } = await page.evaluate(() => {
-            const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
-            w.__obs.disconnect();
-            return {
-              cls: w.__cls,
-              finalEntryIds: Array.from(document.querySelectorAll('[data-entry-id]')).map(
+            // Bootstrap: snapshot initial entry IDs AND install the layout-
+            // shift observer in one round-trip. buffered:false skips shifts
+            // that fired before this point (initial render, font swap) so we
+            // only measure the polling-prepend window.
+            const initialEntryIds = await page.evaluate(() => {
+              const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
+              w.__cls = 0;
+              const obs = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                  const ls = entry as PerformanceEntry & {
+                    value: number;
+                    hadRecentInput: boolean;
+                  };
+                  if (!ls.hadRecentInput) w.__cls += ls.value;
+                }
+              });
+              obs.observe({ type: 'layout-shift', buffered: false });
+              w.__obs = obs;
+              return Array.from(document.querySelectorAll('[data-entry-id]')).map(
                 (el) => el.getAttribute('data-entry-id') ?? '',
-              ),
-            };
-          });
+              );
+            });
 
-          expect(initialEntryIds.length).toBeGreaterThan(0);
-          expect(finalEntryIds.length).toBeGreaterThan(initialEntryIds.length);
-          expect(cls).toBeLessThanOrEqual(CLS_PREPEND_BUDGET);
-        } finally {
-          await page.close();
-        }
+            // Wait for the Updater to prepend at least one new entry — the
+            // count of [data-entry-id] elements grows because both apps'
+            // Updater section appends polled entries with the same data-
+            // entry-id wrapper as the SSR'd entries below.
+            await page.waitForFunction(
+              (initial: number) => document.querySelectorAll('[data-entry-id]').length > initial,
+              { timeout: 15_000 },
+              initialEntryIds.length,
+            );
+
+            // Teardown: disconnect observer, return CLS + final IDs in one
+            // round-trip.
+            const { cls, finalEntryIds } = await page.evaluate(() => {
+              const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
+              w.__obs.disconnect();
+              return {
+                cls: w.__cls,
+                finalEntryIds: Array.from(document.querySelectorAll('[data-entry-id]')).map(
+                  (el) => el.getAttribute('data-entry-id') ?? '',
+                ),
+              };
+            });
+
+            expect(initialEntryIds.length).toBeGreaterThan(0);
+            expect(finalEntryIds.length).toBeGreaterThan(initialEntryIds.length);
+            expect(cls).toBeLessThanOrEqual(CLS_PREPEND_BUDGET);
+          },
+          url,
+        );
       },
     );
+
+    // BreakingTicker capstone (story-005, M10): four page types × two
+    // snapshots each — verifies hydration + active/inactive contract across
+    // both apps. Header pinning works because BreakingTicker's first poll is
+    // browser-originated (post-hydration); SSR fetches go server→mock-api
+    // with no header forwarding so the SSR HTML always sees env-pinned
+    // snapshot-0 (test:acceptance pins SNAPSHOT_INDEX=0). The component
+    // useState(null) means SSR never renders the banner regardless — only
+    // the post-hydration first poll surfaces snapshot-N's content.
+    for (const pageType of TICKER_PAGE_TYPES) {
+      it(
+        `renders [data-breaking-ticker] hydrated on ${pageType.name} with snapshot-0 (no banner)`,
+        { timeout: 20_000 },
+        async () => {
+          const url = `http://127.0.0.1:${APP_PORT[target]}${pageType.path}`;
+          await withPageAndHeaders(
+            { 'x-liveblog-snapshot': '0' },
+            async (page) => {
+              await waitUntilHydrated(page, 'section[data-breaking-ticker]');
+              // Sleep so the first browser poll has surely completed; banner
+              // must remain absent because snapshot-0 is the empty fixture.
+              await new Promise((r) => setTimeout(r, POLL_WAIT_MS));
+              const bannerExists = await page.evaluate(
+                () => !!document.querySelector('[data-breaking-ticker-banner]'),
+              );
+              expect(bannerExists, `${pageType.name}: snapshot-0 must not render banner`).toBe(
+                false,
+              );
+            },
+            url,
+          );
+        },
+      );
+
+      it(
+        `renders banner with snapshot-1 tickerText + dismiss button on ${pageType.name}`,
+        { timeout: 20_000 },
+        async () => {
+          const url = `http://127.0.0.1:${APP_PORT[target]}${pageType.path}`;
+          await withPageAndHeaders(
+            { 'x-liveblog-snapshot': '1' },
+            async (page) => {
+              await waitForBannerText(page, TICKER_TEXT_SNAPSHOT_1);
+              const dismissExists = await page.evaluate(
+                () => !!document.querySelector('button[data-breaking-ticker-dismiss]'),
+              );
+              expect(dismissExists, `${pageType.name}: dismiss button missing`).toBe(true);
+            },
+            url,
+          );
+        },
+      );
+    }
+
+    // Polling-detects-change: load with snapshot-1 header, wait for the
+    // banner to render snapshot-1 text, flip the header to snapshot-2, wait
+    // for the next browser poll (500ms cadence) to swap the banner text.
+    // Single test on the homepage — the per-page-type assertions above
+    // already proved hydration on every page.
+    it(
+      'breaking-ticker polling detects snapshot change and updates banner text',
+      { timeout: 30_000 },
+      async () => {
+        await withPageAndHeaders({ 'x-liveblog-snapshot': '1' }, async (page) => {
+          await waitForBannerText(page, TICKER_TEXT_SNAPSHOT_1);
+          // Subsequent browser fetches (the next poll) carry the new header.
+          await page.setExtraHTTPHeaders({ 'x-liveblog-snapshot': '2' });
+          await waitForBannerText(page, TICKER_TEXT_SNAPSHOT_2);
+        });
+      },
+    );
+
+    // Dismiss is component-local state — once clicked, the banner must not
+    // return on subsequent polls even though the server still says active.
+    it(
+      'breaking-ticker dismiss removes banner and it does not return on next poll',
+      { timeout: 20_000 },
+      async () => {
+        await withPageAndHeaders({ 'x-liveblog-snapshot': '1' }, async (page) => {
+          await waitForBannerText(page, TICKER_TEXT_SNAPSHOT_1);
+          await page.click('button[data-breaking-ticker-dismiss]');
+          await page.waitForFunction(
+            () => !document.querySelector('[data-breaking-ticker-banner]'),
+            { timeout: 5_000 },
+          );
+          // Sleep so the next snapshot-1 poll has fired; banner must remain
+          // absent because dismissed is local state, not server-driven.
+          await new Promise((r) => setTimeout(r, POLL_WAIT_MS));
+          const bannerExists = await page.evaluate(
+            () => !!document.querySelector('[data-breaking-ticker-banner]'),
+          );
+          expect(bannerExists, 'banner returned after dismiss').toBe(false);
+        });
+      },
+    );
+
+    // CLS regression guard: BreakingTicker is overlaid via position:fixed
+    // (apps/{astro,qwik}/src/styles/global.css .breaking-ticker) so the
+    // banner appearing post-hydration must not push document content. Mirrors
+    // the live-blog Updater CLS gate above. Without this probe a future CSS
+    // change that drops position:fixed could re-introduce the regression that
+    // story-005 measured at CLS 0.081 across article + section-topic.
+    it('breaking-ticker banner appearance does not regress CLS', { timeout: 20_000 }, async () => {
+      await withPageAndHeaders({ 'x-liveblog-snapshot': '1' }, async (page) => {
+        await waitUntilHydrated(page, 'section[data-breaking-ticker]');
+        // Install observer BEFORE the polled banner appears. buffered:false
+        // skips initial-render shifts (font swap, etc.) so we measure only
+        // the appear window.
+        await page.evaluate(() => {
+          const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
+          w.__cls = 0;
+          const obs = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              const ls = entry as PerformanceEntry & {
+                value: number;
+                hadRecentInput: boolean;
+              };
+              if (!ls.hadRecentInput) w.__cls += ls.value;
+            }
+          });
+          obs.observe({ type: 'layout-shift', buffered: false });
+          w.__obs = obs;
+        });
+        await waitForBannerText(page, TICKER_TEXT_SNAPSHOT_1);
+        const cls = await page.evaluate(() => {
+          const w = window as unknown as { __cls: number; __obs: PerformanceObserver };
+          w.__obs.disconnect();
+          return w.__cls;
+        });
+        expect(cls).toBeLessThanOrEqual(CLS_PREPEND_BUDGET);
+      });
+    });
 
     // Capstone article suite (story-008): one navigated DOM probe per
     // fixture variant, asserting the article shell, the embed-specific DOM

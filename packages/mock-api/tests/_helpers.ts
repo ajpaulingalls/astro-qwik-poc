@@ -1,7 +1,10 @@
 import { startServer } from "../server.ts";
 
-export const LIVE_BLOG_SLUG =
-  "iran-war-live-trump-says-ceasefire-extended-as-talks-with-tehran-in-limbo";
+// Re-exported from shared-types via the deno.json import map so the slug has
+// a single SoT across the bun-side shared-types tests and the Deno-side
+// mock-api tests; see packages/shared-types/index.ts for the canonical
+// declaration.
+export { LIVE_BLOG_SLUG } from "@aje-poc/shared-types";
 
 export function buildRequest(opts: {
   method?: string;

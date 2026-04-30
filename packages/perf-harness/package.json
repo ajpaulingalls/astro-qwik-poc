@@ -10,6 +10,7 @@
   "scripts": {
     "run": "bun run runner.ts",
     "test": "vitest run",
+    "test:acceptance": "bun run --cwd ../../apps/astro test:acceptance && bun run --cwd ../../apps/qwik test:acceptance",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

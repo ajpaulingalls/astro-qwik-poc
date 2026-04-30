@@ -2,7 +2,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, waitFor } from '@testing-library/preact';
 import { mockFetchOnce, mockFetchSequence } from '@aje-poc/shared-test-helpers';
-import { TICKER_POLL_INTERVAL_MS, type BreakingTicker as Data } from '@aje-poc/shared-types';
+import {
+  MAX_CONSECUTIVE_EMPTY_POLLS,
+  TICKER_POLL_INTERVAL_MS,
+  type BreakingTicker as Data,
+} from '@aje-poc/shared-types';
 import { BreakingTicker } from './BreakingTicker';
 
 const ACTIVE: Data = {
@@ -112,6 +116,39 @@ describe('BreakingTicker', () => {
         ACTIVE_2.tickerText!,
       ),
     );
+  });
+
+  it('clears banner when polling later returns null (active→null transition)', async () => {
+    mock = mockFetchSequence([tickerResponse(ACTIVE), tickerResponse(null)]);
+    const { container } = render(<BreakingTicker />);
+    await waitFor(() =>
+      expect(container.querySelector('[data-breaking-ticker-banner]')).not.toBeNull(),
+    );
+    // Next tick: API returns null. Banner must clear, not stay stuck.
+    await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS);
+    await waitFor(() =>
+      expect(container.querySelector('[data-breaking-ticker-banner]')).toBeNull(),
+    );
+  });
+
+  it('stops polling after MAX_CONSECUTIVE_EMPTY_POLLS null responses (deletion guard)', async () => {
+    // Mock returns null banner (snapshot-0 equivalent) every poll → counter
+    // increments each tick. After MAX cycles the interval clears; further
+    // time advances must NOT produce additional fetches.
+    const sequence = Array.from({ length: MAX_CONSECUTIVE_EMPTY_POLLS + 5 }, () =>
+      tickerResponse(null),
+    );
+    mock = mockFetchSequence(sequence);
+    render(<BreakingTicker />);
+
+    for (let i = 0; i < MAX_CONSECUTIVE_EMPTY_POLLS; i++) {
+      await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS);
+    }
+    await waitFor(() => expect(mock!.calls.length).toBe(MAX_CONSECUTIVE_EMPTY_POLLS));
+
+    const callsAtThreshold = mock!.calls.length;
+    await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS * 2);
+    expect(mock!.calls.length).toBe(callsAtThreshold);
   });
 
   it('skips polling fetches while document.hidden is true', async () => {

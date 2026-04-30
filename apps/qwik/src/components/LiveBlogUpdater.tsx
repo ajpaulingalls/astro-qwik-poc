@@ -1,6 +1,9 @@
 import { component$, useSignal, useVisibleTask$ } from '@qwik.dev/core';
 import {
+  createPollLoop,
   LIVEBLOG_POLL_INTERVAL_MS,
+  MAX_CONSECUTIVE_EMPTY_POLLS,
+  resolvePollIntervalMs,
   type LiveBlogChildrenIds,
   type LiveBlogUpdate,
 } from '@aje-poc/shared-types';
@@ -8,14 +11,6 @@ import { GraphqlHttpError } from '../lib/graphql';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
-// Build-time poll-cadence override for acceptance tests — Vite inlines
-// import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS at build, so production
-// builds bake the 30s default unless the build is run with the env set.
-// Non-positive / non-finite values fall through to the default.
-export function resolvePollIntervalMs(rawEnv: unknown, defaultMs: number): number {
-  const n = Number(rawEnv);
-  return Number.isFinite(n) && n > 0 ? n : defaultMs;
-}
 const POLL_INTERVAL_MS = resolvePollIntervalMs(
   import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
   LIVEBLOG_POLL_INTERVAL_MS,
@@ -73,11 +68,11 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
   const hydrated = useSignal(false);
 
   // routeLoader$ is not re-invoked from the client without a navigation,
-  // so polling lives here as a manual setInterval inside useVisibleTask$.
-  // allowStale (the v2-shaped equivalent) does not exist in beta.32 —
-  // see apps/qwik/docs/QWIK2_NOTES.md for the recorded decision. clearInterval
-  // MUST be registered via the visible-task `cleanup` callback (not from
-  // inside the setInterval body) so QRL teardown invokes it on unmount.
+  // so polling lives here. allowStale (the v2-shaped equivalent) does not
+  // exist in beta.32 — see apps/qwik/docs/QWIK2_NOTES.md for the recorded
+  // decision. The shared createPollLoop helper handles the concurrency
+  // guard, document.hidden honoring, consecutive-empty/error stop, and
+  // single-log emit; only the tick body and onResult are app-specific.
   //
   // strategy: 'document-ready' (not the default 'intersection-observer')
   // because the section starts empty (0 height) — IntersectionObserver
@@ -89,39 +84,23 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
   useVisibleTask$(
     ({ cleanup }) => {
       hydrated.value = true;
-      // Concurrency guard: if a fetch from tick N stalls past the 30s
-      // interval, tick N+1 must NOT fire a second concurrent fetch — the
-      // older fetch could resolve last and prepend stale entries above
-      // newer ones. Drop the late tick on the floor; the next tick after
-      // `polling` clears will pick up the latest known ids. Production
-      // upgrade path: AbortController + sequence number to actively
-      // cancel the stalled fetch.
-      let polling = false;
-      const intervalId = setInterval(async () => {
-        if (polling) return;
-        // Skip background tabs — no point burning the user's battery (and the
-        // server) when the entries aren't being read. useVisibleTask$ is
-        // client-only, so document is always defined here.
-        if (document.hidden) return;
-        polling = true;
-        try {
+      const { stop } = createPollLoop<LiveBlogUpdate[]>({
+        tick: async () => {
           const polledIds = newEntries.value.map((e) => Number(e.id));
           const known = [...polledIds, ...initialChildIds];
           const fresh = await fetchPollUpdate(slug, known);
-          // Early return is safe: finally clears polling.
-          if (fresh.length === 0) return;
+          return fresh.length === 0 ? null : fresh;
+        },
+        onResult: (fresh) => {
           newEntries.value = [...fresh, ...newEntries.value];
-        } catch (err) {
-          // fetchLiveBlogShell or any other unhandled awaitable can reject
-          // (5xx, network, parse). Without this catch the rejection becomes
-          // an unhandled promise rejection at every tick. The `finally`
-          // still resets polling so the next tick proceeds.
-          console.error('liveblog-updater: poll tick failed:', err);
-        } finally {
-          polling = false;
-        }
-      }, POLL_INTERVAL_MS);
-      cleanup(() => clearInterval(intervalId));
+        },
+        onError: (err) => console.error('liveblog-updater: poll tick failed:', err),
+        shouldSkip: () => document.hidden,
+        intervalMs: POLL_INTERVAL_MS,
+        maxConsecutiveEmpty: MAX_CONSECUTIVE_EMPTY_POLLS,
+        label: 'liveblog-updater',
+      });
+      cleanup(stop);
     },
     { strategy: 'document-ready' },
   );

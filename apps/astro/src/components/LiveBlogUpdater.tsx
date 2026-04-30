@@ -1,17 +1,15 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { LIVEBLOG_POLL_INTERVAL_MS, type LiveBlogUpdate } from '@aje-poc/shared-types';
+import {
+  createPollLoop,
+  LIVEBLOG_POLL_INTERVAL_MS,
+  MAX_CONSECUTIVE_EMPTY_POLLS,
+  resolvePollIntervalMs,
+  type LiveBlogUpdate,
+} from '@aje-poc/shared-types';
 import { GraphqlHttpError } from '../lib/graphql';
 import { fetchLiveBlogShell, fetchLiveBlogUpdate } from '../lib/liveblog-api';
 import { LiveBlogEntry } from './LiveBlogEntry';
 
-// Build-time poll-cadence override for acceptance tests — Vite inlines
-// import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS at build, so production
-// builds bake the 30s default unless the build is run with the env set.
-// Non-positive / non-finite values fall through to the default.
-export function resolvePollIntervalMs(rawEnv: unknown, defaultMs: number): number {
-  const n = Number(rawEnv);
-  return Number.isFinite(n) && n > 0 ? n : defaultMs;
-}
 const POLL_INTERVAL_MS = resolvePollIntervalMs(
   import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
   LIVEBLOG_POLL_INTERVAL_MS,
@@ -68,44 +66,28 @@ interface Props {
 export function LiveBlogUpdater({ slug, initialChildIds }: Props) {
   const [newEntries, setNewEntries] = useState<LiveBlogUpdate[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
-  // Latest entries kept in a ref so the interval callback always reads the
+  // Latest entries kept in a ref so the poll callback always reads the
   // current value without re-arming the interval on every state change.
   const newEntriesRef = useRef<LiveBlogUpdate[]>([]);
   newEntriesRef.current = newEntries;
-  // Concurrency guard: if a fetch from tick N stalls past the 30s
-  // interval, tick N+1 must NOT fire a second concurrent fetch — the
-  // older fetch could resolve last and prepend stale entries above
-  // newer ones. Drop the late tick on the floor; the next tick after
-  // pollingRef clears picks up the latest known ids. Mirrors the Qwik
-  // LiveBlogUpdater guard.
-  const pollingRef = useRef(false);
 
   useEffect(() => {
     sectionRef.current?.setAttribute('data-hydrated', 'true');
-    const intervalId = setInterval(async () => {
-      if (pollingRef.current) return;
-      // Skip background tabs — no point burning the user's battery (and the
-      // server) when entries aren't being read. document is always defined
-      // here (this useEffect is browser-only).
-      if (document.hidden) return;
-      pollingRef.current = true;
-      try {
+    const { stop } = createPollLoop<LiveBlogUpdate[]>({
+      tick: async () => {
         const polled = newEntriesRef.current.map((e) => Number(e.id));
         const known = [...polled, ...initialChildIds];
         const fresh = await fetchPollUpdate(slug, known);
-        // Early return is safe: finally clears pollingRef.
-        if (fresh.length === 0) return;
-        setNewEntries((prev) => [...fresh, ...prev]);
-      } catch (err) {
-        // fetchLiveBlogShell or any other unhandled awaitable can reject
-        // (5xx, network, parse). Without this catch the rejection becomes
-        // an unhandled promise rejection at every tick.
-        console.error('liveblog-updater: poll tick failed:', err);
-      } finally {
-        pollingRef.current = false;
-      }
-    }, POLL_INTERVAL_MS);
-    return () => clearInterval(intervalId);
+        return fresh.length === 0 ? null : fresh;
+      },
+      onResult: (fresh) => setNewEntries((prev) => [...fresh, ...prev]),
+      onError: (err) => console.error('liveblog-updater: poll tick failed:', err),
+      shouldSkip: () => document.hidden,
+      intervalMs: POLL_INTERVAL_MS,
+      maxConsecutiveEmpty: MAX_CONSECUTIVE_EMPTY_POLLS,
+      label: 'liveblog-updater',
+    });
+    return stop;
   }, [slug, initialChildIds]);
 
   return (
