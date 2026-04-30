@@ -4,6 +4,7 @@ import { EventEmitter } from 'node:events';
 import {
   ASTRO_ALLOWED_ENV,
   buildAstroDenoArgv,
+  decideChildExitAction,
   deriveAllowNet,
   killService,
   qwikSpawnEnv,
@@ -165,5 +166,32 @@ describe('buildAstroDenoArgv', () => {
 
   it('throws via assertSafeApiBase when apiBase is malformed', () => {
     expect(() => buildAstroDenoArgv(' http://x.com', 8080)).toThrow(/apiBase contains/);
+  });
+});
+
+describe('decideChildExitAction', () => {
+  // Decides what the demo launcher's parent process does when its deno
+  // child exits. Re-raise the signal so the parent's exit disposition
+  // matches the child's; otherwise propagate exit code (null → 1, the
+  // honest fail-loud default for "abnormal termination without signal").
+
+  it('re-raises the signal when child exited via signal', () => {
+    expect(decideChildExitAction(null, 'SIGINT')).toEqual({ kind: 'signal', signal: 'SIGINT' });
+  });
+
+  it('propagates the exit code when child exited cleanly', () => {
+    expect(decideChildExitAction(0, null)).toEqual({ kind: 'exit', code: 0 });
+    expect(decideChildExitAction(2, null)).toEqual({ kind: 'exit', code: 2 });
+  });
+
+  it('falls back to exit 1 when both code and signal are null', () => {
+    expect(decideChildExitAction(null, null)).toEqual({ kind: 'exit', code: 1 });
+  });
+
+  it('prefers signal over code when both are present', () => {
+    // Node sets code=null when signal is non-null, but the helper is
+    // defensive — pin the precedence so a future Node behavior change
+    // can't silently swallow the signal.
+    expect(decideChildExitAction(0, 'SIGTERM')).toEqual({ kind: 'signal', signal: 'SIGTERM' });
   });
 });

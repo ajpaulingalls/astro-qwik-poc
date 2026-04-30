@@ -140,6 +140,24 @@ export function spawnApp(target: Target): ChildProcess {
   return target === 'astro' ? spawnAstro() : spawnQwik();
 }
 
+// What the demo launcher's parent process should do when its spawned
+// child exits. Re-raise the signal (so the parent's exit disposition
+// matches the child's — Ctrl-C surfaces as SIGINT, not exit-0); fall
+// back to exit-with-code on clean exit. Both code and signal can be
+// null on spawn-failure 'exit' events — default to exit-1 so a failed
+// launch fails loud rather than reporting success.
+export type ChildExitAction =
+  | { kind: 'signal'; signal: NodeJS.Signals }
+  | { kind: 'exit'; code: number };
+
+export function decideChildExitAction(
+  code: number | null,
+  signal: NodeJS.Signals | null,
+): ChildExitAction {
+  if (signal) return { kind: 'signal', signal };
+  return { kind: 'exit', code: code ?? 1 };
+}
+
 export function killService(proc: ChildProcess): Promise<void> {
   if (proc.exitCode !== null) return Promise.resolve();
   return new Promise((resolve) => {
