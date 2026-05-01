@@ -533,4 +533,41 @@ Three discoveries from the M11 live-endpoint smoke test, captured in `docs/bug-r
 
 ## 8. Tradeoffs
 
-_To be written by sprint-013 story-006 (capstone)._
+§8 synthesizes §1-§7 into per-app verdicts. Every claim cites a §N.M anchor; no new measurements are introduced here. The verdicts are conditional on the four production page types this PoC implemented and measured (Homepage, Article, Section Front in two variants, Live Blog) — generalising to other page types (search, tag, archive) is out of PoC scope.
+
+### 8.1 Methodology
+
+Each verdict below is backed by 2+ measurable findings drawn from §1-§7. The "Source" column points back into the doc (`§N.M`) so a reader can drill from the verdict to the data; from there the §N.M cells point to their underlying source files (`packages/perf-harness/reports/RUN_NOTES.md`, `docs/M12_VALIDATION.md`, `apps/<framework>/docs/...`, etc.). No verdict claim is opinion — every adjective is replaced by a numeric delta or a cited code reference.
+
+### 8.2 When to choose Astro 6
+
+**Verdict.** For the four production page types measured in this PoC, **Astro 6 is the production-ready choice today.** It clears every stretch CWV bar without per-target relaxation, ships a narrow Deno sandbox, and surfaced no framework-channel risk during the M11 live-endpoint smoke.
+
+| Finding                                                                                                                          | Source                 |
+| -------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| Lighthouse Performance 100 median across all 5 page-rows (Qwik median range 83-93)                                               | §1.3.1                 |
+| CLS = 0 median + p95 across all 5 page-rows (Fonts API delivers automatic size-adjusted fallback metrics — no layout shift risk) | §1.3.1 + §1.3.2 + §4.1 |
+| Zero CSP violations across n=10 runs via `scriptDirective` / `styleDirective` auto-hash; Qwik requires `'unsafe-inline'`         | §1.6 + §4.2 + §7.4     |
+| Stable framework channel (Astro 6 current `latest`); M11 live-endpoint smoke surfaced no Astro-side blockers                     | §6.3 + §7.5            |
+
+**Deployment-side cost.** Astro's narrow Deno sandbox (`--allow-net` + `--allow-read=apps/astro/dist` + `--allow-env` over 11 audited vars per `packages/perf-harness/spawn.ts:57-69,75-86,92-103`) is the deployment-side trade-off: any code path needing an unaudited env var or filesystem read outside `apps/astro/dist` is denied at boot with a Deno permission denial. This is intentional — fewer surprise privileges, more boot-time visibility — but it does require auditing each new env-var or filesystem dependency the app picks up.
+
+### 8.3 When to choose Qwik 2
+
+**Verdict.** Qwik 2 beta.32 demonstrates the resumability model holding up against the same workload Astro handles, **but only when Qwik 2 stable ships and the §5.5 "Re-evaluate" rows are re-measured**. The leading risk is the framework-floor finding from §5.3: ~136 KB of irreducible runtime cost (~77% of the homepage budget anchor) measures 101,968 B against Qwik 1 stable's `core` 54,680 B (+86% delta per §5.3) and is the cause of the LH-Perf floor relaxation in §1.7. Until Qwik 2 stable ships its size-optimization pass, that cost is unavoidable.
+
+| Finding                                                                                           | Source          |
+| ------------------------------------------------------------------------------------------------- | --------------- |
+| CLS = 0 median + p95 across all 5 page-rows (resumability avoids hydration-driven layout shift)   | §1.3.1 + §1.3.2 |
+| INP 16 ms median across all 5 page-rows; clears stretch ≤ 100 ms by ≥ 6×                          | §1.3.1          |
+| Resumability model — handler lazy-load via QRL chunks; no hydration JS for non-interactive markup | §3.1 + §5.1     |
+
+**Beta-conditioning (per M-13 constraint).** The Qwik recommendation is conditioned on Qwik 2 stable shipping and the §5.5 "Re-evaluate" rows landing at stable: Vite 7 pin, `allowStale`, `useVisibleTask$` test ergonomics, framework-floor regression, LH-Perf 80 floor (vs the stretch ≥ 98). The §5.5 "Likely persist" rows — CSP `'unsafe-inline'` and the leaf-component convention — remain inputs to the verdict regardless of stable-ship status. The §7.6 verdict already states this; §8.3 inherits the same conditioning so the synthesis stays consistent with §7.
+
+### 8.4 What's still open
+
+- **Page types beyond the four measured.** Search results, tag pages, author archives, and other page types in the production aljazeera.com taxonomy are not in PoC scope. The verdicts above are conditional on the page types this PoC implemented (Homepage, Article, Section Front, Live Blog).
+- **Production load.** The perf-harness measures n=10 single-page runs, not concurrent load. SSR throughput (§1.5) is per-page sequential; production traffic patterns (concurrent users, cache warmth, downstream API latency) are not in PoC scope.
+- **Editorial workflow integration.** Both apps consume the GraphQL API; neither writes to it. Authoring, scheduling, and preview workflows are out of PoC scope.
+- **Qwik 2 stable re-measurement.** Per §5.5 "Re-evaluate" rows. Until Qwik 2 stable ships, the §8.3 verdict cannot move past PoC-validated.
+- **F1 — Qwik liveblog 404 (resolved).** Mentioned for completeness: `apps/qwik/src/lib/liveblog-api.ts` originally missed `postType: 'liveblog'`; fixed pre-sprint at commit `2c6882d` (see §7.5). Not an open item; listed here so the M-13 reader sees the full M11 surface.
