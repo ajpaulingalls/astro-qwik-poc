@@ -54,15 +54,15 @@ Comparison view: rows per page-row, columns per app. Astro number first, Qwik nu
 
 #### 1.3.2 p95 (n=10)
 
-| page-row      | LH-Perf p95 (A / Q) | CLS p95 (A / Q) | LCP real ms p95 (A / Q) | INP real ms p95 (A / Q) | Source                                                                            |
-| ------------- | ------------------- | --------------- | ----------------------- | ----------------------- | --------------------------------------------------------------------------------- |
-| index         | 100 / 86            | 0 / 0           | 88 / 108                | 24 / 24                 | `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` + per-page JSONs |
-| article       | 100 / 90.55         | 0 / 0           | 56 / 64                 | 20 / 24                 | same                                                                              |
-| section-geo   | 100 / 95            | 0 / 0           | 56 / 56                 | 24 / 16                 | same                                                                              |
-| section-topic | 100 / 94.55         | 0 / 0           | 56 / 56                 | 16 / 20                 | same                                                                              |
-| liveblog      | 100 / 92.55         | 0 / 0           | 56 / 58                 | 16 / 20                 | same                                                                              |
+| page-row      | LH-Perf p95 (A / Q) | CLS p95 (A / Q) | LCP real ms p95 (A / Q) | INP real ms p95 (A / Q) | Source                                                                                                                                                |
+| ------------- | ------------------- | --------------- | ----------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| index         | 100 / 86            | 0 / 0           | 88 / 108                | 24 / 24                 | `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` + per-page JSONs; Qwik LH-Perf p95: `docs/M12_VALIDATION.md § HONEST-FAILURE detail` |
+| article       | 100 / 90.55         | 0 / 0           | 56 / 64                 | 20 / 24                 | same                                                                                                                                                  |
+| section-geo   | 100 / 95            | 0 / 0           | 56 / 56                 | 24 / 16                 | same                                                                                                                                                  |
+| section-topic | 100 / 94.55         | 0 / 0           | 56 / 56                 | 16 / 20                 | same                                                                                                                                                  |
+| liveblog      | 100 / 92.55         | 0 / 0           | 56 / 58                 | 16 / 20                 | same                                                                                                                                                  |
 
-Astro LH-Perf p95 cells (100 across all page-rows) come from `packages/perf-harness/reports/astro-{page}.json:metrics.lhPerf.p95` (the RUN_NOTES.md aggregate table shows median only).
+Astro LH-Perf p95 cells (100 across all page-rows) come from `packages/perf-harness/reports/astro-{page}.json:metrics.lhPerf.p95` (the RUN_NOTES.md aggregate table shows LH-Perf median only). Qwik LH-Perf p95 cells (86, 90.55, 95, 94.55, 92.55) come from `docs/M12_VALIDATION.md § HONEST-FAILURE detail`, which sources them from `packages/perf-harness/reports/qwik-{page}.json:metrics.lhPerf.p95`.
 
 **CLS observations.** Both apps land CLS = 0 at median and p95 across all 5 page-rows; both are at the stretch ≤ 0.05 budget with 0.05 of headroom (source: §1.3.1, §1.3.2 above; stretch budget per §1.2).
 
