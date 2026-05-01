@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { EventEmitter } from 'node:events';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   ASTRO_ALLOWED_ENV,
   buildAstroDenoArgv,
   decideChildExitAction,
   deriveAllowNet,
   killService,
+  MOCK_API_PORT,
   qwikSpawnEnv,
 } from '../spawn.ts';
 
@@ -194,4 +197,26 @@ describe('decideChildExitAction', () => {
     // can't silently swallow the signal.
     expect(decideChildExitAction(0, 'SIGTERM')).toEqual({ kind: 'signal', signal: 'SIGTERM' });
   });
+});
+
+// Root scripts that shell-bake PUBLIC_API_BASE with the literal qwik mock-api
+// port. Extracted so future drift-gate additions reference one source.
+const QWIK_PORT_BAKING_SCRIPTS = ['perf:qwik', 'demo:qwik'] as const;
+
+describe('root package.json qwik script port', () => {
+  // Drift gate: if MOCK_API_PORT.qwik moves in spawn.ts, the spawned app and
+  // the baked CSP / proxy target silently disagree until a perf sweep notices.
+  // Pin the literal so a port change fails fast and forces both root scripts
+  // to update in lockstep.
+  const rootPkg: { scripts: Record<string, string> } = JSON.parse(
+    readFileSync(resolve(import.meta.dirname, '../../../package.json'), 'utf8'),
+  );
+  const qwikPort = String(MOCK_API_PORT.qwik);
+
+  it.each(QWIK_PORT_BAKING_SCRIPTS)(
+    'root script %s pins MOCK_API_PORT.qwik literal',
+    (scriptName) => {
+      expect(rootPkg.scripts[scriptName]).toContain(qwikPort);
+    },
+  );
 });
