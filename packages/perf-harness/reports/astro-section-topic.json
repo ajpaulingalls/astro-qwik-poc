@@ -3,60 +3,62 @@
   "metrics": {
     "cls": {
       "median": 0,
-      "n": 10,
+      "n": 3,
       "p95": 0
     },
     "jsBytes": {
-      "median": 16079,
-      "n": 10,
-      "p95": 16079
+      "median": 16106,
+      "n": 3,
+      "p95": 16106
     },
     "lcp": {
-      "median": 1806.74565,
-      "n": 10,
-      "p95": 1881.857275
+      "median": 2032.1426000000001,
+      "n": 3,
+      "p95": 2500.98104
     },
     "lhPerf": {
-      "median": 100,
-      "n": 10,
-      "p95": 100
+      "median": 99,
+      "n": 3,
+      "p95": 99
     }
   },
   "page": "section-topic",
-  "runs": 10,
+  "runs": 3,
   "target": "astro",
   "webVitals": {
     "aggregated": {
       "inp": {
         "median": 16,
-        "n": 10,
-        "p95": 32
+        "n": 3,
+        "p95": 30.4
       },
       "lcp": {
-        "median": 50,
-        "n": 10,
-        "p95": 62.199999999999996
+        "median": 116,
+        "n": 6,
+        "p95": 120
       }
     },
     "samples": [
       {
-        "delta": 44,
+        "delta": 32,
         "entries": [
           {}
         ],
-        "id": "v4-1777594636597-7455013550316",
+        "id": "v4-1777672320235-9528901975452",
         "lcpElement": {
-          "tagName": "FIGCAPTION"
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/04/AFP__20260416__A7ZC4WE__v1__HighRes__IranUsIsraelWar-1776341624.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 44
+        "value": 120
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594636617-6342135238224",
+        "id": "v4-1777672320266-5998957316897",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -65,37 +67,18 @@
       {
         "delta": 32,
         "entries": [
-          {},
           {}
         ],
-        "id": "v4-1777594636597-3619585639506",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 32
-      },
-      {
-        "delta": 48,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594645099-2061286500207",
+        "id": "v4-1777672320235-9528901975452",
         "lcpElement": {
-          "tagName": "FIGCAPTION"
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/04/AFP__20260416__A7ZC4WE__v1__HighRes__IranUsIsraelWar-1776341624.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594645130-4773078632198",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
+        "value": 120
       },
       {
         "delta": 16,
@@ -103,34 +86,52 @@
           {},
           {}
         ],
-        "id": "v4-1777594645100-4571385869973",
+        "id": "v4-1777672320235-7808003750871",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 16
       },
       {
-        "delta": 60,
+        "delta": 52,
         "entries": [
           {}
         ],
-        "id": "v4-1777594653638-3019048109293",
+        "id": "v4-1777672329902-8662224284794",
         "lcpElement": {
-          "tagName": "FIGCAPTION"
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/04/AFP__20260416__A7ZC4WE__v1__HighRes__IranUsIsraelWar-1776341624.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 60
+        "value": 116
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594653672-2313150642939",
+        "id": "v4-1777672329925-5036332555179",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
+      },
+      {
+        "delta": 52,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777672329902-8662224284794",
+        "lcpElement": {
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/04/AFP__20260416__A7ZC4WE__v1__HighRes__IranUsIsraelWar-1776341624.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 116
       },
       {
         "delta": 16,
@@ -138,139 +139,52 @@
           {},
           {}
         ],
-        "id": "v4-1777594653638-9867926029725",
+        "id": "v4-1777672329902-8106798190713",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 16
       },
       {
-        "delta": 64,
+        "delta": 36,
         "entries": [
           {}
         ],
-        "id": "v4-1777594662325-4626765391427",
+        "id": "v4-1777672339527-6714723971722",
         "lcpElement": {
-          "tagName": "FIGCAPTION"
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/04/AFP__20260416__A7ZC4WE__v1__HighRes__IranUsIsraelWar-1776341624.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 64
+        "value": 108
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594662362-5738280502782",
+        "id": "v4-1777672339557-9802508999325",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
       },
       {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594662326-7589259525858",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 48,
+        "delta": 36,
         "entries": [
           {}
         ],
-        "id": "v4-1777594670948-6295669869305",
+        "id": "v4-1777672339527-6714723971722",
         "lcpElement": {
-          "tagName": "FIGCAPTION"
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/04/AFP__20260416__A7ZC4WE__v1__HighRes__IranUsIsraelWar-1776341624.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594670979-6407573941475",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594670949-9609908067739",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 56,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594679592-3466487077284",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 56
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594679628-2812323972368",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594679592-9163549999539",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 48,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594688230-3731387288804",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594688261-3700991239636",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
+        "value": 108
       },
       {
         "delta": 32,
@@ -278,116 +192,11 @@
           {},
           {}
         ],
-        "id": "v4-1777594688230-9687285712803",
+        "id": "v4-1777672339527-3221664982652",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 32
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594696824-7992248642559",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594696861-1588010876508",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594696825-7278503438562",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594705110-4769527903922",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594705145-5758729275516",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594705110-6096235446812",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 48,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594713738-3024311880964",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594713771-8875792917473",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594713738-4589296913726",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
       }
     ]
   }

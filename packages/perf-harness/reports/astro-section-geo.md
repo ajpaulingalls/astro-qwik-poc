@@ -1,14 +1,14 @@
-# perf report — astro/section-geo (n=10)
+# perf report — astro/section-geo (n=3)
 
-| metric  |     median |        p95 |
-| ------- | ---------- | ---------- |
-| cls     |          0 |          0 |
-| jsBytes |      16079 |      16079 |
-| lcp     | 1806.05965 | 1881.30203 |
-| lhPerf  |        100 |        100 |
+| metric  |    median |        p95 |
+| ------- | --------- | ---------- |
+| cls     |         0 |          0 |
+| jsBytes |     16106 |      16106 |
+| lcp     | 2801.0931 | 3389.05455 |
+| lhPerf  |        96 |         96 |
 
-web-vitals samples: 30
-real-browser lcp median: 50ms p95: 54.199999999999996ms (n=10)
-real-browser inp median: 24ms p95: 28.39999999999999ms (n=10)
-lcp element: FIGCAPTION
-csp violations: 0 (across 10 runs)
+web-vitals samples: 12
+real-browser lcp median: 108ms p95: 148ms (n=6)
+real-browser inp median: 16ms p95: 30.4ms (n=3)
+lcp element: IMG http://localhost:8080/wp-content/uploads/2026/05/afp_69f4e4de5303-1777657054.jpg?w=400&resize=400%2C267
+csp violations: 0 (across 3 runs)

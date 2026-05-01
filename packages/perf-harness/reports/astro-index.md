@@ -1,14 +1,14 @@
-# perf report — astro/index (n=10)
+# perf report — astro/index (n=3)
 
-| metric  |             median |                p95 |
-| ------- | ------------------ | ------------------ |
-| cls     |                  0 |                  0 |
-| jsBytes |              13917 |              13917 |
-| lcp     | 1729.1851499999998 | 1772.0264599999998 |
-| lhPerf  |                100 |                100 |
+| metric  |    median |        p95 |
+| ------- | --------- | ---------- |
+| cls     |         0 |          0 |
+| jsBytes |     13944 |      13944 |
+| lcp     | 2109.4436 | 2311.53293 |
+| lhPerf  |        99 |       99.9 |
 
-web-vitals samples: 37
-real-browser lcp median: 76ms p95: 88ms (n=17)
-real-browser inp median: 24ms p95: 24ms (n=10)
-lcp element: LI
-csp violations: 0 (across 10 runs)
+web-vitals samples: 12
+real-browser lcp median: 244ms p95: 780ms (n=6)
+real-browser inp median: 32ms p95: 32ms (n=3)
+lcp element: IMG http://localhost:8080/wp-content/uploads/2026/05/AP26120661797066-1777643036.jpg?w=800&resize=800%2C533
+csp violations: 0 (across 3 runs)

@@ -3,64 +3,82 @@
   "metrics": {
     "cls": {
       "median": 0,
-      "n": 10,
+      "n": 3,
       "p95": 0
     },
     "jsBytes": {
-      "median": 16079,
-      "n": 10,
-      "p95": 16079
+      "median": 16106,
+      "n": 3,
+      "p95": 16106
     },
     "lcp": {
-      "median": 1806.05965,
-      "n": 10,
-      "p95": 1881.30203
+      "median": 2801.0931,
+      "n": 3,
+      "p95": 3389.05455
     },
     "lhPerf": {
-      "median": 100,
-      "n": 10,
-      "p95": 100
+      "median": 96,
+      "n": 3,
+      "p95": 96
     }
   },
   "page": "section-geo",
-  "runs": 10,
+  "runs": 3,
   "target": "astro",
   "webVitals": {
     "aggregated": {
       "inp": {
-        "median": 24,
-        "n": 10,
-        "p95": 28.39999999999999
+        "median": 16,
+        "n": 3,
+        "p95": 30.4
       },
       "lcp": {
-        "median": 50,
-        "n": 10,
-        "p95": 54.199999999999996
+        "median": 108,
+        "n": 6,
+        "p95": 148
       }
     },
     "samples": [
       {
-        "delta": 48,
+        "delta": 84,
         "entries": [
           {}
         ],
-        "id": "v4-1777594551062-5858419238794",
+        "id": "v4-1777672289920-8587014983642",
         "lcpElement": {
-          "tagName": "FIGCAPTION"
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/05/afp_69f4e4de5303-1777657054.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 48
+        "value": 148
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594551096-2738577626740",
+        "id": "v4-1777672289950-2535871120560",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
+      },
+      {
+        "delta": 84,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777672289920-8587014983642",
+        "lcpElement": {
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/05/afp_69f4e4de5303-1777657054.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 148
       },
       {
         "delta": 16,
@@ -68,69 +86,105 @@
           {},
           {}
         ],
-        "id": "v4-1777594551063-6884713106142",
+        "id": "v4-1777672289920-9471098797877",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 16
       },
       {
-        "delta": 48,
+        "delta": 44,
         "entries": [
           {}
         ],
-        "id": "v4-1777594559782-1433456760089",
+        "id": "v4-1777672299920-6593801188611",
         "lcpElement": {
-          "tagName": "FIGCAPTION"
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/05/afp_69f4e4de5303-1777657054.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 48
+        "value": 108
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594559809-1459285958619",
+        "id": "v4-1777672299950-1732022367406",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594559782-7151942700018",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
       },
       {
         "delta": 44,
         "entries": [
           {}
         ],
-        "id": "v4-1777594568313-9364653571675",
+        "id": "v4-1777672299920-6593801188611",
         "lcpElement": {
-          "tagName": "FIGCAPTION"
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/05/afp_69f4e4de5303-1777657054.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 44
+        "value": 108
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777672299920-1231453169740",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 40,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777672310146-8432906335281",
+        "lcpElement": {
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/05/afp_69f4e4de5303-1777657054.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 104
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594568336-4311625420609",
+        "id": "v4-1777672310176-2741565553120",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
+      },
+      {
+        "delta": 40,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777672310146-8432906335281",
+        "lcpElement": {
+          "className": "w-full h-auto rounded",
+          "src": "http://localhost:8080/wp-content/uploads/2026/05/afp_69f4e4de5303-1777657054.jpg?w=400&resize=400%2C267",
+          "tagName": "IMG"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 104
       },
       {
         "delta": 32,
@@ -138,256 +192,11 @@
           {},
           {}
         ],
-        "id": "v4-1777594568313-5096763198826",
+        "id": "v4-1777672310146-3521540690397",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 32
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594576901-2568036003554",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594576934-7595100647389",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594576901-5595652035033",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 44,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594585558-5509559697384",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 44
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594585580-5844683777889",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594585559-1201267242824",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594594246-5584713251424",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594594283-2428191986760",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594594246-2854166181097",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 48,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594602513-1378047806333",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594602546-1589308390382",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594602513-9463812991866",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594611118-2369446244115",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594611154-6187117920348",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594611119-6589270942336",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 56,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594619348-4731560312172",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 56
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594619387-5648939108644",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594619348-3865522758299",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594627961-6231582769222",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594627994-7985899045599",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594627961-1506346971060",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
       }
     ]
   }
