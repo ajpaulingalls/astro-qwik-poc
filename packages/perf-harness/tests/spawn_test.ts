@@ -3,6 +3,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { EventEmitter } from 'node:events';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { REPO_ROOT } from '@aje-poc/shared-test-helpers';
 import {
   ASTRO_ALLOWED_ENV,
   buildAstroDenoArgv,
@@ -209,7 +210,7 @@ describe('root package.json qwik script port', () => {
   // Pin the literal so a port change fails fast and forces both root scripts
   // to update in lockstep.
   const rootPkg: { scripts: Record<string, string> } = JSON.parse(
-    readFileSync(resolve(import.meta.dirname, '../../../package.json'), 'utf8'),
+    readFileSync(resolve(REPO_ROOT, 'package.json'), 'utf8'),
   );
   const qwikPort = String(MOCK_API_PORT.qwik);
 

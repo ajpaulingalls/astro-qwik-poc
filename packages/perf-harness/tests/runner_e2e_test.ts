@@ -13,6 +13,7 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { REPO_ROOT } from '@aje-poc/shared-test-helpers';
 
 vi.hoisted(() => {
   const tmp = (process.env.TMPDIR ?? '/tmp').replace(/\/$/, '');
@@ -23,7 +24,6 @@ import { REPORTS_DIR, type AggregatedReport } from '../reporter.ts';
 import { main as runnerMain } from '../runner.ts';
 
 const E2E = process.env.PERF_E2E === '1';
-const REPO_ROOT = resolve(import.meta.dirname, '../../..');
 const ASTRO_DIST = resolve(REPO_ROOT, 'apps/astro/dist');
 const QWIK_DIST = resolve(REPO_ROOT, 'apps/qwik/dist');
 
