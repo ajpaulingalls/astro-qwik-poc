@@ -432,11 +432,104 @@ The Qwik production-readiness recommendation in §7 / §8 is conditioned on the 
 
 ## 6. Ecosystem
 
-_To be written by sprint-013 story-005._
+§6 captures the surrounding-tooling story: what each app uses for testing, where the integration harness lives, what release channel the framework ships on, and where the canonical docs are sourced. The performance and architecture comparisons (§1, §3) stand independent of these choices; §6 is the surface a team adopting either framework reaches for next.
+
+### 6.1 Testing toolchain
+
+| Concern                               | Astro                                                                     | Qwik                                                                                                                                                                                                                                               | Source                                                                                                                                                      |
+| ------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DOM env                               | `happy-dom ^15.11.0`                                                      | `@qwik.dev/core/testing` (`createDOM()` from the Qwik runtime — does not bootstrap qwikLoader)                                                                                                                                                     | `apps/astro/package.json`, `apps/qwik/package.json`; `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > APIs confirmed present` (line 128)                   |
+| Component testing                     | `@testing-library/preact ^3.2.4` (works against happy-dom out of the box) | **blocked** — `@testing-library/dom`'s `getByRole` requires `dom-accessibility-api` → `window.getComputedStyle`, which `createDOM()` doesn't expose; Qwik's `renderToString` SSR-mount workaround crashes inside vitest with a Symbol getter error | `apps/astro/package.json`; `apps/qwik/docs/QWIK2_NOTES.md § M7 article shell > Divergences` (lines 104-109)                                                 |
+| Workaround                            | none required                                                             | custom `getByHeading(screen, level, name)` walks `screen.querySelectorAll('h${level}')` + `textContent` — catches `<h3>` → `<div>` regressions without the `@testing-library` dep                                                                  | `apps/qwik/src/test-utils/dom.ts`                                                                                                                           |
+| `screen.querySelector` (no match)     | returns `null` (happy-dom standard) — assert with `toBeNull()`            | returns `undefined` (Qwik 2 beta.32 divergence from happy-dom) — must assert with `toBeFalsy()`                                                                                                                                                    | `apps/qwik/docs/QWIK2_NOTES.md § sprint-007 > Beta friction encountered` item 2 (line 95)                                                                   |
+| Cross-island side-effect verification | unit-testable in happy-dom                                                | NOT unit-testable — `createDOM()` does not bootstrap qwikLoader, so `useOnDocument` / `useVisibleTask$` register but never settle (5 s timeout, no DOM output); side-effect verification deferred to e2e                                           | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > APIs confirmed present` (line 128) + `§ sprint-007 > Beta friction encountered` items 1 + 3 (lines 91-98) |
+| Test runner                           | `vitest ^2.1.0`                                                           | `vitest 4.1.5` — cold-start 6.3 s vs Astro 0.67 s (~9.4× delta)                                                                                                                                                                                    | `apps/astro/package.json`, `apps/qwik/package.json`; SMM risk `4573b5815a2f`                                                                                |
+
+**Headline.** Astro's testing path is the standard Preact / happy-dom stack and works with no modifications. Qwik 2 beta.32 is on `@qwik.dev/core/testing` only — the `@testing-library/*` integration is empirically blocked, so the PoC ships a custom `getByHeading` helper at `apps/qwik/src/test-utils/dom.ts` and verifies cross-island side effects via e2e instead of unit tests. Both blockers stem from `createDOM()` being a Qwik-runtime DOM, not happy-dom — the WHY also lives at the top of `apps/qwik/src/test-utils/dom.ts` so future readers don't strip the helper as dead code.
+
+### 6.2 Integration test harness
+
+Both apps share `packages/perf-harness/` (puppeteer-core driving interactions, chrome-launcher providing the headless Chrome, Lighthouse running against the resulting interactive state, web-vitals collector capturing real-browser CWV). Identical methodology = the §1 numbers are apples-to-apples. The harness spawns each app via the same `spawn{Astro,Qwik}` functions that `scripts/demo-launch-{astro,qwik}.ts` use (so the demo and perf-harness boot byte-identical args), with the Qwik target on `:4456` and the Astro target on `:4455` so runs can parallelise.
+
+The CSP-zero gate that asserts no real-browser violations (`packages/perf-harness/runner_e2e_test.ts`) is opt-in via `PERF_E2E=1` so the default `bun test` keeps the unit-test suite as the default loop (per SMM constraint on `perf:*` script gating). Sources: `packages/perf-harness/spawn.ts` (shared spawn functions); `packages/perf-harness/runner_e2e_test.ts` (CSP-zero pipeline gate); `apps/qwik/docs/QWIK2_NOTES.md § sprint-003 > Production-equivalent perf-harness path` (lines 151-187, methodology rationale).
+
+### 6.3 Release-channel position
+
+| Concern                     | Astro                                                | Qwik                                                                                                                                                                        | Source                                                                                                 |
+| --------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Framework version           | Astro 6 (current stable `latest`)                    | `@qwik.dev/core ~2.0.0-beta.32` (release date unannounced)                                                                                                                  | `apps/astro/package.json`, `apps/qwik/package.json`; root `CLAUDE.md § Locked-in structural decisions` |
+| Package scope               | `astro` (stable since v1.0)                          | `@qwik.dev/*` — **renamed** from `@builder.io/qwik` 1.x; new scope at v2 beta                                                                                               | `apps/qwik/CLAUDE.md § Qwik-specific decisions`                                                        |
+| API verification discipline | release-notes summaries align with installed `.d.ts` | every Qwik 2 platform feature must be re-verified against `node_modules/@qwik.dev/core/*.d.ts` on each beta bump (release notes describe features that haven't yet shipped) | `apps/qwik/CLAUDE.md § Looking up Qwik 2 specifics`                                                    |
+| Pin discipline              | `astro ^6` (caret, follows minor)                    | `@qwik.dev/core ~2.0.0-beta.32` (tilde, pins to beta — re-verify on every bump per SMM risk `5e27d0509507`)                                                                 | `apps/qwik/package.json`; SMM risks                                                                    |
+
+### 6.4 Documentation source-of-truth
+
+Neither framework hosts `llms.txt` / `llms-full.txt` (verified 2026-04 via root `CLAUDE.md § Looking up framework details`). For both, `gh api` against the docs source repo is the canonical fetch.
+
+| Framework | Docs repo                                                    | Branch / path quirk                                                                                                                                  |
+| --------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Astro     | `withastro/docs`, pages under `src/content/docs/en/`         | v6 migration at `guides/upgrade-to/v6.mdx`                                                                                                           |
+| Qwik 2    | `QwikDev/qwik`, pages under `packages/docs/src/routes/docs/` | **`?ref=build/v2`** required — the `main` branch hosts Qwik 1 docs (`@builder.io/qwik`, route group `(qwikcity)`); v2 uses `(qwik)` + `(qwikrouter)` |
+
+The Qwik branch quirk is not a soft preference — `?ref=main` returns docs for the wrong package. Source: root `CLAUDE.md § Looking up framework details` + `apps/qwik/CLAUDE.md § Conceptual / migration docs`.
 
 ## 7. Production readiness
 
-_To be written by sprint-013 story-005._
+§7 covers the production-deployment surface for both apps: the demo build/run experience, the runtime + sandboxing model per app, the deployment trade-offs that fall out of those choices, the M11 live-endpoint findings, and a per-app production-readiness verdict. The Qwik verdict is conditioned on the §5.5 "Re-evaluate vs Likely-persist" classification — §7 doesn't restate it, just inherits it.
+
+### 7.1 Demo build/run experience
+
+Both apps ship a one-line demo wrapper:
+
+- `bun run demo:astro` → builds + invokes `scripts/demo-launch-astro.ts` → calls `spawnAstro('inherit')` from `packages/perf-harness/spawn.ts`
+- `bun run demo:qwik` → builds + invokes `scripts/demo-launch-qwik.ts` → calls `spawnQwik('inherit')` from the same module
+
+The wrappers exist only to forward signals (so Ctrl-C surfaces as SIGINT, not exit-0) and to swap `stdio: 'ignore'` (perf-harness default) for `stdio: 'inherit'` (operators see runtime logs). The actual spawn argv lives in `packages/perf-harness/spawn.ts` and is consumed by both the demo and the perf-harness — so the M11 demo and the §1 perf-harness sweep boot byte-identical args. Source: `docs/DEMO.md § Quick start` (lines 22-52); wrapper scripts at `scripts/demo-launch-astro.ts` and `scripts/demo-launch-qwik.ts`.
+
+### 7.2 Deployment runtime — Astro / Deno
+
+Astro 6 runs production SSR under Deno 2 via `@deno/astro-adapter ^0.4.0`. The runtime is sandboxed with three `--allow` flag families, all derived per-environment from `PUBLIC_API_BASE`:
+
+- `--allow-net=${deriveAllowNet(apiBase, appPort)}` — host:port pairs derived from `PUBLIC_API_BASE` plus the local listen address. Validated through `assertSafeApiBase` to prevent CSP injection. Source: `packages/perf-harness/spawn.ts:75-86`.
+- `--allow-read=apps/astro/dist` — Deno can only read the build output directory.
+- `--allow-env=${ASTRO_ALLOWED_ENV}` — 11 audited environment variables (`NODE_ENV`, `NODE_DEBUG`, `ASTRO_INTERNAL_TEST_DISABLE_CONSOLE_FILTER`, `CI`, `NO_COLOR`, `FORCE_COLOR`, `TERM`, `PKG_CONFIG_PATH`, `SHARP_FORCE_GLOBAL_LIBVIPS`, `SHARP_IGNORE_GLOBAL_LIBVIPS`, `npm_package_config_libvips`), each with an inline rationale comment naming the consumer. Source: `packages/perf-harness/spawn.ts:57-69`.
+
+The full argv builder is `buildAstroDenoArgv` at `packages/perf-harness/spawn.ts:92-103` — a single source of truth consumed by both `scripts/demo-launch-astro.ts` and the perf-harness, so M11 demo and §1 sweep boot byte-identical Deno invocations. Headline trade-off: any code path needing an unaudited env var or filesystem read outside `apps/astro/dist` is denied at boot with a Deno permission denial. Cross-reference §4.3 for the full Vite Env API → `PUBLIC_API_BASE` → CSP `connect-src` derivation chain.
+
+### 7.3 Deployment runtime — Qwik / bun
+
+Qwik 2 runs production SSR via `apps/qwik/server.ts` — a hand-rolled `node:http` wrapper around `entry.preview.js`, executed under bun (originally launched under `node --experimental-strip-types`; M0 swapped to bun to drop the nvm/Node toolchain dependency). The wrapper measures **154 lines** (`wc -l`) and exists for two reasons documented in its own header comment:
+
+1. `entry.preview.js` exports `QwikRouterNodeMiddleware` (handlers, not a listening server), so it must be wrapped in an http server. Source: `apps/qwik/docs/QWIK2_NOTES.md § sprint-003 > Why a wrapper is required` (lines 151-169).
+2. The bundled `staticFile` middleware resolves `static.root` against `apps/qwik/server/dist/...` instead of the actual `apps/qwik/dist/...`, so the wrapper hand-rolls static-file serving with a 14-row MIME table covering everything the current build emits. Verified empirically — `staticFile` returned 500 with `ENOENT: no such file or directory, open 'apps/qwik/server/dist/build/q-*.js'`. Source: `apps/qwik/server.ts` header comment.
+
+No Deno-style sandboxing — bun runs with full filesystem / net / env access. Why not Deno: `@qwik.dev/router/middleware/deno` exists but using it would require a rewrite (Deno middleware uses Web-standard `Request → Response` instead of `(req, res, next)`) and the `staticFile` resolution bug above would recur. Source: `apps/qwik/docs/QWIK2_NOTES.md § sprint-003 > Why Node and not Deno` (lines 181-187). A separate constraint forces the CSP setting into `server.ts` rather than `vite.config.ts`: `apps/qwik/vite.config.ts` cannot `import { ... } from '@aje-poc/shared-csp'` because Vite's config loader uses Node's ESM loader, which doesn't handle `.ts` workspace-package entries. Source: `apps/qwik/docs/QWIK2_NOTES.md § post-sprint-007` (lines 69-75).
+
+### 7.4 Deployment trade-off summary
+
+| Concern              | Astro / Deno                                                                          | Qwik / bun                                                                                                                    | Source                                                                                                                    |
+| -------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Sandbox              | narrow `--allow-net` + `--allow-read` + `--allow-env` (11 vars audited)               | none — bun has full host access                                                                                               | `packages/perf-harness/spawn.ts:57-100` vs `apps/qwik/server.ts`                                                          |
+| CSP enforcement      | per-bundle script + style hashes via `scriptDirective` / `styleDirective` (auto-hash) | `'unsafe-inline'` on `script-src` + `style-src` — no auto-hash equivalent in Qwik 2 beta                                      | §3 (architecture) cross-ref + `apps/qwik/docs/QWIK2_NOTES.md § story-008 — CSP 'unsafe-inline' requirement` (lines 77-83) |
+| Build-time env-bake  | `PUBLIC_API_BASE` flows through Vite → CSP `connect-src` baked once (§4.3)            | needs `scripts/demo-launch-qwik.ts` wrapper to keep `PUBLIC_API_BASE` matching at build + runtime per SMM risk `44b455b402fb` | `scripts/demo-launch-qwik.ts`                                                                                             |
+| Wrapper LoC          | minimal — Deno spawns `dist/server/entry.mjs` directly                                | 154 lines (`wc -l`) — `node:http` adapter + 14-row MIME table for hand-rolled static-file serving                             | `packages/perf-harness/spawn.ts` vs `apps/qwik/server.ts` (header comment)                                                |
+| Env-var failure mode | unaudited var → Deno permission denial at boot (visible)                              | unaudited var → silent (bun reads any env var)                                                                                | n/a                                                                                                                       |
+
+### 7.5 M11 live-endpoint findings
+
+Three discoveries from the M11 live-endpoint smoke test, captured in `docs/bug-reports/m11-live-endpoint-smoke.md`:
+
+1. **F3 — Article slug rotation is operational, not a bug.** Featured articles rotate weekly on aljazeera.com; any live-acceptance suite must discover paths at runtime (e.g. `page.$$eval` on `/`) rather than hard-coding `KNOWN_LIVE_*_PATH` constants. Source: `docs/bug-reports/m11-live-endpoint-smoke.md § F3` + `docs/DEMO.md § Article slug rotation` (lines 76-82).
+
+2. **F1 — Qwik liveblog 404 against live (resolved).** `apps/qwik/src/lib/liveblog-api.ts` originally sent `{ name: slug, preview: '' }` without `postType: 'liveblog'`; production returned `no_posts_found` with `data.article: null`. The Astro twin always sent `{ name: slug, postType: 'liveblog', preview: '' }` and resolved correctly. Fixed in commit `2c6882d` ahead of this sprint — `apps/qwik/src/lib/liveblog-api.ts:17` now sends `postType: 'liveblog'` with the rationale comment immediately above. Source: `docs/bug-reports/m11-live-endpoint-smoke.md § F1` (lines 62-74).
+
+3. **CORS — zero PoC-side mitigation needed.** All GraphQL fires from the SSR runtime (Astro Deno or Qwik bun); the image proxy is same-origin in both apps. Server-to-server requests have no CORS surface. Source: `docs/bug-reports/m11-live-endpoint-smoke.md § CORS` + `docs/DEMO.md § CORS` (lines 99-110).
+
+### 7.6 Production-readiness verdict
+
+- **Astro 6.** Stable runtime channel; narrow Deno sandbox (§7.2); CSP auto-hash (§7.4); Fonts API delivered measured CLS = 0 across all five page-rows (§1.3.1); Lighthouse Performance held the stretch ≥ 98 across all five page-rows in the n=10 sweep (§1.3.1). M11 live-endpoint smoke surfaced no Astro-side blockers. **Verdict: production-ready** for the four page types measured.
+
+- **Qwik 2 beta.32.** Production-readiness is **conditioned on Qwik 2 stable shipping**. Specifically conditioned on the §5.5 "Re-evaluate" rows landing at stable: Vite 7 pin, `allowStale`, `useVisibleTask$` test ergonomics, framework-floor regression (~136 KB pre-app, +86% vs Qwik 1), LH-Perf 80 floor (vs the stretch ≥ 98). The §5.5 "Likely persist" rows — CSP `'unsafe-inline'` and the leaf-component convention — remain inputs to the verdict regardless of stable-ship status. M11 surfaced one Qwik-specific app bug (F1, fixed pre-sprint at commit `2c6882d`). Until Qwik 2 stable ships and the "Re-evaluate" triggers are re-measured: **PoC-validated, not production-recommended.** Cross-reference §5.5 for the full re-evaluate-vs-persist classification that conditions this verdict.
 
 ## 8. Tradeoffs
 
