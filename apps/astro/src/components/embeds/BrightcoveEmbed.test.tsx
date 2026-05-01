@@ -44,4 +44,15 @@ describe('BrightcoveEmbed', () => {
     render(<BrightcoveEmbed html={BRIGHTCOVE_HTML} account="665003303001" player="6tKQRAx7lu" />);
     expect(document.querySelectorAll(`script[src^="${SCRIPT_PREFIX}"]`).length).toBe(1);
   });
+
+  it('strips inline style="" attributes from CMS markup before render (CSP pin)', () => {
+    // Astro CSP blocks style-src-attr; if stripInlineStyles is removed from the
+    // component, this test catches it. BRIGHTCOVE_HTML has style="display: block;"
+    // and style="padding-top: 56%;" — neither must reach the DOM.
+    const { container } = render(
+      <BrightcoveEmbed html={BRIGHTCOVE_HTML} account="665003303001" player="6tKQRAx7lu" />,
+    );
+    const styledNodes = container.querySelectorAll('[style]');
+    expect(styledNodes.length).toBe(0);
+  });
 });

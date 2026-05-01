@@ -74,10 +74,13 @@ describe('runner main()', () => {
 
   it('writes JSON+MD reports for astro/index with aggregated n=2 metrics', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 900, cls: 0, lhPerf: 100, jsBytes: 0 });
-    collectWebVitalsMock.mockResolvedValue([
-      { name: 'LCP', value: 60, id: 'x' },
-      { name: 'INP', value: 24, id: 'y' },
-    ]);
+    collectWebVitalsMock.mockResolvedValue({
+      samples: [
+        { name: 'LCP', value: 60, id: 'x' },
+        { name: 'INP', value: 24, id: 'y' },
+      ],
+      cspViolations: [],
+    });
 
     await main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`]);
 
@@ -104,7 +107,10 @@ describe('runner main()', () => {
   it('emits MISSING aggregated INP when no INP samples arrived (parallel to LCP MISSING path)', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 100, jsBytes: 0 });
     // LCP arrived; INP did not (e.g. click never fired or INP-wait timed out).
-    collectWebVitalsMock.mockResolvedValue([{ name: 'LCP', value: 60, id: 'x' }]);
+    collectWebVitalsMock.mockResolvedValue({
+      samples: [{ name: 'LCP', value: 60, id: 'x' }],
+      cspViolations: [],
+    });
 
     await main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`]);
 
@@ -118,7 +124,10 @@ describe('runner main()', () => {
   it('emits MISSING aggregated (median=null, n=0) when web-vitals collected zero LCP samples', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 100, jsBytes: 0 });
     // Non-LCP samples only (e.g. only CLS/FCP arrived).
-    collectWebVitalsMock.mockResolvedValue([{ name: 'CLS', value: 0.01, id: 'x' }]);
+    collectWebVitalsMock.mockResolvedValue({
+      samples: [{ name: 'CLS', value: 0.01, id: 'x' }],
+      cspViolations: [],
+    });
 
     await main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`]);
 
@@ -130,7 +139,7 @@ describe('runner main()', () => {
 
   it('runs Lighthouse + collectWebVitals exactly --runs times', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 99, jsBytes: 100 });
-    collectWebVitalsMock.mockResolvedValue([]);
+    collectWebVitalsMock.mockResolvedValue({ samples: [], cspViolations: [] });
 
     await main([`--target=${TARGET}`, '--runs=3', `--page=${PAGE}`]);
 
@@ -140,7 +149,7 @@ describe('runner main()', () => {
 
   it('spawns qwik via bun + server.ts with HOST/PORT env in apps/qwik cwd', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 99, jsBytes: 100 });
-    collectWebVitalsMock.mockResolvedValue([]);
+    collectWebVitalsMock.mockResolvedValue({ samples: [], cspViolations: [] });
 
     await main(['--target=qwik', '--runs=1', `--page=${PAGE}`]);
 
@@ -162,7 +171,10 @@ describe('runner main()', () => {
       { name: PAGE, path: '/', budgets: { lcp: 100, lhPerf: 98 } },
     ]);
     runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 100, jsBytes: 0 });
-    collectWebVitalsMock.mockResolvedValue([{ name: 'LCP', value: 500, id: 'x' }]);
+    collectWebVitalsMock.mockResolvedValue({
+      samples: [{ name: 'LCP', value: 500, id: 'x' }],
+      cspViolations: [],
+    });
 
     await expect(main([`--target=${TARGET}`, '--runs=1', `--page=${PAGE}`])).rejects.toThrow(
       /Budget violations/,
@@ -178,7 +190,10 @@ describe('runner main()', () => {
       { name: PAGE, path: '/', budgets: { lcp: 1500, cls: 0.05, lhPerf: 98, jsBytes: 30 * 1024 } },
     ]);
     runLighthouseAuditMock.mockResolvedValue({ lcp: 800, cls: 0.01, lhPerf: 99, jsBytes: 5000 });
-    collectWebVitalsMock.mockResolvedValue([{ name: 'LCP', value: 1200, id: 'x' }]);
+    collectWebVitalsMock.mockResolvedValue({
+      samples: [{ name: 'LCP', value: 1200, id: 'x' }],
+      cspViolations: [],
+    });
 
     await expect(
       main([`--target=${TARGET}`, '--runs=1', `--page=${PAGE}`]),
@@ -189,7 +204,7 @@ describe('runner main()', () => {
     runLighthouseAuditMock
       .mockResolvedValueOnce({ lcp: 1000, cls: 0, lhPerf: 99, jsBytes: 100 })
       .mockRejectedValueOnce(new Error('lighthouse blew up'));
-    collectWebVitalsMock.mockResolvedValue([]);
+    collectWebVitalsMock.mockResolvedValue({ samples: [], cspViolations: [] });
 
     await expect(main([`--target=${TARGET}`, '--runs=2', `--page=${PAGE}`])).rejects.toThrow(
       /lighthouse blew up/,

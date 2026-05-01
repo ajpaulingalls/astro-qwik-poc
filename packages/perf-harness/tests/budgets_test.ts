@@ -18,6 +18,7 @@ function reportFixture(overrides: Partial<AggregatedReport['metrics']> = {}): Ag
       samples: [],
       aggregated: { lcp: { median: 1200, p95: 1200, n: 5 }, inp: MISSING_METRIC },
     },
+    cspViolations: [],
   };
 }
 

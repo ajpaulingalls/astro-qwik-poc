@@ -1,4 +1,5 @@
 {
+  "cspViolations": [],
   "metrics": {
     "cls": {
       "median": 0,
@@ -6,19 +7,19 @@
       "p95": 0
     },
     "jsBytes": {
-      "median": 170065,
+      "median": 182038,
       "n": 10,
-      "p95": 170065
+      "p95": 182038
     },
     "lcp": {
-      "median": 3094.3997,
+      "median": 3127.0859,
       "n": 10,
-      "p95": 3320.21354
+      "p95": 3841.8475
     },
     "lhPerf": {
-      "median": 91.5,
+      "median": 91,
       "n": 10,
-      "p95": 92
+      "p95": 92.55
     }
   },
   "page": "liveblog",
@@ -27,14 +28,14 @@
   "webVitals": {
     "aggregated": {
       "inp": {
-        "median": 16,
+        "median": 20,
         "n": 10,
-        "p95": 28.39999999999999
+        "p95": 24
       },
       "lcp": {
-        "median": 52,
+        "median": 48,
         "n": 10,
-        "p95": 58.199999999999996
+        "p95": 54.199999999999996
       }
     },
     "samples": [
@@ -43,7 +44,7 @@
         "entries": [
           {}
         ],
-        "id": "v4-1777584180640-1030993344687",
+        "id": "v4-1777596191738-2455929352179",
         "lcpElement": {
           "className": "text-3xl md:text-4xl font-bold leading-tight",
           "tagName": "H1"
@@ -56,7 +57,7 @@
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777584180640-3714510438424",
+        "id": "v4-1777596191738-1707717525977",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -68,162 +69,18 @@
           {},
           {}
         ],
-        "id": "v4-1777584180640-7467750115225",
+        "id": "v4-1777596191738-6973059329896",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 24
       },
       {
-        "delta": 44,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777584189123-4106240453842",
-        "lcpElement": {
-          "className": "text-3xl md:text-4xl font-bold leading-tight",
-          "tagName": "H1"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 44
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777584189123-6477564122977",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777584189123-6928608491458",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 44,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777584197761-9874091393703",
-        "lcpElement": {
-          "className": "text-3xl md:text-4xl font-bold leading-tight",
-          "tagName": "H1"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 44
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777584197761-2139446607545",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777584197761-2013501728196",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777584206246-5182008337633",
-        "lcpElement": {
-          "className": "text-3xl md:text-4xl font-bold leading-tight",
-          "tagName": "H1"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777584206247-1376575485996",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777584206246-9396464543332",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 48,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777584214808-3520394511052",
-        "lcpElement": {
-          "className": "text-3xl md:text-4xl font-bold leading-tight",
-          "tagName": "H1"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777584214809-6686949611655",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777584214808-3324798639974",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
         "delta": 56,
         "entries": [
           {}
         ],
-        "id": "v4-1777584223488-7882356074641",
+        "id": "v4-1777596200310-1949351514700",
         "lcpElement": {
           "className": "text-3xl md:text-4xl font-bold leading-tight",
           "tagName": "H1"
@@ -236,7 +93,7 @@
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777584223488-4784041211975",
+        "id": "v4-1777596200310-7709184479428",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -248,79 +105,7 @@
           {},
           {}
         ],
-        "id": "v4-1777584223488-5389710463553",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777584232175-8237835042149",
-        "lcpElement": {
-          "className": "text-3xl md:text-4xl font-bold leading-tight",
-          "tagName": "H1"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777584232175-6152914106484",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777584232175-8901807680819",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777584240749-7625692732992",
-        "lcpElement": {
-          "className": "text-3xl md:text-4xl font-bold leading-tight",
-          "tagName": "H1"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777584240749-8521820286161",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777584240749-4292557445365",
+        "id": "v4-1777596200310-4449828202909",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
@@ -331,7 +116,7 @@
         "entries": [
           {}
         ],
-        "id": "v4-1777584249389-4855328234292",
+        "id": "v4-1777596208789-6255981769452",
         "lcpElement": {
           "className": "text-3xl md:text-4xl font-bold leading-tight",
           "tagName": "H1"
@@ -344,7 +129,7 @@
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777584249390-9151813267884",
+        "id": "v4-1777596208789-9805648552077",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -356,18 +141,18 @@
           {},
           {}
         ],
-        "id": "v4-1777584249390-3627892341756",
+        "id": "v4-1777596208789-2772505364766",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 16
       },
       {
-        "delta": 60,
+        "delta": 52,
         "entries": [
           {}
         ],
-        "id": "v4-1777584258006-5008559238369",
+        "id": "v4-1777596217314-7957654492880",
         "lcpElement": {
           "className": "text-3xl md:text-4xl font-bold leading-tight",
           "tagName": "H1"
@@ -375,28 +160,244 @@
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 60
+        "value": 52
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777584258006-8709382626933",
+        "id": "v4-1777596217314-9789602426707",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
       },
       {
-        "delta": 32,
+        "delta": 24,
         "entries": [
           {},
           {}
         ],
-        "id": "v4-1777584258006-7986859805687",
+        "id": "v4-1777596217314-5960299789440",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 32
+        "value": 24
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777596225828-7760344080571",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777596225828-1027462290944",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777596225828-8626100614464",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777596234507-8929924875619",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777596234508-5308185238020",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777596234507-4804471515222",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777596243543-9717094630342",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777596243544-1809091189726",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777596243543-7272443047957",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777596252074-8203962551707",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777596252075-4699331627665",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777596252074-6412094047530",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777596260827-7150233582756",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777596260828-1903539442144",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777596260828-9106504368407",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 52,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777596269510-6056901222238",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 52
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777596269510-8714488259240",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777596269510-2652615641551",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
       }
     ]
   }

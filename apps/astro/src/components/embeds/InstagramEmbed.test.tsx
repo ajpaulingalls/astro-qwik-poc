@@ -53,4 +53,11 @@ describe('InstagramEmbed', () => {
     const script = document.querySelector(SCRIPT_SELECTOR) as HTMLScriptElement;
     expect(() => script.dispatchEvent(new Event('load'))).not.toThrow();
   });
+
+  it('strips inline style attributes (CSP style-src-attr defense)', () => {
+    const styledHtml =
+      '<blockquote class="instagram-media" style="background:#fff; padding:16px"></blockquote>';
+    const { container } = render(<InstagramEmbed html={styledHtml} />);
+    expect(container.querySelectorAll('[style]').length).toBe(0);
+  });
 });

@@ -9,6 +9,8 @@ const { connectMock, browserMock, pageMock } = vi.hoisted(() => {
     keyboard: keyboardMock,
     evaluate: vi.fn(),
     close: vi.fn(),
+    exposeFunction: vi.fn(),
+    evaluateOnNewDocument: vi.fn(),
   };
   const browserMock = {
     newPage: vi.fn(async () => pageMock),
@@ -28,7 +30,7 @@ vi.mock('puppeteer-core', async () => {
   };
 });
 
-import { collectWebVitals } from '../web_vitals_collector.ts';
+import { collectWebVitals, type SerializedCspViolation } from '../web_vitals_collector.ts';
 
 describe('collectWebVitals', () => {
   beforeEach(() => {
@@ -39,6 +41,8 @@ describe('collectWebVitals', () => {
     pageMock.keyboard.press.mockReset();
     pageMock.evaluate.mockReset();
     pageMock.close.mockReset();
+    pageMock.exposeFunction.mockReset().mockResolvedValue(undefined);
+    pageMock.evaluateOnNewDocument.mockReset().mockResolvedValue(undefined);
     browserMock.newPage.mockClear();
     browserMock.disconnect.mockClear();
     connectMock.mockClear();
@@ -50,17 +54,19 @@ describe('collectWebVitals', () => {
       { name: 'CLS', value: 0.001 },
     ]);
 
-    const samples = await collectWebVitals('http://localhost:8080/', 9876);
+    const result = await collectWebVitals('http://localhost:8080/', 9876);
 
     expect(connectMock).toHaveBeenCalledWith({ browserURL: 'http://127.0.0.1:9876' });
     expect(pageMock.goto).toHaveBeenCalledWith(
       'http://localhost:8080/',
       expect.objectContaining({ waitUntil: 'networkidle2' }),
     );
-    expect(samples).toEqual([
+    expect(result.samples).toEqual([
       { name: 'LCP', value: 800 },
       { name: 'CLS', value: 0.001 },
     ]);
+    // No violation events fired during this navigation → empty array.
+    expect(result.cspViolations).toEqual([]);
   });
 
   it('presses Tab between the LCP wait and the INP wait', async () => {
@@ -93,8 +99,9 @@ describe('collectWebVitals', () => {
 
   it('returns the page-evaluated samples (empty array fallback handled in-page)', async () => {
     pageMock.evaluate.mockResolvedValueOnce([]);
-    const samples = await collectWebVitals('http://localhost:8080/', 9876);
-    expect(samples).toEqual([]);
+    const result = await collectWebVitals('http://localhost:8080/', 9876);
+    expect(result.samples).toEqual([]);
+    expect(result.cspViolations).toEqual([]);
   });
 
   it('disconnects browser even if waitForFunction throws (timeout)', async () => {
@@ -112,9 +119,9 @@ describe('collectWebVitals', () => {
       .mockRejectedValueOnce(new TimeoutError('5000ms exceeded')); // INP wait times out
     pageMock.evaluate.mockResolvedValueOnce([{ name: 'LCP', value: 800 }]);
 
-    const samples = await collectWebVitals('http://localhost:8080/', 9876);
+    const result = await collectWebVitals('http://localhost:8080/', 9876);
 
-    expect(samples).toEqual([{ name: 'LCP', value: 800 }]);
+    expect(result.samples).toEqual([{ name: 'LCP', value: 800 }]);
     expect(browserMock.disconnect).toHaveBeenCalled();
   });
 
@@ -133,6 +140,74 @@ describe('collectWebVitals', () => {
     pageMock.evaluate.mockResolvedValueOnce([]);
     await collectWebVitals('http://localhost:8080/', 9876);
     expect(pageMock.close).toHaveBeenCalled();
+  });
+
+  it('captures CSP violations bridged via the exposed function', async () => {
+    // Behavior, not implementation: capture the handler the collector
+    // hands to exposeFunction (the Node-side bridge that page-side
+    // securitypolicyviolation listeners call into), invoke it twice
+    // mid-flow with synthetic violation objects, and assert both land
+    // in the returned cspViolations array. This pins the Node-side
+    // accumulation contract without coupling to the page-side script
+    // text — that lives in the M0d real-Chrome smoke test.
+    const synthetic1: SerializedCspViolation = {
+      violatedDirective: "script-src 'self'",
+      effectiveDirective: 'script-src',
+      blockedURI: '',
+      disposition: 'enforce',
+      documentURI: 'http://localhost:8080/',
+      sourceFile: 'http://localhost:8080/',
+      lineNumber: 12,
+      columnNumber: 4,
+      sample: '',
+    };
+    const synthetic2: SerializedCspViolation = {
+      violatedDirective: "img-src 'self'",
+      effectiveDirective: 'img-src',
+      blockedURI: 'http://evil.example/pixel.gif',
+      disposition: 'enforce',
+      documentURI: 'http://localhost:8080/',
+      sourceFile: 'http://localhost:8080/',
+      lineNumber: 0,
+      columnNumber: 0,
+      sample: '',
+    };
+    let bridgeName: string | undefined;
+    let capturedHandler: ((v: SerializedCspViolation) => void) | undefined;
+    pageMock.exposeFunction.mockImplementation((name: string, handler: unknown) => {
+      bridgeName = name;
+      capturedHandler = handler as (v: SerializedCspViolation) => void;
+      return Promise.resolve();
+    });
+    pageMock.evaluateOnNewDocument.mockImplementation(() => {
+      // Simulate the page-side listener firing: invoke the bridge twice,
+      // exactly as the real script would when the browser dispatches
+      // securitypolicyviolation events.
+      capturedHandler!(synthetic1);
+      capturedHandler!(synthetic2);
+      return Promise.resolve();
+    });
+    pageMock.evaluate.mockResolvedValueOnce([]);
+
+    const result = await collectWebVitals('http://localhost:8080/', 9876);
+
+    expect(bridgeName).toBeDefined();
+    expect(result.cspViolations).toEqual([synthetic1, synthetic2]);
+  });
+
+  it('attaches the CSP listener BEFORE goto so first-paint violations are caught', async () => {
+    // Pin the call order: exposeFunction → evaluateOnNewDocument → goto.
+    // If the collector ever moves goto ahead of evaluateOnNewDocument,
+    // the listener attaches too late and the very first violation
+    // (often the most informative one — initial inline-script eval)
+    // slips by silently. This test stops that regression.
+    pageMock.evaluate.mockResolvedValueOnce([]);
+    await collectWebVitals('http://localhost:8080/', 9876);
+    const exposeOrder = pageMock.exposeFunction.mock.invocationCallOrder[0];
+    const onNewDocOrder = pageMock.evaluateOnNewDocument.mock.invocationCallOrder[0];
+    const gotoOrder = pageMock.goto.mock.invocationCallOrder[0];
+    expect(exposeOrder).toBeLessThan(onNewDocOrder);
+    expect(onNewDocOrder).toBeLessThan(gotoOrder);
   });
 
   // Run the enrichment callback page.evaluate would have invoked, with a

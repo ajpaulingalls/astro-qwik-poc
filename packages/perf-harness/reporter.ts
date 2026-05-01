@@ -1,7 +1,7 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { RawMetrics } from './lighthouse.ts';
-import type { EnrichedMetric } from './web_vitals_collector.ts';
+import type { EnrichedMetric, SerializedCspViolation } from './web_vitals_collector.ts';
 
 // Single source of truth for both runner.ts and throughput.ts; pinned by a
 // reporter_test assertion so a file move can't silently desync the two CLIs.
@@ -41,6 +41,12 @@ export interface AggregatedReport {
     samples: EnrichedMetric[];
     aggregated: { lcp: AggregatedMetric; inp: AggregatedMetric };
   };
+  // Concatenation of every securitypolicyviolation event the collector
+  // observed across the N runs of this page. Empty array means the listener
+  // ran AND no violation fired — distinguishable from a missing listener
+  // because tsc requires the field, so a runner.ts that forgot to populate
+  // it would not compile.
+  cspViolations: SerializedCspViolation[];
 }
 
 // Recursively sorts object keys for byte-stable JSON output (frozen-key contract:
@@ -112,8 +118,38 @@ function formatMarkdown(report: AggregatedReport): string {
     const src = lcpElement.src ? ` ${lcpElement.src}` : '';
     lines.push(`lcp element: ${lcpElement.tagName}${id}${src}`);
   }
+  // CSP violations counted across all N runs. Surfaced even when 0 — that
+  // IS the audit signal SECURITY.md cites. Per-violation detail (directive,
+  // blockedURI, sample) lives in the JSON cspViolations array; MD stays
+  // a one-line summary so the report scans at a glance.
+  lines.push(`csp violations: ${report.cspViolations.length} (across ${runs} runs)`);
+  if (report.cspViolations.length > 0) {
+    const summary = summarizeCspViolations(report.cspViolations);
+    for (const line of summary) {
+      lines.push(`  ${line}`);
+    }
+  }
   lines.push('');
   return lines.join('\n');
+}
+
+// Sentinel rendered when blockedURI is empty — matches the spec-defined
+// empty-string case (inline scripts/styles where there's no URI to report).
+// Tests reference this constant rather than the raw literal.
+export const INLINE_BLOCKED_URI_LABEL = '(inline)';
+
+// Group violations by (effectiveDirective, blockedURI) so a repeated
+// directive/source pair counts as one MD line with a multiplier instead of
+// flooding the report when the page repeatedly violates the same rule.
+function summarizeCspViolations(violations: SerializedCspViolation[]): string[] {
+  const counts = new Map<string, number>();
+  for (const v of violations) {
+    const key = `${v.effectiveDirective} ← ${v.blockedURI || INLINE_BLOCKED_URI_LABEL}`;
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([key, n]) => `${key} × ${n}`);
 }
 
 export function formatReport(report: AggregatedReport): { json: string; markdown: string } {

@@ -1,4 +1,5 @@
 import { parseEmbeds } from '../lib/parse-embeds';
+import { safeInnerHTML } from '../lib/safe-inner-html';
 import { TwitterEmbed } from './embeds/TwitterEmbed';
 import { InstagramEmbed } from './embeds/InstagramEmbed';
 import { GalleryEmbed } from './embeds/GalleryEmbed';
@@ -15,7 +16,7 @@ interface Props {
 
 // Content is trusted CMS HTML; CSP enforces script policy app-side (M5/M7).
 // Embeds are dispatched by parseEmbeds; remaining text segments render
-// verbatim via dangerouslySetInnerHTML.
+// verbatim via safeInnerHTML so the style-src-attr sanitizer is non-skippable.
 export function ArticleBody({ content, transformContent }: Props) {
   const html = transformContent ? transformContent(content) : content;
   const segments = parseEmbeds(html);
@@ -23,7 +24,7 @@ export function ArticleBody({ content, transformContent }: Props) {
     <article class="article-body prose max-w-none">
       {segments.map((seg, i) => {
         if (seg.kind === 'html') {
-          return <div key={i} dangerouslySetInnerHTML={{ __html: seg.html }} />;
+          return <div key={i} dangerouslySetInnerHTML={safeInnerHTML(seg.html)} />;
         }
         switch (seg.type) {
           case 'twitter':

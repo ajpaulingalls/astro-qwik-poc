@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { join } from 'node:path';
-import { formatReport, MISSING_METRIC, REPORTS_DIR, type AggregatedReport } from '../reporter.ts';
-import type { EnrichedMetric } from '../web_vitals_collector.ts';
+import {
+  formatReport,
+  INLINE_BLOCKED_URI_LABEL,
+  MISSING_METRIC,
+  REPORTS_DIR,
+  type AggregatedReport,
+} from '../reporter.ts';
+import type { EnrichedMetric, SerializedCspViolation } from '../web_vitals_collector.ts';
 
 describe('REPORTS_DIR', () => {
   it('resolves to packages/perf-harness/reports/', () => {
@@ -21,6 +27,7 @@ const fixture: AggregatedReport = {
     jsBytes: { median: 12345, p95: 13000, n: 5 },
   },
   webVitals: { samples: [], aggregated: { lcp: MISSING_METRIC, inp: MISSING_METRIC } },
+  cspViolations: [],
 };
 
 describe('formatReport', () => {
@@ -29,6 +36,7 @@ describe('formatReport', () => {
     expect(json).toBe(
       [
         '{',
+        '  "cspViolations": [],',
         '  "metrics": {',
         '    "cls": {',
         '      "median": 0.001,',
@@ -90,9 +98,54 @@ describe('formatReport', () => {
         'web-vitals samples: 0',
         'real-browser lcp median: MISSING (0/5 runs)',
         'real-browser inp median: MISSING (0/5 runs)',
+        'csp violations: 0 (across 5 runs)',
         '',
       ].join('\n'),
     );
+  });
+
+  it('renders csp violations summary when non-empty (grouped + sorted)', () => {
+    const violations: SerializedCspViolation[] = [
+      {
+        // blockedURI '' is the spec-defined inline case; the renderer
+        // substitutes INLINE_BLOCKED_URI_LABEL via summarizeCspViolations.
+        violatedDirective: "script-src 'self'",
+        effectiveDirective: 'script-src',
+        blockedURI: '',
+        disposition: 'enforce',
+        documentURI: 'http://localhost:8080/',
+        sourceFile: 'http://localhost:8080/',
+        lineNumber: 12,
+        columnNumber: 4,
+        sample: '',
+      },
+      {
+        violatedDirective: "script-src 'self'",
+        effectiveDirective: 'script-src',
+        blockedURI: '',
+        disposition: 'enforce',
+        documentURI: 'http://localhost:8080/',
+        sourceFile: 'http://localhost:8080/',
+        lineNumber: 18,
+        columnNumber: 4,
+        sample: '',
+      },
+      {
+        violatedDirective: "img-src 'self'",
+        effectiveDirective: 'img-src',
+        blockedURI: 'http://evil.example/pixel.gif',
+        disposition: 'enforce',
+        documentURI: 'http://localhost:8080/',
+        sourceFile: 'http://localhost:8080/',
+        lineNumber: 0,
+        columnNumber: 0,
+        sample: '',
+      },
+    ];
+    const { markdown } = formatReport({ ...fixture, cspViolations: violations });
+    expect(markdown).toContain('csp violations: 3 (across 5 runs)');
+    expect(markdown).toContain('img-src ← http://evil.example/pixel.gif × 1');
+    expect(markdown).toContain(`script-src ← ${INLINE_BLOCKED_URI_LABEL} × 2`);
   });
 
   it('is byte-identical for the same input across calls (determinism gate)', () => {
