@@ -104,7 +104,48 @@ Server-side rendering throughput per page-row, both apps. Run parameters: `--dur
 
 **Throughput-skew note.** The aggregate row-by-row deltas (Q − A) range from −95.1 req/s on `index` to +109.6 req/s on `section-geo`. RUN_NOTES.md attributes the skew to per-page SSR work — larger pages (article, index) do more work per request, lowering req/s; smaller pages (sections, liveblog) churn faster (source: `RUN_NOTES.md § SSR throughput`, paragraph after the table).
 
-_§1.6–§1.7 follow in subsequent commits._
+### 1.6 Stretch verdict per (app, page-row)
+
+PASS / HONEST-FAILURE per stretch metric per (app, page-row), aggregated from §1.3 (CWV), §1.4 (jsBytes), §1.5 (SSR throughput), and the CSP-zero claim from `apps/astro/docs/SECURITY.md § M12 Audit > Final CSP directive set` and `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` (`CSP violations` column). The CSP gate per SMM constraint `fd770051b407` requires runtime collector evidence (`AggregatedReport.cspViolations` from `packages/perf-harness/web_vitals_collector.ts`), not header-only assertions — collected and recorded in the n=10 sweep.
+
+| app   | page-row      | LH-Perf               | CLS  | LCP-real | INP-real | jsBytes | SSR req/s | CSP violations | Source                                                                                               |
+| ----- | ------------- | --------------------- | ---- | -------- | -------- | ------- | --------- | -------------- | ---------------------------------------------------------------------------------------------------- |
+| astro | index         | PASS                  | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | §1.3.1, §1.3.2, §1.4, §1.5; `RUN_NOTES.md § Measured outcomes`; `M12_VALIDATION.md § Sign-off table` |
+| astro | article       | PASS                  | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+| astro | section-geo   | PASS                  | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+| astro | section-topic | PASS                  | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+| astro | liveblog      | PASS                  | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+| qwik  | index         | HONEST-FAILURE (§1.7) | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+| qwik  | article       | HONEST-FAILURE (§1.7) | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+| qwik  | section-geo   | HONEST-FAILURE (§1.7) | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+| qwik  | section-topic | HONEST-FAILURE (§1.7) | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+| qwik  | liveblog      | HONEST-FAILURE (§1.7) | PASS | PASS     | PASS     | PASS    | PASS      | PASS (0)       | same                                                                                                 |
+
+**Aggregate.** Astro: 35 PASS / 0 HONEST-FAILURE across 5 page-rows × 7 stretch metrics (LH-Perf, CLS, LCP-real, INP-real, jsBytes, SSR req/s, CSP violations). Qwik: 30 PASS / 5 HONEST-FAILURE — the failures are all the LH-Perf cells (one per Qwik page-row), gated against the documented `QWIK_LH_PERF_FLOOR=80` per-target relaxation explained in §1.7.
+
+### 1.7 Honest-failure: Qwik LH-Perf relaxation rationale
+
+The single HONEST-FAILURE category in §1.6 is Qwik LH-Perf vs the stretch ≥ 98 budget. This section records the relaxation rationale per SMM constraint `d77dd7b4007e` ("Stretch INP<=100ms applies to all targets; on miss accept honest failure or land per-target relaxation with measured numbers — never silently raise") — measured numbers, named cause, no silent stretch raise.
+
+**Floor.** `QWIK_LH_PERF_FLOOR = 80`, defined at `packages/perf-harness/cli_helpers.ts:50-59`. The Qwik LH-Perf gate runs against this floor; the stretch ≥ 98 budget is preserved in `STRETCH_CWV.lhPerf` and continues to gate Astro routes.
+
+**Per-page Qwik LH-Perf measurements (n=10).** Transcribed verbatim from `docs/M12_VALIDATION.md § HONEST-FAILURE detail` (which itself cites `packages/perf-harness/reports/qwik-{page}.json:metrics.lhPerf.median` / `.p95`).
+
+| page-row      | LH-Perf median | LH-Perf p95 | Source                                           |
+| ------------- | -------------- | ----------- | ------------------------------------------------ |
+| index         | 83             | 86          | `docs/M12_VALIDATION.md § HONEST-FAILURE detail` |
+| article       | 88.5           | 90.55       | same                                             |
+| section-geo   | 92             | 95          | same                                             |
+| section-topic | 93             | 94.55       | same                                             |
+| liveblog      | 91             | 92.55       | same                                             |
+
+**Cause.** ~136 KB framework runtime irreducible on `@qwik.dev/core` 2.0.0-beta.32 (~102 KB Qwik core + ~12 KB router + zod + ~7 KB router internals + ~5 KB qwikLoader + ~5 KB preloader + ~5.5 KB web-vitals). Qwik 2 beta.32's core runtime is +86% over Qwik 1 stable's `core` chunk (101,968 B vs 54,680 B) per the chunk-inventory bisect. Source: `apps/qwik/docs/QWIK2_NOTES.md § M12 Consolidated Audit > Framework-floor characterization`.
+
+**Floor calibration.** The 80 floor sits 3 points below the lowest measured Qwik LH-Perf median (83 on `index`). The gap is sized to absorb framework-runtime variance on the beta line without false-failing while still firing on a real ~5-point regression. Source: `apps/qwik/docs/QWIK2_NOTES.md § M12 Consolidated Audit > LH-Perf floor relaxation rationale`.
+
+**Re-evaluation point.** When `@qwik.dev/core` ships its size-optimization pass at Qwik 2 stable, re-measure LH-Perf and reconsider whether the floor stays at 80 or returns to the stretch ≥ 98. The relaxation is per-target and per-version, not permanent. Source: same as floor calibration above; full bisect history in §5 (story-004).
+
+**Cross-references.** §5 (story-004) elaborates on the framework-floor cost story, the leaf-component convention, and the other beta-blockers consolidated in `QWIK2_NOTES.md § M12 Consolidated Audit > Beta blockers landed`.
 
 ## 2. Developer Experience
 
