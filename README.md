@@ -37,24 +37,78 @@ aje-poc/
 └── deno.json                        ← deno workspace (mock-api)
 ```
 
-## Quick Start
+## Try it locally
+
+### Prerequisites
+
+| Tool     | Min version | Notes                                                                                               |
+| -------- | ----------- | --------------------------------------------------------------------------------------------------- |
+| **bun**  | 1.3.13      | `packageManager` pinned in `package.json`. Used for installs + dev + Qwik runtime.                  |
+| **deno** | 2.x         | Production SSR runtime for the Astro app via `@deno/astro-adapter`; also runs the mock GraphQL API. |
+| **git**  | any         | For clone.                                                                                          |
 
 ```bash
-# 1. Start the shared mock API (Deno)
-bun run mock-api
-# or: deno task mock-api
-
-# 2. Install dependencies for all workspaces
+git clone <this repo> aje-poc && cd aje-poc
 bun install
-
-# 3. Run one of the apps
-bun run dev:astro       # Astro 6 dev server
-bun run dev:qwik        # Qwik 2 dev server
-
-# 4. Run the performance harness (after pages are built)
-bun run perf:astro
-bun run perf:qwik
 ```
+
+### Dev (mock data, hot-reload)
+
+In two shells:
+
+```bash
+# shell 1 — start the shared mock GraphQL server (Deno, http://localhost:4455)
+bun run mock-api
+
+# shell 2 — run one of the apps
+bun run dev:astro       # Astro 6 dev server (http://localhost:4321)
+bun run dev:qwik        # Qwik 2 dev server  (http://localhost:5173)
+```
+
+Both apps default `PUBLIC_API_BASE` to the local mock; no env config needed for dev.
+
+### Demo against production aljazeera.com
+
+```bash
+export PUBLIC_API_BASE=https://www.aljazeera.com
+
+# Astro — built with Astro 6, served by Deno on http://localhost:8080
+bun run demo:astro
+
+# Qwik — built with Qwik 2 beta, served by bun on http://localhost:4173
+bun run demo:qwik
+```
+
+Each demo script chains `build:` (with `PUBLIC_API_BASE` baked into CSP + the same-origin uploads proxy) then launches the production runtime. The Astro demo derives Deno `--allow-net` from `PUBLIC_API_BASE` and audits all 11 env vars at boot — see [`docs/DEMO.md`](./docs/DEMO.md) for the full sandboxing model + known-issues list (article slug rotation, liveblog availability).
+
+### Tests + lint + typecheck
+
+```bash
+bun run --cwd apps/astro test     # Astro: vitest + happy-dom + @testing-library/preact
+bun run --cwd apps/qwik test      # Qwik:  vitest + @qwik.dev/core/testing + custom getByHeading helper
+bun run typecheck                 # All apps + packages
+bun run lint                      # ESLint
+bun run format:check              # Prettier (use `format` to write)
+```
+
+### Performance harness (n=10 sweep, mock data)
+
+```bash
+bun run perf:astro                # build + spawn Astro under Deno + run Lighthouse on :4455 mock
+bun run perf:qwik                 # build + spawn Qwik under bun + run Lighthouse on :4456 mock
+bun run perf:e2e-csp              # builds both, runs the CSP-zero pipeline gate
+```
+
+Reports land in `packages/perf-harness/reports/{astro,qwik}-{page}.json` plus an aggregated `RUN_NOTES.md`. The harness is the methodology used for the §1 numbers in [`docs/COMPARISON.md`](./docs/COMPARISON.md).
+
+### Doc acceptance scripts
+
+```bash
+bash scripts/check-comparison-denylist.sh    # editorial vocabulary + per-section heading-format guard
+bash scripts/check-comparison-citations.sh   # §1 pipe-rows must cite an accepted basename
+```
+
+Both scripts gate `docs/COMPARISON.md` against the M-13 "measured data, no opinions" constraint. Re-run after any edit.
 
 ## Pages in scope
 
