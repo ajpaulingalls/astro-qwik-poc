@@ -22,12 +22,17 @@
 // `data-style="..."` because both lack the leading-whitespace + bare-`style=`
 // pattern.
 //
-// Known limitation — attribute-value smuggling: an attribute value that
-// literally contains `style="…"` as a substring (e.g. a server-side
-// template stored in `data-tmpl='<x style="y">'`) will have the inner
-// `style="y"` stripped. We accept this — the CMS doesn't emit such markup
-// today and a full HTML parse would cost ~100x more per SSR pass. Revisit
-// if a fixture surfaces it.
+// Known limits (acceptable for current CMS content; revisit if the audit
+// surfaces them):
+//   1. Attribute-value smuggling — an attribute value that literally
+//      contains `style="…"` as a substring (e.g. a server-side template
+//      stored in `data-tmpl='<x style="y">'`) will have the inner
+//      `style="y"` stripped. CMS doesn't emit such markup today.
+//   2. Unquoted attribute values — HTML5 `<div style=red>` slips through
+//      because the regex requires either `"…"` or `'…'`. WordPress
+//      fixtures use quoted forms; CMS that emits unquoted styles would
+//      re-introduce the violation the next sweep would catch.
+// A full HTML parse would close both gaps but costs ~100x more per SSR pass.
 export function stripInlineStyles(html: string): string {
   return html.replace(/\s+style\s*=\s*(?:"[^"]*"|'[^']*')/gi, '');
 }
