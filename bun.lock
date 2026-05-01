@@ -4,8 +4,10 @@
   "workspaces": {
     "": {
       "name": "aje-poc",
-      "devDependencies": {
+      "dependencies": {
         "@aje-poc/perf-harness": "workspace:*",
+      },
+      "devDependencies": {
         "@eslint/js": "^9.39.4",
         "eslint": "^9.39.4",
         "eslint-plugin-astro": "^1.7.0",
