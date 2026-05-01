@@ -202,7 +202,7 @@ describe('decideChildExitAction', () => {
 
 // Root scripts that shell-bake PUBLIC_API_BASE with the literal qwik mock-api
 // port. Extracted so future drift-gate additions reference one source.
-const QWIK_PORT_BAKING_SCRIPTS = ['perf:qwik', 'demo:qwik'] as const;
+const QWIK_PORT_BAKING_SCRIPTS = ['perf:qwik', 'demo:qwik', 'perf:e2e-csp'] as const;
 
 describe('root package.json qwik script port', () => {
   // Drift gate: if MOCK_API_PORT.qwik moves in spawn.ts, the spawned app and
