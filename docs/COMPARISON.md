@@ -554,7 +554,7 @@ Each verdict below is backed by 2+ measurable findings drawn from §1-§7. The "
 
 ### 8.3 When to choose Qwik 2
 
-**Verdict.** Qwik 2 beta.32 demonstrates the resumability model holding up against the same workload Astro handles, **but only when Qwik 2 stable ships and the §5.5 "Re-evaluate" rows are re-measured**. The leading risk is the framework-floor finding from §5.3: ~136 KB of irreducible runtime cost (~77% of the homepage budget anchor) measures 101,968 B against Qwik 1 stable's `core` 54,680 B (+86% delta per §5.3) and is the cause of the LH-Perf floor relaxation in §1.7. Until Qwik 2 stable ships its size-optimization pass, that cost is unavoidable.
+**Verdict.** Qwik 2 beta.32 demonstrates the resumability model holding up against the same workload Astro handles, **but only when Qwik 2 stable ships and the §5.5 "Re-evaluate" rows are re-measured**. The leading risk is the framework-floor finding from §5.3: ~136 KB of irreducible runtime cost (~77% of the homepage budget anchor) is the cause of the LH-Perf floor relaxation in §1.7. The Qwik 2 beta.32 `core` chunk measures 101,968 B against Qwik 1 stable's 54,680 B (+86% delta per §5.3) — characterizing the regression, not the absolute cost. Until Qwik 2 stable ships its size-optimization pass, both the absolute floor and the +86% delta are unavoidable.
 
 | Finding                                                                                           | Source          |
 | ------------------------------------------------------------------------------------------------- | --------------- |
@@ -570,4 +570,4 @@ Each verdict below is backed by 2+ measurable findings drawn from §1-§7. The "
 - **Production load.** The perf-harness measures n=10 single-page runs, not concurrent load. SSR throughput (§1.5) is per-page sequential; production traffic patterns (concurrent users, cache warmth, downstream API latency) are not in PoC scope.
 - **Editorial workflow integration.** Both apps consume the GraphQL API; neither writes to it. Authoring, scheduling, and preview workflows are out of PoC scope.
 - **Qwik 2 stable re-measurement.** Per §5.5 "Re-evaluate" rows. Until Qwik 2 stable ships, the §8.3 verdict cannot move past PoC-validated.
-- **F1 — Qwik liveblog 404 (resolved).** Mentioned for completeness: `apps/qwik/src/lib/liveblog-api.ts` originally missed `postType: 'liveblog'`; fixed pre-sprint at commit `2c6882d` (see §7.5). Not an open item; listed here so the M-13 reader sees the full M11 surface.
+  _(For the record — not still-open: `apps/qwik/src/lib/liveblog-api.ts` originally missed `postType: 'liveblog'`; fixed pre-sprint at commit `2c6882d`; full discussion at §7.5 F1. Listed here so the M-13 reader sees the full M11 surface in the same place.)_
