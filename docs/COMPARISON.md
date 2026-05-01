@@ -149,7 +149,65 @@ The single HONEST-FAILURE category in §1.6 is Qwik LH-Perf vs the stretch ≥ 9
 
 ## 2. Developer Experience
 
-_To be written by sprint-013 story-002._
+§2 captures measurable DX surfaces (build, dev server, TypeScript, code-complexity proxies, test cold-start) per app. Where a number is reproducible, the citation is a measurement command the reader can re-run; where a behavior is documented, the citation is a file path. Build-time wall-clock numbers are not transcribed because neither app's docs publishes them — the reproducible commands below are the citation.
+
+### 2.1 Build commands & build shape
+
+| Concern                         | Astro                                                                          | Qwik                                                                                               | Source                                                                                                        |
+| ------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Build command                   | `bun --bun astro build`                                                        | `vite build && vite build --ssr ./src/entry.ssr.tsx && vite build --ssr ./src/entry.preview.tsx`   | `apps/astro/package.json` build script; `apps/qwik/package.json:9` build script                               |
+| Build steps                     | 1 (Astro orchestrates client + SSR)                                            | 3 sequential vite builds (client / SSR entry / preview entry)                                      | same                                                                                                          |
+| Production bundle output        | `apps/astro/dist/server/entry.mjs` (Deno-targeted SSR)                         | `apps/qwik/dist/` (client) + `apps/qwik/server/entry.ssr.js` + `apps/qwik/server/entry.preview.js` | `apps/astro/CLAUDE.md`; `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Build / dev checks (M3 acceptance)` |
+| Node-version gate workaround    | `bun --bun` flag forces bun runtime to bypass Astro 6's Node ≥22.12 hard-check | n/a (Qwik vite plugin tolerates bun directly)                                                      | `apps/astro/CLAUDE.md`                                                                                        |
+| Reproducible build-time command | `time bun run build:astro` from repo root                                      | `time bun run build:qwik` from repo root                                                           | root `package.json`                                                                                           |
+
+Why three builds for Qwik: the SSR entry and the preview entry both need to be SSR-compiled (one for production-style request handling, one for the `bun run preview` smoke loop). The `entry.preview.tsx` was added in sprint-003 to unblock the perf-harness production-equivalent path (`apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Production-equivalent perf-harness path` — sprint-004 story-003).
+
+### 2.2 Dev server & HMR
+
+| Concern          | Astro                                               | Qwik                                                                                                                                                   | Source                                                                                                          |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Dev runtime      | bun running Astro 6's Vite-based dev server         | bun running Qwik 2's Vite-based dev server                                                                                                             | `apps/astro/docs/ARCHITECTURE.md § Runtime & Tooling`; `apps/qwik/vite.config.ts`                               |
+| HMR mechanism    | Vite HMR for `.astro` + Preact islands (out-of-box) | Vite HMR + Qwik vite plugin (`qwikVite` from `@qwik.dev/core/optimizer` + `qwikRouter` from `@qwik.dev/router/vite`)                                   | same; `apps/qwik/vite.config.ts:24` (plugin import sites)                                                       |
+| Vite version     | latest (no pin documented)                          | **Pinned `^7.3.2`** — Vite 8's rolldown bundler breaks Qwik router SSR module collection (`TypeError: ... 'concat'`); recheck on subsequent beta bumps | `apps/qwik/package.json:35`; `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Vite version pin — beta blocker` |
+| Default dev port | `4321` (Astro default)                              | `5173` (Vite default)                                                                                                                                  | per-app `package.json` dev scripts                                                                              |
+
+The Vite-version pin is the most load-bearing dev-server difference: a routine `bun update` in Qwik can break SSR until rolled back. The Astro stack has no equivalent pin — Astro 6 + Vite tracks Vite latest.
+
+### 2.3 TypeScript experience
+
+| Concern                       | Astro                                                                                                 | Qwik                                                                                                                                                              | Source                                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Strict mode                   | `extends: "astro/tsconfigs/strict"`                                                                   | `"strict": true`                                                                                                                                                  | `apps/astro/tsconfig.json:2`; `apps/qwik/tsconfig.json`                                                       |
+| Component file types          | `.astro` (static, no JS) + `.tsx` (Preact islands, `jsx: "react-jsx"` w/ `jsxImportSource: "preact"`) | `.tsx` everywhere; Qwik 2 JSX                                                                                                                                     | `apps/astro/tsconfig.json:4-5`; `apps/qwik/src/` (find result, §2.4)                                          |
+| Notable framework gotchas     | none (Astro 6 is stable)                                                                              | `QwikCityProvider` deprecated → use `useQwikRouter()` inside `component$` (Qwik 2 v3-removal warning); `passive:` event marker syntax not yet verified in beta.32 | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Divergences from apps/qwik/docs/ARCHITECTURE.md` items 1, 4 |
+| Type-source-of-truth doctrine | n/a                                                                                                   | Read `node_modules/@qwik.dev/core/*.d.ts` before depending on release-notes features (SMM wisdom `2cc98fbeedff`)                                                  | `apps/qwik/CLAUDE.md § Looking up Qwik 2 specifics`                                                           |
+
+Qwik's beta-friction TypeScript surface is documented inline in QWIK2_NOTES.md as it accumulates; Astro 6's TS surface is the same as Astro 5's for the patterns this PoC uses, with no documented gotchas in the M1-M12 work.
+
+### 2.4 Code complexity proxies
+
+Measurements taken at story-002 commit time on the post-merge `main` tip. The reproducible `find` + `wc -l` commands ARE the citation — re-run them to verify or re-measure later.
+
+| Metric                         | Astro                                                                              | Qwik                                                                                                                        | Source                                                                                                                                                                                                               |
+| ------------------------------ | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Source files (excluding tests) | 42                                                                                 | 45                                                                                                                          | `find apps/astro/src -type f \( -name "*.astro" -o -name "*.tsx" -o -name "*.ts" \) ! -name "*.test.*" ! -name "*.spec.*" \| wc -l`; analogous `apps/qwik/src` command (no `.astro`)                                 |
+| Test files                     | 36                                                                                 | 39                                                                                                                          | `find apps/astro -type f \( -name "*.test.*" -o -name "*.spec.*" \) \| wc -l`; analogous `apps/qwik` command                                                                                                         |
+| Source LOC (cat-piped wc)      | 1,901                                                                              | 2,183                                                                                                                       | `find apps/astro/src ... ! -name "*.test.*" -exec cat {} + \| wc -l`; analogous `apps/qwik/src`                                                                                                                      |
+| Interactive boundary count     | 4 `client:idle` + 2 `client:visible` directive uses across `.astro` + `.tsx` files | 8 `component$` production uses (6 routes + BreakingTicker + Navigation) + 13 plain-function leaf exports per the convention | `grep -roE "client:[a-z]+" apps/astro/src \| sort \| uniq -c`; `grep -rln 'component\$(' apps/qwik/src --include="*.tsx" \| grep -v test`; `grep -rln "^export function" apps/qwik/src/components --include="*.tsx"` |
+
+The interactive-boundary count is the most informative complexity proxy: Astro names exactly 6 hydration sites in the codebase via `client:*` directives; Qwik names 8 `component$` boundaries (which the optimizer further dices into per-handler QRL chunks at build time — see §3.3) plus 13 plain-function leaves (per the leaf-component convention in `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Leaf component convention`, which §5 elaborates).
+
+### 2.5 Test cold-start cost
+
+SMM risk `4573b5815a2f` records "Qwik vitest cold-start ~10x Astro (6.3s vs 0.67s) — Vite+Qwik plugin transform overhead may compound as src grows" (source: SMM event id, sprint-002 measurement). The pre-build prerequisite in Qwik's test script (`bun run build &&` in `apps/qwik/package.json:13`) compounds the cold-start cost vs Astro's standalone `bun test`.
+
+Reproducible commands:
+
+- Astro: `time bun --filter aje-poc-astro test:run`
+- Qwik: `time bun --filter aje-poc-qwik test:run`
+
+This is one of the few apples-to-apples DX measurements that exists in the M1-M12 record. The 10× multiplier was sized at sprint-002 with a near-empty src tree; both apps have grown since (Astro to 42 source files, Qwik to 45 — see §2.4), so a re-measure at story-006 capstone would be useful but is out of story-002 scope.
 
 ## 3. Architecture
 
