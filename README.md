@@ -91,7 +91,7 @@ Measured against the four production page types via the n=10 perf-harness sweep 
 | LCP (real-browser)     | 46-76 ms               | 48-100 ms             | ≤ 1500 ms — both clear by ~20×                     |
 | INP (real-browser)     | 16 ms                  | 16 ms                 | ≤ 100 ms — both clear by ≥ 6×                      |
 | CSP violations         | 0 (auto-hash)          | 0 (`'unsafe-inline'`) | 0 — both PASS via different mechanisms             |
-| JS bundle (homepage)   | 13,917 B               | 177,431 B             | per-app budget — both PASS                         |
+| JS bundle (homepage)   | 13,917 B               | 176,237 B             | per-app budget — both PASS                         |
 
 **The headline Qwik finding** is the framework-floor cost: beta.32 ships ~136 KB of irreducible runtime before any app symbol — the `core` chunk alone is 101,968 B vs Qwik 1 stable's 54,680 B (+86%). This is upstream, not app-architecture: the leaf-component refactor recovered only −558 B / −4 chunks across four conversions. The cost is unavoidable until Qwik 2 stable's size-optimization pass lands. Full deep-dive in [`docs/COMPARISON.md`](./docs/COMPARISON.md) §5.
 
