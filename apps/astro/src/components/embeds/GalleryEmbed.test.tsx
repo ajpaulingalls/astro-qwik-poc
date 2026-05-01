@@ -29,4 +29,13 @@ describe('GalleryEmbed', () => {
     render(<GalleryEmbed html={GALLERY_HTML} />);
     expect(document.querySelectorAll('script').length).toBe(0);
   });
+
+  it('strips inline style attributes (CSP style-src-attr defense)', () => {
+    // Pin the stripInlineStyles wiring — without this assertion, removing
+    // the call from GalleryEmbed.tsx would leave the other tests green
+    // but reintroduce the M1-observed CSP violation.
+    const styledHtml = '<div class="wp-block-gallery"><figure style="width: 50%"></figure></div>';
+    const { container } = render(<GalleryEmbed html={styledHtml} />);
+    expect(container.querySelectorAll('[style]').length).toBe(0);
+  });
 });

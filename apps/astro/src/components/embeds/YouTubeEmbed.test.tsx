@@ -25,4 +25,11 @@ describe('YouTubeEmbed', () => {
     render(<YouTubeEmbed html={YOUTUBE_HTML} />);
     expect(document.querySelectorAll('script').length).toBe(0);
   });
+
+  it('strips inline style attributes (CSP style-src-attr defense)', () => {
+    const styledHtml =
+      '<div style="position:relative;padding-bottom:56.25%"><iframe src="https://youtube.com/embed/x"></iframe></div>';
+    const { container } = render(<YouTubeEmbed html={styledHtml} />);
+    expect(container.querySelectorAll('[style]').length).toBe(0);
+  });
 });

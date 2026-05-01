@@ -33,4 +33,10 @@ describe('TwitterEmbed', () => {
     render(<TwitterEmbed html={TWITTER_HTML} />);
     expect(document.querySelectorAll(SCRIPT_SELECTOR).length).toBe(1);
   });
+
+  it('strips inline style attributes (CSP style-src-attr defense)', () => {
+    const styledHtml = '<blockquote class="twitter-tweet" style="background:#fff"></blockquote>';
+    const { container } = render(<TwitterEmbed html={styledHtml} />);
+    expect(container.querySelectorAll('[style]').length).toBe(0);
+  });
 });
