@@ -71,11 +71,11 @@ Acceptance bar: `req/s ≥ 50` per page. Every page clears the bar; lowest is `q
 | astro | liveblog      | 461.3  | 4618 | 0 |  9 | 11 |
 | qwik  | index         |  65.2  |  654 | 0 | 63 | 70 |
 | qwik  | article       | 162.9  | 1633 | 0 | 26 | 33 |
-| qwik  | section-geo   | 597.0  | 5972 | 0 |  7 |  8 |
+| qwik  | section-geo   | 596.9  | 5972 | 0 |  7 |  8 |
 | qwik  | section-topic | 219.4  | 2197 | 0 | 17 | 24 |
 | qwik  | liveblog      | 436.4  | 4367 | 0 |  9 | 12 |
 
-Throughput skew is expected: the larger pages (article, index) do more SSR work per request, lowering req/s. The smaller pages (sections, liveblog) churn faster. No errors across 31,217 total requests.
+Throughput skew is expected: the larger pages (article, index) do more SSR work per request, lowering req/s. The smaller pages (sections, liveblog) churn faster. No errors across 31,197 total requests.
 
 ### Honest-failure inventory
 

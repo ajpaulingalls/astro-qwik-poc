@@ -24,9 +24,9 @@ The +15 KB regression observed sprint-006 → post-sprint-008 (156 → 171 KB on
 
 ### LH-Perf floor relaxation rationale
 
-`packages/perf-harness/cli_helpers.ts:50-59` defines `QWIK_LH_PERF_FLOOR = 80`. The stretch ≥98 LH-Perf budget is **unmeetable on beta.32**: sprint-012 story-003's n=10 sweep measured per-page Lighthouse-Perf median in the 83–93 range (index 83, article 89, section-geo 91, section-topic 93, liveblog 91.5). The framework runtime drift is the cause — qwik/index dropped from 85 to 81 between sprint-008 and sprint-009 with no homepage code changes (see _sprint-009 § What landed (this session)_ item 4 below), attributable to framework growth in the beta line.
+`packages/perf-harness/cli_helpers.ts:50-59` defines `QWIK_LH_PERF_FLOOR = 80`. The stretch ≥98 LH-Perf budget is **unmeetable on beta.32**: sprint-012 story-003's n=10 sweep measured per-page Lighthouse-Perf median in the 83–93 range (index 83, article 88.5, section-geo 92, section-topic 93, liveblog 91). The framework runtime drift is the cause — qwik/index dropped from 85 to 81 between sprint-008 and sprint-009 with no homepage code changes (see _sprint-009 § What landed (this session)_ item 4 below), attributable to framework growth in the beta line.
 
-The 80 floor sits 1pt below the lowest measured median (83) so the gate stops false-failing on framework variance while still firing on a real ~5pt regression. Per SMM constraint `d77dd7b4007e` (perf budget honesty), this is the **documented honest failure path** — the stretch budget is not silently raised, the per-target relaxation is recorded with measured numbers, and Astro routes still hold the stretch ≥98. Re-evaluate when Qwik 2 stable ships its size-optimization pass.
+The 80 floor sits 3pt below the lowest measured median (83) so the gate stops false-failing on framework variance while still firing on a real ~5pt regression. Per SMM constraint `d77dd7b4007e` (perf budget honesty), this is the **documented honest failure path** — the stretch budget is not silently raised, the per-target relaxation is recorded with measured numbers, and Astro routes still hold the stretch ≥98. Re-evaluate when Qwik 2 stable ships its size-optimization pass.
 
 ### Budgets at n=10
 
