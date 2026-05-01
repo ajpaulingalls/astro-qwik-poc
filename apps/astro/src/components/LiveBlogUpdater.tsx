@@ -3,6 +3,7 @@ import {
   createPollLoop,
   LIVEBLOG_POLL_INTERVAL_MS,
   MAX_CONSECUTIVE_EMPTY_POLLS,
+  POLL_DONE,
   resolvePollIntervalMs,
   type LiveBlogUpdate,
 } from '@aje-poc/shared-types';
@@ -24,12 +25,30 @@ const POLL_INTERVAL_MS = resolvePollIntervalMs(
 // failure surfaces in the console (the poll site has no UI consumer for a
 // degraded marker today; loadLiveBlogData carries the marker on the SSR
 // path where the route is a credible UI consumer).
+//
+// Returns POLL_DONE when the upstream signals end-of-blog: shell === null
+// (deleted / no_posts_found) or shell.isLive === false (concluded). The
+// tick callsite forwards POLL_DONE to createPollLoop which clears the
+// interval immediately, sparing ~10 minutes of wasted polling that the
+// max-consecutive-empty safety net would otherwise take to notice.
+//
+// Returns `[]` (NOT POLL_DONE) when the blog is still live but no new ids
+// arrived this cycle — that's a transient empty: more updates may arrive
+// next cycle, so the loop should keep polling and only stop after
+// MAX_CONSECUTIVE_EMPTY_POLLS consecutive empties (the safety net).
 export async function fetchPollUpdate(
   slug: string,
   currentIds: number[],
-): Promise<LiveBlogUpdate[]> {
+): Promise<LiveBlogUpdate[] | typeof POLL_DONE> {
   const shell = await fetchLiveBlogShell(slug);
-  if (!shell) return [];
+  // End-of-blog: shell deleted (null from 404 / no_posts_found) OR editors
+  // flipped isLive false (concluded). Inlined rather than extracted to a
+  // shared isLiveBlogActive() predicate — TS narrowing through a boolean
+  // helper would force a non-null assertion at the access below; the inline
+  // disjunction narrows shell to LiveBlogShell on the green path naturally.
+  // Qwik twin (apps/qwik/src/components/LiveBlogUpdater.tsx) duplicates this
+  // line — extract to shared-types if a third caller appears (rule of three).
+  if (shell === null || shell.isLive === false) return POLL_DONE;
   const known = new Set(currentIds);
   const newIds = shell.children.filter((id) => !known.has(id));
   if (newIds.length === 0) return [];
@@ -78,6 +97,7 @@ export function LiveBlogUpdater({ slug, initialChildIds }: Props) {
         const polled = newEntriesRef.current.map((e) => Number(e.id));
         const known = [...polled, ...initialChildIds];
         const fresh = await fetchPollUpdate(slug, known);
+        if (fresh === POLL_DONE) return POLL_DONE;
         return fresh.length === 0 ? null : fresh;
       },
       onResult: (fresh) => setNewEntries((prev) => [...fresh, ...prev]),
