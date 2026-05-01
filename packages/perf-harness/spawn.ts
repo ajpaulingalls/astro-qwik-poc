@@ -99,10 +99,12 @@ export function buildAstroDenoArgv(apiBase: string | undefined, appPort: number)
   ];
 }
 
-export function spawnAstro(): ChildProcess {
+// stdio defaults to 'ignore' for perf-harness silence; demo launcher passes
+// 'inherit' so operators see the runtime's logs. Mirrors spawnQwik.
+export function spawnAstro(stdio: 'ignore' | 'inherit' = 'ignore'): ChildProcess {
   return spawn('deno', buildAstroDenoArgv(process.env.PUBLIC_API_BASE, APP_PORT.astro), {
     cwd: REPO_ROOT,
-    stdio: 'ignore',
+    stdio,
   });
 }
 
@@ -124,14 +126,16 @@ export function qwikSpawnEnv(callerEnv: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   };
 }
 
-export function spawnQwik(): ChildProcess {
+// stdio defaults to 'ignore' for perf-harness silence; demo launcher passes
+// 'inherit' so operators see the runtime's logs.
+export function spawnQwik(stdio: 'ignore' | 'inherit' = 'ignore'): ChildProcess {
   // Production-bundled handler via bun wrapper, not `vite preview` —
   // matches spawnAstro's raw-runtime methodology (no Vite in front).
   // See apps/qwik/server.ts for why a wrapper is needed (entry.preview.js
   // exports middleware, not a listener).
   return spawn('bun', ['run', 'server.ts'], {
     cwd: resolve(REPO_ROOT, 'apps/qwik'),
-    stdio: 'ignore',
+    stdio,
     env: qwikSpawnEnv(process.env),
   });
 }

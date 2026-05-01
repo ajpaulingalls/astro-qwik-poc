@@ -7,3 +7,4 @@ export {
 } from './mock-fetch.ts';
 export { isolateDocumentHidden } from './document-hidden.ts';
 export { startTestServer, type TestServerHandle, type TestServerResponse } from './http-server.ts';
+export { REPO_ROOT } from './repo-root.ts';

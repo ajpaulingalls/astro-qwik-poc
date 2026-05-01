@@ -1,7 +1,30 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest';
 import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { MISSING_METRIC, REPORTS_DIR } from '../reporter.ts';
+
+// Set REPORTS_DIR_ENV before reporter.ts loads so its REPORTS_DIR const
+// captures the temp path, redirecting all writes from the committed reports/*
+// directory. Without this, `bun test` deletes committed *.baseline.json
+// snapshots. vi.hoisted runs before ESM imports resolve, so the env is set
+// in time for reporter.ts module init. Path-only construction (no fs at hoist
+// time) — runner.ts:52 calls mkdirSync(REPORTS_DIR, { recursive: true }) at
+// first write, and afterAll cleans the dir at suite end.
+vi.hoisted(() => {
+  const tmp = (process.env.TMPDIR ?? '/tmp').replace(/\/$/, '');
+  process.env.PERF_REPORTS_DIR = `${tmp}/perf-runner-test-${process.pid}`;
+});
+
+import { MISSING_METRIC, REPORTS_DIR, REPORTS_DIR_ENV } from '../reporter.ts';
+
+// Defensive: don't rmSync a path the env-override didn't redirect. If hoisting
+// regresses, REPORTS_DIR points at the committed dir — refuse to delete it.
+function assertScopedReportsDir() {
+  if (process.env[REPORTS_DIR_ENV] !== REPORTS_DIR) {
+    throw new Error(
+      `runner_test refuses to clean REPORTS_DIR=${REPORTS_DIR} (env not honored — hoisting regressed)`,
+    );
+  }
+}
 const TARGET = 'astro';
 const PAGE = 'index';
 
@@ -70,6 +93,10 @@ describe('runner main()', () => {
   });
   afterEach(() => {
     cleanupAstroReports();
+  });
+  afterAll(() => {
+    assertScopedReportsDir();
+    rmSync(REPORTS_DIR, { recursive: true, force: true });
   });
 
   it('writes JSON+MD reports for astro/index with aggregated n=2 metrics', async () => {
@@ -145,6 +172,23 @@ describe('runner main()', () => {
 
     expect(runLighthouseAuditMock).toHaveBeenCalledTimes(3);
     expect(collectWebVitalsMock).toHaveBeenCalledTimes(3);
+  });
+
+  it('iterates the listed pages when --page is comma-separated', async () => {
+    runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 99, jsBytes: 100 });
+    collectWebVitalsMock.mockResolvedValue({ samples: [], cspViolations: [] });
+
+    await main([`--target=${TARGET}`, '--runs=1', `--page=index,article`]);
+
+    // 2 pages × 1 run each = 2 lighthouse calls
+    expect(runLighthouseAuditMock).toHaveBeenCalledTimes(2);
+    expect(collectWebVitalsMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('throws when no comma-listed page names match', async () => {
+    await expect(main([`--target=${TARGET}`, '--runs=1', '--page=ghost,phantom'])).rejects.toThrow(
+      /no pages match --page=ghost,phantom/,
+    );
   });
 
   it('spawns qwik via bun + server.ts with HOST/PORT env in apps/qwik cwd', async () => {

@@ -37,6 +37,11 @@ const POST_LCP_TAIL_MS = 500;
 // rename can't desync the two ends silently.
 const CSP_BRIDGE_NAME = '__cspViolation';
 
+// Max chars retained from SecurityPolicyViolationEvent.sample. Chrome includes
+// up to ~40 chars of violating source for inline-script violations; clamp to
+// 64 so committed reports/*.json never grow an unbounded sample field.
+const CSP_SAMPLE_MAX_CHARS = 64;
+
 // Extracted as a named function so the test can invoke it directly. page.evaluate
 // serializes the callback to source — no closures over imports — so this only runs
 // in the page context, never in Node at runtime.
@@ -76,7 +81,8 @@ export async function collectWebVitals(url: string, port: number): Promise<Colle
     // one. Reverse the order and the first-paint violation slips by
     // because the listener attaches after the document is already parsed.
     await page.exposeFunction(CSP_BRIDGE_NAME, (v: SerializedCspViolation) => {
-      cspViolations.push(v);
+      // Node-side enforcement so a future page-side change can't bypass the clamp.
+      cspViolations.push({ ...v, sample: v.sample.slice(0, CSP_SAMPLE_MAX_CHARS) });
     });
     await page.evaluateOnNewDocument((bridgeName: string) => {
       document.addEventListener('securitypolicyviolation', (e) => {

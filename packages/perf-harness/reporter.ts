@@ -5,7 +5,20 @@ import type { EnrichedMetric, SerializedCspViolation } from './web_vitals_collec
 
 // Single source of truth for both runner.ts and throughput.ts; pinned by a
 // reporter_test assertion so a file move can't silently desync the two CLIs.
-export const REPORTS_DIR = resolve(dirname(fileURLToPath(import.meta.url)), 'reports');
+// REPORTS_DIR_ENV override lets tests scope writes to a temp dir so committed
+// reports/*.baseline.json are never touched by the test suite. Shared symbol
+// keeps the env name typo-proof across the override and the consumer.
+//
+// REQUIRED PATTERN for new test files that import from this module: set
+// process.env[REPORTS_DIR_ENV] to a temp path inside a `vi.hoisted(() => ...)`
+// block BEFORE the import statement. REPORTS_DIR is captured at module init,
+// so a test that imports without hoisting silently uses the committed
+// `reports/` directory and may delete its contents. See `tests/runner_test.ts`
+// for the canonical shape (vi.hoisted env setup + assertScopedReportsDir
+// guard before any rmSync) — `tests/runner_e2e_test.ts` mirrors it.
+export const REPORTS_DIR_ENV = 'PERF_REPORTS_DIR';
+export const REPORTS_DIR =
+  process.env[REPORTS_DIR_ENV] ?? resolve(dirname(fileURLToPath(import.meta.url)), 'reports');
 
 // median/p95 both null iff n === 0 — the single missing signal (SMM concern be23cb2d0a70).
 // p95 lands alongside median for stretch-CWV honesty: median + tail-latency shipped

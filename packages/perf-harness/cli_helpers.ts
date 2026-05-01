@@ -150,6 +150,9 @@ export function parseArgs(argv: readonly string[]): ParsedArgs {
   }
 
   const out: ParsedArgs = { target, runs };
+  // --page accepts a single name or a comma-separated list (e.g.
+  // --page=article,liveblog). The raw flag value is preserved here; runner.ts
+  // does the comma split + inclusion filter at the buildPageList boundary.
   if (flags.has('page')) out.page = flags.get('page');
   return out;
 }
