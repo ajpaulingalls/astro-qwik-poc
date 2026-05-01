@@ -211,7 +211,91 @@ This is one of the few apples-to-apples DX measurements that exists in the M1-M1
 
 ## 3. Architecture
 
-_To be written by sprint-013 story-002._
+§3 captures the core architectural difference between the two apps and the per-app patterns that fall out of it. Every architectural claim cites a code reference (`apps/<app>/<file>` or section in an audit doc) — the citation discipline is the §3 equivalent of §1's no-opinion rule.
+
+### 3.1 Hydration vs resumability — the central distinction
+
+Astro and Qwik are both SSR-first; the difference is what happens **client-side after first paint**.
+
+- **Astro**: client islands. The server emits static HTML; each Preact island runs its own initialization on hydrate per its `client:*` directive. The rest of the page is static — no JS executes for non-island markup. Hydration is per-island and independent — a failed island does not cascade (`apps/astro/docs/ARCHITECTURE.md § Component Library` table, line 23).
+- **Qwik**: resumability. The server renders HTML and serializes component state into the DOM. The client does not re-execute component initialization — it resumes from the serialized state, with interactive handlers lazy-loaded as QRL chunks only when the user triggers them (`apps/qwik/docs/ARCHITECTURE.md § Resumability` lines 12-14).
+
+The two models converge on a similar end-state for non-interactive markup (zero JS) but diverge on how interactive code arrives at the page: Astro ships per-island bundles eagerly per directive (`client:idle`/`client:visible`/etc.); Qwik ships nothing for handlers until first interaction, with the framework runtime itself providing the lazy-load infrastructure (the ~136 KB framework floor cited in §1.4 + §5).
+
+### 3.2 Astro islands — directives in use
+
+The Astro app declares 6 island components in its component library; the directive used for each comes from the deploy site (grep against `apps/astro/src`).
+
+| Component                                  | Directive                                | Purpose                                                             | Source                                                                                                |
+| ------------------------------------------ | ---------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `BreakingTicker.tsx`                       | `client:idle`                            | 30s polling for breaking-news banner; mounted in `BaseLayout.astro` | `apps/astro/docs/ARCHITECTURE.md § Component Library`; `apps/astro/src/components/BreakingTicker.tsx` |
+| `LoadMoreButton.tsx`                       | `client:idle`                            | Section-front pagination (offset-based, client-side append)         | same; `apps/astro/src/components/LoadMoreButton.tsx`                                                  |
+| `LiveBlogUpdater.tsx`                      | `client:idle`                            | 30s polling for live-blog entries with prepend                      | same; `apps/astro/src/components/LiveBlogUpdater.tsx`                                                 |
+| `NavigationMenu.tsx`                       | `client:idle`                            | Hamburger-toggle menu; mounted in `BaseLayout.astro:37`             | same; `apps/astro/src/layouts/BaseLayout.astro:37`                                                    |
+| `VerticalVideoCarousel.tsx`                | `client:visible`                         | Vertical-video carousel with touch/scroll handlers                  | same; `apps/astro/src/components/VerticalVideoCarousel.tsx`                                           |
+| `VideoPlayer.tsx` / `LivestreamPlayer.tsx` | `client:visible`                         | Embedded video / livestream playback                                | same                                                                                                  |
+| **In-tree directive count**                | **4 `client:idle` + 2 `client:visible`** | (verified inline)                                                   | `grep -roE "client:[a-z]+" apps/astro/src \| sort \| uniq -c`                                         |
+
+The directives are explicit per-island choices: polling work that should be lazy-but-warm uses `client:idle`; viewport-conditional content uses `client:visible`. There are no `client:load` (eager) uses — the budget discipline is to ship as little upfront JS as possible.
+
+### 3.3 Qwik QRL boundaries — `$()`, `useVisibleTask$`, `useOnDocument`
+
+Qwik's optimizer extracts `$`-suffixed expressions into separate QRL chunks at build time. There are three distinct primitives in this codebase, each with a concrete deploy site:
+
+- **`$()` click handlers** — wrap async handlers with `$()` to mark a QRL boundary; the chunk is fetched on first interaction. Example: `LoadMoreButton.tsx` async pagination handler (per `apps/qwik/docs/ARCHITECTURE.md § LoadMoreButton component`, line 177 cites the `loadMore = $(async () => …)` pattern). In-tree: 8 `$()` handler markers in `apps/qwik/src/components/` (`grep -rn '\$(async\|\$(()' apps/qwik/src/components --include="*.tsx" | wc -l`).
+- **`useVisibleTask$`** — runs once on visibility (mount-equivalent); wraps `setInterval` for polling. Production deploy sites: `apps/qwik/src/components/BreakingTicker.tsx:28`, `apps/qwik/src/components/LiveBlogUpdater.tsx:84`, `apps/qwik/src/components/LoadMoreButton.tsx`, `apps/qwik/src/routes/layout.tsx`. Test limitation: `createDOM()` does not bootstrap qwikLoader, so `useVisibleTask$` registers but never settles in unit tests — verification deferred to e2e (`apps/qwik/docs/QWIK2_NOTES.md § sprint-007 § Beta friction encountered` items 1, 3).
+- **`useOnDocument`** — preferred over `useVisibleTask$` + `addEventListener` for cross-island document listeners because the handler lazy-loads via `$()` instead of being part of the visible-task chunk. Production deploy sites: `apps/qwik/src/components/LivestreamPlayer.tsx`, `apps/qwik/src/components/embeds/{Twitter,Instagram,Brightcove}Embed.tsx` (`apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > APIs confirmed present in beta.32`).
+
+The `allowStale` primitive that the architecture doc originally referenced for routeLoader-driven polling does not exist in `@qwik.dev/core` 2.0.0-beta.32 — `useVisibleTask$ + setInterval` is the documented workaround until it lands (`apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Divergences` item 3). §5 (story-004) elaborates on the leaf-component convention (when to use `component$` vs plain function) which is the build-time complement to these runtime QRL boundaries.
+
+### 3.4 Server-islands rejection — the M2 decision and post-M-12 reflection
+
+`apps/astro/docs/ARCHITECTURE.md § Why client islands and not server islands?` (lines 25-34) records the original rejection. Astro 6 supports server islands — components rendered out-of-band on the server with their own cache TTL, deferred from the initial HTML response and streamed in afterward. The PoC chose client islands because every interactive component in the M4-M12 work either:
+
+1. Requires true client-side interactivity (carousel swipes, hamburger toggle, video playback) — server islands cannot fire DOM events.
+2. Polls on a client-controlled cadence (BreakingTicker 30s, LiveBlogUpdater 30s) — server islands would round-trip the SSR layer on every poll, defeating the purpose.
+3. Maintains pure client-state (hamburger open/closed) — server-side execution would be incoherent.
+
+**Post-M-12 reflection:** the rejection still holds. Walking the M4-M12 component additions:
+
+- **M4 (perf harness)** — no server-island candidates (instrumentation only).
+- **M5 (Layout & Nav)** — `NavigationMenu` (hamburger toggle, pure client state). Not a server-island candidate.
+- **M6 (Homepage)** — `VerticalVideoCarousel`, `LivestreamPlayer` (DOM event handlers). Not server-island candidates.
+- **M7 (Article)** — embed components (DOM script injection). Not server-island candidates.
+- **M8 (Section Front + Load More)** — `LoadMoreButton` (client-side offset pagination, no URL change). Not a server-island candidate; would defeat the whole "client-side append" design per SMM constraint about pagination.
+- **M9 (Live Blog)** — `LiveBlogUpdater` (30s polling). Server-island worst-case: 30s × N concurrent readers = N requests/30s back to the SSR origin where currently zero land.
+- **M10 (Breaking Ticker)** — `BreakingTicker` (30s polling, global). Same worst-case as M9.
+- **M11 (Live endpoint)** — config-only; no new components.
+
+Zero M4-M12 components would have been simpler or faster as server islands. The "so future-us doesn't relitigate" annotation in the original doc stood up. Confirmed in-tree: `grep -rin "server.island" apps/ docs/` returns only the `ARCHITECTURE.md` rejection block plus this section — no follow-up "actually we should reconsider" entry exists.
+
+### 3.5 Hardcoded navigation — both apps
+
+Per SMM constraint `05a8538dd5d5` ("Navigation is hardcoded per app; no nav GraphQL query, cmsArcSettings is never called"), both apps own their navigation tree statically.
+
+| Concern                    | Astro                                                                           | Qwik                                                                                 |
+| -------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Navigation component       | `apps/astro/src/components/NavigationMenu.tsx` (Preact island)                  | `apps/qwik/src/components/Navigation.tsx` (`component$` with `$()` hamburger toggle) |
+| Mount site                 | `apps/astro/src/layouts/BaseLayout.astro:37` (`<NavigationMenu client:idle />`) | `apps/qwik/src/routes/layout.tsx`                                                    |
+| GraphQL nav query          | none                                                                            | none                                                                                 |
+| `cmsArcSettings` call site | none                                                                            | none                                                                                 |
+
+Verification: `grep -r "cmsArcSettings" apps/astro/src apps/qwik/src` returns zero hits in either tree (confirmed inline). The constraint holds.
+
+### 3.6 Production runtime split
+
+The runtime story is the most divergent architectural choice between the apps. Astro runs on Deno 2 in production for the principle-of-least-privilege win; Qwik runs on bun with a hand-rolled Node-style middleware wrapper for pragmatic reasons documented in sprint-003.
+
+| Concern                      | Astro                                                                                                                          | Qwik                                                                                                                                                                              | Source                                                                                                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production SSR runtime       | Deno 2 via `@deno/astro-adapter ^0.4.0`                                                                                        | bun running `apps/qwik/server.ts` (hand-rolled `node:http` wrapper around `QwikRouterNodeMiddleware` from `dist/server/entry.preview.js`)                                         | `apps/astro/CLAUDE.md`; `apps/qwik/server.ts`; `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Production-equivalent perf-harness path (sprint-004 story-003)` |
+| Permission model             | `--allow-net=<derived from PUBLIC_API_BASE>` + `--allow-read=apps/astro/dist` + `--allow-env=<11 audited vars>`; `-A` rejected | bun runs without sandboxing (Node-style env access)                                                                                                                               | `apps/astro/docs/SECURITY.md § M12 Audit > Deno --allow audit`; `packages/perf-harness/spawn.ts:buildAstroDenoArgv`                                              |
+| Runtime selection rationale  | Deno's permission model is the single biggest production-runtime defense in the Astro PoC                                      | Node middleware was the smaller lift than rewriting Qwik's bundled middleware for Deno's `Request → Response` model + working around a `staticFile` `static.root` resolution bug  | `apps/astro/docs/ARCHITECTURE.md § Runtime & Tooling`; `apps/qwik/docs/QWIK2_NOTES.md § sprint-003 > Why Node and not Deno` (lines 181-187)                      |
+| Why not Deno on Qwik         | n/a                                                                                                                            | Deno middleware DOES exist (`@qwik.dev/router/middleware/deno` verified in node_modules) — pragmatic Node choice, not absence-forced; revisit if upstream `static.root` bug fixed | `apps/qwik/docs/QWIK2_NOTES.md § sprint-003 > Why Node and not Deno` (corrects an earlier "no Deno middleware" claim)                                            |
+| CSP injection site           | `astro.config.mjs` security.csp via `packages/shared-csp/buildAstroCspConfig`                                                  | `apps/qwik/server.ts` sets `Content-Security-Policy` header via `packages/shared-csp/buildQwikCsp`                                                                                | `apps/astro/docs/SECURITY.md § M12 Audit`; `packages/shared-csp/index.ts:buildAstroCspConfig` and `:buildQwikCsp` (lines 104-115)                                |
+| Cross-link to security story | §4 (Astro CSP auto-hash via Astro 6's `scriptDirective` / `styleDirective`)                                                    | §5 (Qwik CSP `'unsafe-inline'` requirement, story-008)                                                                                                                            | per-section cross-references                                                                                                                                     |
+
+The asymmetry is the comparison's most concrete production-readiness data point: Astro shipped with a narrow allowlist Deno permission model, validated by audit (`apps/astro/docs/SECURITY.md § M12 Audit > Deno --allow audit`); Qwik shipped with bun's default permission model (none) plus a hand-rolled middleware wrapper. §7 (story-005) elaborates on what this means for production deployment recommendations.
 
 ## 4. Astro 6 platform features
 
