@@ -21,7 +21,7 @@
     "build:qwik": "bun --filter aje-poc-qwik build",
     "perf": "bun --filter @aje-poc/perf-harness run",
     "perf:astro": "bun run build:astro && bun --filter @aje-poc/perf-harness run -- --target=astro",
-    "perf:qwik": "bun run build:qwik && bun --filter @aje-poc/perf-harness run -- --target=qwik",
+    "perf:qwik": "PUBLIC_API_BASE=http://localhost:4456 bun run build:qwik && bun --filter @aje-poc/perf-harness run -- --target=qwik",
     "demo:astro": "bun run build:astro && bun run scripts/demo-launch-astro.ts",
     "demo:qwik": "bun run build:qwik && bun --bun apps/qwik/server.ts",
     "format": "prettier --write .",
