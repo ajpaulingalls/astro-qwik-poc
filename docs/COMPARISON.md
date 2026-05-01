@@ -38,6 +38,8 @@ All numbers in §1 come from the n=10 measurement matrix that landed in sprint-0
 
 The stretch column is the acceptance bar per SMM constraint `9cc47cf13aba`. The hard-floor column is the failure threshold below which a milestone fails outright. Qwik's LH-Perf floor relaxation is the only documented per-target deviation (§1.7).
 
+**Unit note.** `README.md § stretch CWV` states LCP as `≤ 1.5s` / `< 2.5s` and INP as `≤ 200ms`; values are shown in milliseconds throughout §1 to match the unit used by the §1.3 INP cells (real-browser INP is sub-second, so milliseconds is the natural unit). The conversions are exact (`1.5s = 1500 ms`, `2.5s = 2500 ms`).
+
 ### 1.3 Core Web Vitals
 
 Comparison view: rows per page-row, columns per app. Astro number first, Qwik number second (`A / Q`). Numbers transcribed verbatim from `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` (sprint-012 story-003 + story-004 n=10 sweep).
@@ -76,13 +78,13 @@ Astro LH-Perf p95 cells (100 across all page-rows) come from `packages/perf-harn
 
 Transferred-script bytes (gzipped) per page-row, both apps. Numbers transcribed verbatim from `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` (`jsBytes` column). Per-page anchors are defined in `packages/perf-harness/cli_helpers.ts` and used by the budget gate per SMM constraint `69a5e26f118f`.
 
-| page-row      | Astro jsBytes | Qwik jsBytes | Q − A delta (bytes) | Source                                                           |
-| ------------- | ------------- | ------------ | ------------------- | ---------------------------------------------------------------- |
-| index         | 13,917        | 176,237      | +162,320            | `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` |
-| article       | 13,917        | 176,237      | +162,320            | same                                                             |
-| section-geo   | 16,079        | 176,237      | +160,158            | same                                                             |
-| section-topic | 16,079        | 176,237      | +160,158            | same                                                             |
-| liveblog      | 16,951        | 182,038      | +165,087            | same                                                             |
+| page-row      | Astro jsBytes (gzipped) | Qwik jsBytes (gzipped) | Q − A delta (gzipped bytes) | Source                                                           |
+| ------------- | ----------------------- | ---------------------- | --------------------------- | ---------------------------------------------------------------- |
+| index         | 13,917                  | 176,237                | +162,320                    | `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` |
+| article       | 13,917                  | 176,237                | +162,320                    | same                                                             |
+| section-geo   | 16,079                  | 176,237                | +160,158                    | same                                                             |
+| section-topic | 16,079                  | 176,237                | +160,158                    | same                                                             |
+| liveblog      | 16,951                  | 182,038                | +165,087                    | same                                                             |
 
 **Per-page anchors (gate thresholds).** Astro Article 30 KB / Liveblog 17 KB; Qwik Homepage 176 KB / Article 184 KB / Liveblog 184 KB / sections 176 KB (source: `packages/perf-harness/cli_helpers.ts` per `RUN_NOTES.md § Acceptance budgets in force`). Every measurement above lands under its anchor (M-12 sign-off row 3, source: `docs/M12_VALIDATION.md § Sign-off table`).
 
@@ -100,9 +102,9 @@ Server-side rendering throughput per page-row, both apps. Run parameters: `--dur
 | section-topic | 278.6       | 219.4      | −59.2               | 19                     | 24                    | same                                                          |
 | liveblog      | 461.3       | 436.4      | −24.9               | 11                     | 12                    | same                                                          |
 
-**Acceptance bar.** Per-page acceptance is `req/s ≥ 50` (source: `RUN_NOTES.md § SSR throughput`). Lowest measurement is `qwik / index` at 65.2 req/s — every page-row clears the bar (M-12 sign-off row 4, source: `docs/M12_VALIDATION.md § Sign-off table`).
+**Acceptance bar.** Per-page acceptance is `req/s ≥ 50` (source: `RUN_NOTES.md § SSR throughput`). The lowest measurement in the table above is `qwik / index` — clears the bar with headroom (M-12 sign-off row 4, source: `docs/M12_VALIDATION.md § Sign-off table`). Cell drift in §1.5's table will surface here automatically because no number is restated in this prose.
 
-**Throughput-skew note.** The aggregate row-by-row deltas (Q − A) range from −95.1 req/s on `index` to +109.6 req/s on `section-geo`. RUN_NOTES.md attributes the skew to per-page SSR work — larger pages (article, index) do more work per request, lowering req/s; smaller pages (sections, liveblog) churn faster (source: `RUN_NOTES.md § SSR throughput`, paragraph after the table).
+**Throughput-skew note.** The aggregate row-by-row deltas (Q − A) range from −95.1 req/s on `index` to +109.6 req/s on `section-geo`. RUN_NOTES.md attributes the skew to per-page SSR work — pages with more SSR work per request (article, index) report lower req/s; pages with less SSR work per request (sections, liveblog) report higher req/s (source: `RUN_NOTES.md § SSR throughput`, paragraph after the table).
 
 ### 1.6 Stretch verdict per (app, page-row)
 
