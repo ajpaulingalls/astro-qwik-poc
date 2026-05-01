@@ -267,7 +267,7 @@ The `allowStale` primitive that the architecture doc originally referenced for r
 - **M10 (Breaking Ticker)** — `BreakingTicker` (30s polling, global). Same worst-case as M9.
 - **M11 (Live endpoint)** — config-only; no new components.
 
-Zero M4-M12 components would have been simpler or faster as server islands. The "so future-us doesn't relitigate" annotation in the original doc stood up. Confirmed in-tree: `grep -rin "server.island" apps/ docs/` returns only the `ARCHITECTURE.md` rejection block plus this section — no follow-up "actually we should reconsider" entry exists.
+Zero M4-M12 components fit the server-island use-case profile (cacheable + non-interactive). The "so future-us doesn't relitigate" annotation in the original doc stood up. Confirmed in-tree: `grep -rin "server.island" apps/ docs/` returns only the `ARCHITECTURE.md` rejection block plus this section — no follow-up "actually we should reconsider" entry exists.
 
 ### 3.5 Hardcoded navigation — both apps
 
@@ -284,7 +284,7 @@ Verification: `grep -r "cmsArcSettings" apps/astro/src apps/qwik/src` returns ze
 
 ### 3.6 Production runtime split
 
-The runtime story is the most divergent architectural choice between the apps. Astro runs on Deno 2 in production for the principle-of-least-privilege win; Qwik runs on bun with a hand-rolled Node-style middleware wrapper for pragmatic reasons documented in sprint-003.
+The runtime story is the structural decision with the most variance between the apps. Astro runs on Deno 2 in production to apply the principle of least privilege via Deno's permission system; Qwik runs on bun with a hand-rolled Node-style middleware wrapper for the reasons documented in sprint-003 (below).
 
 | Concern                      | Astro                                                                                                                          | Qwik                                                                                                                                                                              | Source                                                                                                                                                           |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
