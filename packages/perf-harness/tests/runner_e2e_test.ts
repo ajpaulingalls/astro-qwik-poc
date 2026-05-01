@@ -1,6 +1,9 @@
 // Real end-to-end CSP regression gate. NOT a unit test — spawns mock-api,
 // app build, lighthouse, chrome+collector. Gated on PERF_E2E=1 so default
-// `bun test` stays fast. Wire into perf:* sweeps with the env var set.
+// `bun test` stays fast.
+//
+// Run via: `bun run perf:e2e-csp` (root package.json) — that script builds
+// both apps with the right PUBLIC_API_BASE and sets PERF_E2E=1.
 //
 // Why: story-004 audit shipped CSP-clean across all (target, page) combos.
 // This test fails the moment a regression reintroduces a violation, before
@@ -9,9 +12,9 @@
 // surface the operator checks at sweep time.
 //
 // Precondition: dist/ for each app must exist. Skips with a clear message
-// otherwise — operator runs `bun run build:astro && PUBLIC_API_BASE=http://localhost:4456 bun run build:qwik` first.
-import { describe, it, expect, beforeAll, vi } from 'vitest';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+// otherwise — `bun run perf:e2e-csp` handles the build automatically.
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { REPO_ROOT } from '@aje-poc/shared-test-helpers';
 
@@ -20,8 +23,18 @@ vi.hoisted(() => {
   process.env.PERF_REPORTS_DIR = `${tmp}/perf-runner-e2e-${process.pid}`;
 });
 
-import { REPORTS_DIR, type AggregatedReport } from '../reporter.ts';
+import { REPORTS_DIR, REPORTS_DIR_ENV, type AggregatedReport } from '../reporter.ts';
 import { main as runnerMain } from '../runner.ts';
+
+// Defensive: don't rmSync a path the env-override didn't redirect. Mirrors
+// runner_test.ts's assertScopedReportsDir guard.
+function assertScopedReportsDir() {
+  if (process.env[REPORTS_DIR_ENV] !== REPORTS_DIR) {
+    throw new Error(
+      `runner_e2e_test refuses to clean REPORTS_DIR=${REPORTS_DIR} (env not honored — hoisting regressed)`,
+    );
+  }
+}
 
 const E2E = process.env.PERF_E2E === '1';
 const ASTRO_DIST = resolve(REPO_ROOT, 'apps/astro/dist');
@@ -40,6 +53,10 @@ describe.skipIf(!E2E)('runner e2e CSP regression gate', () => {
         `runner_e2e_test requires both apps built. Run: bun run build:astro && PUBLIC_API_BASE=http://localhost:4456 bun run build:qwik`,
       );
     }
+  });
+  afterAll(() => {
+    assertScopedReportsDir();
+    rmSync(REPORTS_DIR, { recursive: true, force: true });
   });
 
   it.each(['astro', 'qwik'] as const)(

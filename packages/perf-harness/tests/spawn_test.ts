@@ -207,17 +207,18 @@ const QWIK_PORT_BAKING_SCRIPTS = ['perf:qwik', 'demo:qwik'] as const;
 describe('root package.json qwik script port', () => {
   // Drift gate: if MOCK_API_PORT.qwik moves in spawn.ts, the spawned app and
   // the baked CSP / proxy target silently disagree until a perf sweep notices.
-  // Pin the literal so a port change fails fast and forces both root scripts
-  // to update in lockstep.
+  // Pin the URL-shaped literal (localhost:<port>) so a port change fails fast
+  // and a coincidental substring match (e.g. "4456" appearing in some unrelated
+  // arg) can't satisfy the assertion.
   const rootPkg: { scripts: Record<string, string> } = JSON.parse(
     readFileSync(resolve(REPO_ROOT, 'package.json'), 'utf8'),
   );
-  const qwikPort = String(MOCK_API_PORT.qwik);
+  const qwikMockApiBase = `localhost:${MOCK_API_PORT.qwik}`;
 
   it.each(QWIK_PORT_BAKING_SCRIPTS)(
-    'root script %s pins MOCK_API_PORT.qwik literal',
+    'root script %s pins localhost:MOCK_API_PORT.qwik literal',
     (scriptName) => {
-      expect(rootPkg.scripts[scriptName]).toContain(qwikPort);
+      expect(rootPkg.scripts[scriptName]).toContain(qwikMockApiBase);
     },
   );
 });
