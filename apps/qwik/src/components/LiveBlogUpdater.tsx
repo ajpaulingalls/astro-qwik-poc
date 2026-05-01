@@ -3,6 +3,7 @@ import {
   createPollLoop,
   LIVEBLOG_POLL_INTERVAL_MS,
   MAX_CONSECUTIVE_EMPTY_POLLS,
+  POLL_DONE,
   resolvePollIntervalMs,
   type LiveBlogChildrenIds,
   type LiveBlogUpdate,
@@ -24,12 +25,27 @@ const POLL_INTERVAL_MS = resolvePollIntervalMs(
 // failure surfaces in the console. The poll site has no UI consumer for a
 // degraded marker today; loadLiveBlogData (Astro side) carries the marker
 // on the SSR path where the route is a credible UI consumer.
+//
+// Returns POLL_DONE when the upstream signals end-of-blog: shell === null
+// (deleted / no_posts_found) or shell.isLive === false (concluded). The
+// tick callsite forwards POLL_DONE to createPollLoop which clears the
+// interval immediately, sparing ~10 minutes of wasted polling that the
+// max-consecutive-empty safety net would otherwise take to notice.
+//
+// Returns `[]` (NOT POLL_DONE) when the blog is still live but no new ids
+// arrived this cycle — that's a transient empty: more updates may arrive
+// next cycle, so the loop should keep polling and only stop after
+// MAX_CONSECUTIVE_EMPTY_POLLS consecutive empties (the safety net).
 export async function fetchPollUpdate(
   slug: string,
   currentIds: LiveBlogChildrenIds,
-): Promise<LiveBlogUpdate[]> {
+): Promise<LiveBlogUpdate[] | typeof POLL_DONE> {
   const shell = await fetchLiveBlogShell(slug);
-  if (shell === null) return [];
+  // End-of-blog: shell deleted (null from 404 / no_posts_found) OR editors
+  // flipped isLive false (concluded). Mirrors the Astro twin's inline check
+  // (apps/astro/src/components/LiveBlogUpdater.tsx); extract to shared-types
+  // if a third caller appears (rule of three).
+  if (shell === null || shell.isLive === false) return POLL_DONE;
   const known = new Set(currentIds);
   const newIds = shell.children.filter((id) => !known.has(id));
   if (newIds.length === 0) return [];
@@ -89,6 +105,7 @@ export const LiveBlogUpdater = component$<Props>(({ slug, initialChildIds }) => 
           const polledIds = newEntries.value.map((e) => Number(e.id));
           const known = [...polledIds, ...initialChildIds];
           const fresh = await fetchPollUpdate(slug, known);
+          if (fresh === POLL_DONE) return POLL_DONE;
           return fresh.length === 0 ? null : fresh;
         },
         onResult: (fresh) => {

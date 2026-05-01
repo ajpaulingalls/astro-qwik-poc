@@ -35,8 +35,21 @@ import {
   type PollLoopOptions,
   MAX_CONSECUTIVE_EMPTY_POLLS,
   LIVEBLOG_POLL_INTERVAL_MS,
+  POLL_DONE,
   resolvePollIntervalMs,
 } from '@aje-poc/shared-types';
+
+// Narrows fetchPollUpdate's discriminated return for tests that expect
+// entries (not the POLL_DONE end-of-blog signal). Failure message names
+// the expectation explicitly so a regression that flips a still-live
+// shell to POLL_DONE points at the right symptom.
+function assertEntries(
+  result: LiveBlogUpdate[] | typeof POLL_DONE,
+): asserts result is LiveBlogUpdate[] {
+  if (result === POLL_DONE) {
+    throw new Error('expected LiveBlogUpdate[], got POLL_DONE end-of-blog signal');
+  }
+}
 
 function makeUpdate(id: string, title: string): LiveBlogUpdate {
   return {
@@ -97,6 +110,7 @@ describe('fetchPollUpdate', () => {
       isAmp: false,
     });
 
+    assertEntries(newEntries);
     expect(newEntries.map((e) => e.id)).toEqual(['4514963', '4514943']);
   });
 
@@ -118,17 +132,28 @@ describe('fetchPollUpdate', () => {
     ]);
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const newEntries = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
+    assertEntries(newEntries);
     expect(newEntries.map((e) => e.id)).toEqual(['4514943']);
     // 404 is intentional (no_posts_found) — must NOT log.
     expect(errSpy).not.toHaveBeenCalled();
     errSpy.mockRestore();
   });
 
-  it('returns [] when shell payload is null (production no_posts_found)', async () => {
+  it('returns POLL_DONE when shell is null (deleted blog / no_posts_found — fast-stop signal)', async () => {
     mock = mockFetchSequence([{ body: { data: { article: null } } }]);
-    const newEntries = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
+    const result = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
     expect(mock.calls).toHaveLength(1);
-    expect(newEntries).toEqual([]);
+    expect(result).toBe(POLL_DONE);
+  });
+
+  it('returns POLL_DONE when shell.isLive is false (definitive end of blog — fast-stop signal)', async () => {
+    mock = mockFetchSequence([
+      { body: { data: { article: { ...SHELL_WITH_TWO_NEW.data.article, isLive: false } } } },
+    ]);
+    const result = await fetchPollUpdate('iran-war-live', [4514963, 4514943, 4512107]);
+    // No per-update fetches: ended state short-circuits before the diff.
+    expect(mock.calls).toHaveLength(1);
+    expect(result).toBe(POLL_DONE);
   });
 
   it('drops per-update results whose payload is null (no_posts_found per id)', async () => {
@@ -138,6 +163,7 @@ describe('fetchPollUpdate', () => {
       { body: { data: { posts: makeUpdate('4514943', 'Survived') } } },
     ]);
     const newEntries = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
+    assertEntries(newEntries);
     expect(newEntries.map((e) => e.id)).toEqual(['4514943']);
   });
 
@@ -151,6 +177,7 @@ describe('fetchPollUpdate', () => {
 
     const newEntries = await fetchPollUpdate('iran-war-live', [4512107, 4512099, 4512131]);
 
+    assertEntries(newEntries);
     expect(newEntries.map((e) => e.id)).toEqual(['4514963']);
     expect(errSpy).toHaveBeenCalledWith(
       'liveblog-updater: per-update fetch failed:',
@@ -230,5 +257,31 @@ describe('LiveBlogUpdater createPollLoop wiring', () => {
     opts.onError!(new Error('boom'));
     expect(errSpy).toHaveBeenCalledWith('liveblog-updater: poll tick failed:', expect.any(Error));
     errSpy.mockRestore();
+  });
+
+  // Integration evidence for the POLL_DONE fast-stop path. createDOM doesn't
+  // bootstrap qwikLoader (SMM risk d2dcc5b0900f) so we can't observe a real
+  // setInterval cycle, but we capture the tick options arg via vi.mock above
+  // and invoke tick() directly with a mocked ended shell. Returning POLL_DONE
+  // here is what wires through createPollLoop's fast-stop branch — symmetric
+  // to the Astro twin's component-level integration test.
+  it('tick returns POLL_DONE when the shell signals isLive:false (fast-stop wire-up)', async () => {
+    const { render } = await createDOM();
+    await render(<LiveBlogUpdater slug="iran-war-live" initialChildIds={[4514963, 4514943]} />);
+
+    const calls = createPollLoopMock.mock.calls as unknown as Array<
+      [PollLoopOptions<LiveBlogUpdate[]>]
+    >;
+    const opts = calls[0]![0];
+
+    // Re-stub fetch on top of beforeEach's null-shell stub: this run returns
+    // a populated shell with isLive:false, the runtime end-of-blog signal.
+    mock?.restore();
+    mock = mockFetchOnce({
+      body: { data: { article: { ...SHELL_WITH_TWO_NEW.data.article, isLive: false } } },
+    });
+
+    const result = await opts.tick();
+    expect(result).toBe(POLL_DONE);
   });
 });
