@@ -72,7 +72,39 @@ Astro LH-Perf p95 cells (100 across all page-rows) come from `packages/perf-harn
 
 **LH-Perf observations.** Astro median and p95 LH-Perf is 100 on every page-row, meeting the stretch ≥ 98 budget. Qwik median LH-Perf range is 83–93 across the 5 page-rows; Qwik p95 LH-Perf range is 86–95. Qwik does not meet the stretch ≥ 98 LH-Perf budget on any page-row at median or at p95; Qwik's LH-Perf gate runs against the documented `QWIK_LH_PERF_FLOOR=80` per-target relaxation explained in §1.7.
 
-_§1.4–§1.7 follow in subsequent commits._
+### 1.4 JS bundle sizes
+
+Transferred-script bytes (gzipped) per page-row, both apps. Numbers transcribed verbatim from `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` (`jsBytes` column). Per-page anchors are defined in `packages/perf-harness/cli_helpers.ts` and used by the budget gate per SMM constraint `69a5e26f118f`.
+
+| page-row      | Astro jsBytes | Qwik jsBytes | Q − A delta (bytes) | Source                                                           |
+| ------------- | ------------- | ------------ | ------------------- | ---------------------------------------------------------------- |
+| index         | 13,917        | 176,237      | +162,320            | `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` |
+| article       | 13,917        | 176,237      | +162,320            | same                                                             |
+| section-geo   | 16,079        | 176,237      | +160,158            | same                                                             |
+| section-topic | 16,079        | 176,237      | +160,158            | same                                                             |
+| liveblog      | 16,951        | 182,038      | +165,087            | same                                                             |
+
+**Per-page anchors (gate thresholds).** Astro Article 30 KB / Liveblog 17 KB; Qwik Homepage 176 KB / Article 184 KB / Liveblog 184 KB / sections 176 KB (source: `packages/perf-harness/cli_helpers.ts` per `RUN_NOTES.md § Acceptance budgets in force`). Every measurement above lands under its anchor (M-12 sign-off row 3, source: `docs/M12_VALIDATION.md § Sign-off table`).
+
+**Framework-floor characterization.** All Qwik page-rows include the ~136 KB irreducible Qwik 2 beta runtime (~102 KB Qwik core + ~12 KB router + zod + ~7 KB router internals + ~5 KB qwikLoader + ~5 KB preloader + ~5.5 KB web-vitals) per `apps/qwik/docs/QWIK2_NOTES.md § M12 Consolidated Audit > Framework-floor characterization`. The Q − A delta column is dominated by this floor on every page-row; the chunk-inventory deep dive lives in §5 (story-004).
+
+### 1.5 SSR throughput
+
+Server-side rendering throughput per page-row, both apps. Run parameters: `--duration=10s --concurrency=4` per (target, page) invocation, 10 invocations total (5 page-rows × 2 apps), no errors across 31,197 total requests. Numbers transcribed verbatim from `packages/perf-harness/reports/RUN_NOTES.md § SSR throughput`.
+
+| page-row      | Astro req/s | Qwik req/s | Q − A delta (req/s) | Astro p95 latency (ms) | Qwik p95 latency (ms) | Source                                                        |
+| ------------- | ----------- | ---------- | ------------------- | ---------------------- | --------------------- | ------------------------------------------------------------- |
+| index         | 160.3       | 65.2       | −95.1               | 34                     | 70                    | `packages/perf-harness/reports/RUN_NOTES.md § SSR throughput` |
+| article       | 248.4       | 162.9      | −85.5               | 22                     | 33                    | same                                                          |
+| section-geo   | 487.3       | 596.9      | +109.6              | 11                     | 8                     | same                                                          |
+| section-topic | 278.6       | 219.4      | −59.2               | 19                     | 24                    | same                                                          |
+| liveblog      | 461.3       | 436.4      | −24.9               | 11                     | 12                    | same                                                          |
+
+**Acceptance bar.** Per-page acceptance is `req/s ≥ 50` (source: `RUN_NOTES.md § SSR throughput`). Lowest measurement is `qwik / index` at 65.2 req/s — every page-row clears the bar (M-12 sign-off row 4, source: `docs/M12_VALIDATION.md § Sign-off table`).
+
+**Throughput-skew note.** The aggregate row-by-row deltas (Q − A) range from −95.1 req/s on `index` to +109.6 req/s on `section-geo`. RUN_NOTES.md attributes the skew to per-page SSR work — larger pages (article, index) do more work per request, lowering req/s; smaller pages (sections, liveblog) churn faster (source: `RUN_NOTES.md § SSR throughput`, paragraph after the table).
+
+_§1.6–§1.7 follow in subsequent commits._
 
 ## 2. Developer Experience
 
