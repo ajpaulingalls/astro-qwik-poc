@@ -14,9 +14,20 @@ import {
   LIVEBLOG_SLUG as SLUG,
   MAX_CONSECUTIVE_EMPTY_POLLS,
   POLL_DONE,
+  resolvePollIntervalMs,
 } from '@aje-poc/shared-types';
 import type { LiveBlogUpdate } from '@aje-poc/shared-types';
 import { LiveBlogUpdater, fetchPollUpdate } from './LiveBlogUpdater';
+
+// Mirror the cadence the component resolves at module load — the PoC test
+// command bakes PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500, so test cadence must
+// match component cadence or fake-timer advances overshoot by 60×.
+// (Same fix applied to BreakingTicker.test.tsx; both components share the
+// PUBLIC_LIVEBLOG_POLL_INTERVAL_MS env knob.)
+const POLL_INTERVAL_MS = resolvePollIntervalMs(
+  import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
+  LIVEBLOG_POLL_INTERVAL_MS,
+);
 
 // Narrows fetchPollUpdate's discriminated return for tests that expect
 // entries (not the POLL_DONE end-of-blog signal). Failure message names the
@@ -200,10 +211,10 @@ describe('LiveBlogUpdater', () => {
     globalThis.fetch = fetchSpy as unknown as typeof fetch;
     try {
       render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001]} />);
-      await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+      await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       // Tick 2 fires while the prior fetch is still pending — guard skips it.
-      await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+      await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
       expect(fetchSpy).toHaveBeenCalledTimes(1);
       // Resolve tick 1's fetch and await it explicitly so the awaiter chain
       // (response.json → fetchPollUpdate → finally{} clearing pollingRef)
@@ -211,7 +222,7 @@ describe('LiveBlogUpdater', () => {
       // tolerate any extra microtask the chain might add later.
       pendingResolve!(new Response(JSON.stringify(shellResponse([4001]).body), { status: 200 }));
       await pendingFetch;
-      await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+      await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
       await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(2));
     } finally {
       globalThis.fetch = originalFetch;
@@ -228,7 +239,7 @@ describe('LiveBlogUpdater', () => {
     render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001, 4002]} />);
 
     for (let i = 0; i < MAX_CONSECUTIVE_EMPTY_POLLS; i++) {
-      await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+      await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
     }
     // All N empty polls fired (one shell fetch each).
     await waitFor(() => expect(mock.calls.length).toBe(MAX_CONSECUTIVE_EMPTY_POLLS));
@@ -236,7 +247,7 @@ describe('LiveBlogUpdater', () => {
     const callsAtThreshold = mock.calls.length;
     // Past the threshold: interval should be cleared. Two more cadences must
     // not produce additional shell fetches.
-    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS * 2);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2);
     expect(mock.calls.length).toBe(callsAtThreshold);
   });
 
@@ -248,10 +259,10 @@ describe('LiveBlogUpdater', () => {
     mock = mockFetchSequence([endedShell]);
     vi.spyOn(console, 'info').mockImplementation(() => {});
     render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001, 4002]} />);
-    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
     await waitFor(() => expect(mock.calls.length).toBe(1));
     // Five more cadences — interval should be cleared, no new fetches.
-    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS * 5);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 5);
     expect(mock.calls.length).toBe(1);
   });
 
@@ -269,11 +280,11 @@ describe('LiveBlogUpdater', () => {
     const region = container.querySelector('section[data-live-blog-updater]')!;
     expect(region.children.length).toBe(0);
 
-    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
     await waitFor(() => expect(region.children.length).toBe(1));
     expect(region.querySelector('[data-entry-id="4099"]')).not.toBeNull();
 
-    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
     await waitFor(() => expect(region.children.length).toBe(2));
     // Newest first
     expect(region.children[0]!.getAttribute('data-entry-id')).toBe('4100');
