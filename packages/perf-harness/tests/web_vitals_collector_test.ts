@@ -195,6 +195,41 @@ describe('collectWebVitals', () => {
     expect(result.cspViolations).toEqual([synthetic1, synthetic2]);
   });
 
+  it('truncates CSP violation sample to 64 chars to bound report leakage', async () => {
+    // Inline-script CSP violations carry up to ~40 chars of source in e.sample;
+    // a future script-src violation could land that snippet in committed
+    // reports/*.json. Bound it Node-side so the truncation is enforced even if
+    // a future page-side change forgets to clamp.
+    const longSample = 'x'.repeat(200);
+    const synthetic: SerializedCspViolation = {
+      violatedDirective: "script-src 'self'",
+      effectiveDirective: 'script-src',
+      blockedURI: '',
+      disposition: 'enforce',
+      documentURI: 'http://localhost:8080/',
+      sourceFile: 'http://localhost:8080/',
+      lineNumber: 1,
+      columnNumber: 1,
+      sample: longSample,
+    };
+    let capturedHandler: ((v: SerializedCspViolation) => void) | undefined;
+    pageMock.exposeFunction.mockImplementation((_name: string, handler: unknown) => {
+      capturedHandler = handler as (v: SerializedCspViolation) => void;
+      return Promise.resolve();
+    });
+    pageMock.evaluateOnNewDocument.mockImplementation(() => {
+      capturedHandler!(synthetic);
+      return Promise.resolve();
+    });
+    pageMock.evaluate.mockResolvedValueOnce([]);
+
+    const result = await collectWebVitals('http://localhost:8080/', 9876);
+
+    expect(result.cspViolations).toHaveLength(1);
+    expect(result.cspViolations[0].sample).toHaveLength(64);
+    expect(result.cspViolations[0].sample).toBe('x'.repeat(64));
+  });
+
   it('attaches the CSP listener BEFORE goto so first-paint violations are caught', async () => {
     // Pin the call order: exposeFunction → evaluateOnNewDocument → goto.
     // If the collector ever moves goto ahead of evaluateOnNewDocument,
