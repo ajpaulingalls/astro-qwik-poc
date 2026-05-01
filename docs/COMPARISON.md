@@ -333,11 +333,11 @@ Astro 6's Deno SSR adapter lets the principle of least privilege apply at reques
 
 **Final `--allow` flag set** (sealed at sprint-012 story-004; consumed by both `packages/perf-harness/spawn.ts` and `scripts/demo-launch-astro.ts`):
 
-| Flag                           | Value                                                                        | Source                                                                                                          |
-| ------------------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `--allow-net=<derived>`        | `0.0.0.0:8080,${apiBaseHost}:${apiBasePort}` derived from `PUBLIC_API_BASE`  | `packages/perf-harness/spawn.ts:75` (`deriveAllowNet`); `:92` (`buildAstroDenoArgv`); SECURITY.md M11 follow-up |
-| `--allow-read=apps/astro/dist` | bundle directory only — no source, no config, no traversal vector            | `packages/perf-harness/spawn.ts:92`                                                                             |
-| `--allow-env=<11 vars>`        | `ASTRO_ALLOWED_ENV` — audited whitelist with per-variable rationale comments | `packages/perf-harness/spawn.ts:57` (constant); SECURITY.md M12 audit lists the 11 vars with per-var purpose    |
+| Flag                           | Value                                                                        | Source                                                                                                                                                                                      |
+| ------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--allow-net=<derived>`        | `0.0.0.0:8080,${apiBaseHost}:${apiBasePort}` derived from `PUBLIC_API_BASE`  | `packages/perf-harness/spawn.ts:75` (`deriveAllowNet`); `:92` (`buildAstroDenoArgv`); SECURITY.md M11 follow-up                                                                             |
+| `--allow-read=apps/astro/dist` | bundle directory only — no source, no config, no traversal vector            | `packages/perf-harness/spawn.ts:92`                                                                                                                                                         |
+| `--allow-env=<11 vars>`        | `ASTRO_ALLOWED_ENV` — audited whitelist with per-variable rationale comments | `packages/perf-harness/spawn.ts:57-69` (constant + per-var rationale comments); SECURITY.md M12 audit summarizes the 11 vars in one row and redirects to spawn.ts for the per-var rationale |
 
 **Why `-A` rejected:** `-A` (allow-all) would defeat the principle of least privilege — would grant the SSR process unconstrained access to every network interface, the entire filesystem, and every env var in the parent process (including operator-set secrets). Source: `apps/astro/docs/SECURITY.md § M12 Audit > Deno --allow audit > Why -A is rejected`.
 
