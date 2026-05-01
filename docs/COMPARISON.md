@@ -359,7 +359,75 @@ Astro 6 inherits Vite's `import.meta.env.PUBLIC_*` substitution — env vars pre
 
 ## 5. Qwik 2 beta deep dive
 
-_To be written by sprint-013 story-004._
+§5 captures the Qwik 2 beta.32 PoC findings that don't belong in the per-page perf tables (§1) or the cross-app architecture comparison (§3): which beta APIs the PoC actually used, the five beta-specific blockers it routed around, the irreducible ~136 KB framework runtime, and which findings get re-evaluated when Qwik 2 stable ships. The audit source of truth is `apps/qwik/docs/QWIK2_NOTES.md`; this section names what shipped and cites back to that audit for the bisect histories and call-site rationale.
+
+### 5.1 Qwik 2 APIs in use
+
+The PoC ships against `@qwik.dev/core ~2.0.0-beta.32` and `@qwik.dev/router 2.0.0-beta.32` (pin rationale: `apps/qwik/CLAUDE.md § Qwik-specific decisions`). The non-trivial beta APIs the app depends on:
+
+| API                                                | Where used                                                            | Why this API                                                                                             | Source                                                                                       |
+| -------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `useSerializer$` / `createSerializer$`             | `@qwik.dev/core/public.d.ts:125`                                      | Loaders are no longer serialized to the client by default in v2; opt in for client-resumable data        | `apps/qwik/docs/ARCHITECTURE.md § Qwik 2 platform features in use` (line 64)                 |
+| `useOnDocument('qvisible', $())`                   | embed components, `LivestreamPlayer.tsx`                              | Cross-island document-level listeners; QRL lazy-loads the handler off the visible-task chunk             | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > APIs confirmed present` (line 128)         |
+| `useVisibleTask$`                                  | web-vitals shim, live-blog/breaking-ticker polling                    | Once-on-visibility client init; suppressed `eslint-plugin-qwik/no-use-visible-task` for legitimate uses  | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Divergences` item 6 (line 121)             |
+| `useQwikRouter()` (replaces `<QwikCityProvider>`)  | `apps/qwik/src/root.tsx`                                              | Provider component is `@deprecated … removed in v3`; hook-form is the v2 pattern                         | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Divergences` item 1 (line 116)             |
+| `qwikRouter` vite plugin (renamed from `qwikCity`) | `apps/qwik/vite.config.ts`                                            | `qwikCity` is a deprecated alias scheduled for v3 removal                                                | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Divergences` item 2 (line 117)             |
+| `fetchPriority` JSX prop (camelCase only)          | LCP-critical `<img>`s                                                 | Qwik 2 beta typed only the camelCase form — lowercase `fetchpriority` would compile as untyped attribute | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > APIs confirmed present` (line 129)         |
+| Plain-function leaf components                     | `HeroCard`, `MostPopular`, `CuratedCollection`, `Footer`, `LiveBadge` | Convention: stateless leaves skip `component$` to avoid the per-call-site QRL boundary + chunk overhead  | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Leaf component convention` (lines 131-133) |
+
+### 5.2 Beta blockers
+
+Five beta-specific workarounds shipped during the PoC. None are app bugs; each is a missing or broken feature in the installed beta that the PoC routed around. Source landing site for all five: `apps/qwik/docs/QWIK2_NOTES.md § M12 Consolidated Audit > Beta blockers landed` (lines 9-18).
+
+| #   | Blocker                     | What broke                                                                                                                                                | Workaround                                                                                                                                                                                                                     | Workaround call site                                                                                      | Detail source                                                                                                                                    |
+| --- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Vite 7 pin                  | Vite 8 (current `latest`) ships rolldown; Qwik router SSR pass crashes at module collection (`Cannot read properties of undefined (reading 'concat')`)    | Pin `vite ^7.3.2` until rolldown shape change in `@qwik.dev/router/lib/vite/index.mjs` `collectServerFnModuleIds` is reconciled                                                                                                | `apps/qwik/package.json:35`                                                                               | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Vite version pin — beta blocker` (lines 140-143)                                               |
+| 2   | `allowStale` missing        | Architecture doc references `allowStale` for breaking-ticker / live-blog polling; beta.32 only exposes `serializationStrategy` (controls send, not stale) | Manual `setInterval` inside `useVisibleTask$` (`// allowStale … does not exist in beta.32` rationale comment lives above each call site)                                                                                       | `apps/qwik/src/components/LiveBlogUpdater.tsx:84`, `apps/qwik/src/components/BreakingTicker.tsx:28`       | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Divergences` item 3 (line 118) + `§ sprint-009 live-blog polling`                              |
+| 3   | `useVisibleTask$` test-hang | `createDOM()` does not bootstrap qwikLoader, so `useVisibleTask$` registers but never settles in unit tests (5s timeout, no DOM output)                   | Switch cross-island bootstrap to `useOnDocument('qvisible', $(...))`; component-level tests verify markup only, side-effect verification deferred to e2e                                                                       | `apps/qwik/src/test-utils/dom.ts` (`getByHeading` helper covers the same hang for testing-library compat) | `apps/qwik/docs/QWIK2_NOTES.md § sprint-007 > Beta friction encountered` items 1 + 3 (lines 91-98)                                               |
+| 4   | CSP `'unsafe-inline'`       | Qwik 2 beta has no auto-hash equivalent to Astro's `scriptDirective`/`styleDirective`; without `'unsafe-inline'` styleSheets empty + qwikLoader throws    | `buildQwikCsp` allows `'unsafe-inline'` on both `script-src` and `style-src` (security-vs-functionality trade documented as PoC headline finding for §3 / §7 / §8)                                                             | `packages/shared-csp/index.ts:104-115`                                                                    | `apps/qwik/docs/QWIK2_NOTES.md § story-008 — CSP 'unsafe-inline' requirement` (lines 77-83)                                                      |
+| 5   | Leaf-component convention   | `component$` wrapper introduces a Qrl serialization boundary + separate chunk per call site — pure overhead on stateless leaves against the JS budget     | Convention: stateless leaves (no signals, no `$()`-wrapped handlers, no `Slot`) use plain functions, not `component$` (exception: leaves rendered over reactive signal maps keep `component$` to preserve the reactive append) | `apps/qwik/src/components/{HeroCard,MostPopular,CuratedCollection,Footer,LiveBadge}.tsx`                  | `apps/qwik/docs/QWIK2_NOTES.md § M3 scaffolding > Leaf component convention` (lines 131-133) + `§ sprint-009 > What landed` item 2 (lines 51-54) |
+
+### 5.3 Framework-floor cost (~136 KB)
+
+The story-009 chunk-inventory bisect (homepage `156 → 171 KB` between sprint-006 and post-sprint-008) attributed every byte of the +15 KB regression to framework + router growth across the beta line — no reversible app-code culprit was found. The same bisect named the irreducible Qwik 2 beta.32 runtime cost:
+
+| Chunk            | Size        | Role                                                        |
+| ---------------- | ----------- | ----------------------------------------------------------- |
+| `q-CqNq4nJT.js`  | ~102 KB     | Qwik core (resumability runtime, signal/task primitives)    |
+| router + zod     | ~12 KB      | `@qwik.dev/router` user-surface API + zod (form validation) |
+| router internals | ~7.4 KB     | server-fn collection, route-loader plumbing                 |
+| `qwikLoader`     | ~4.9 KB     | qvisible/qinit/qclick listener bootstrap                    |
+| preloader        | ~4.7 KB     | speculative chunk warmer                                    |
+| `web-vitals`     | ~5.5 KB     | LCP/INP/CLS measurement shim                                |
+| **Total**        | **~136 KB** | **framework cost before any app symbol**                    |
+
+Source: `apps/qwik/docs/QWIK2_NOTES.md § M12 Consolidated Audit > Framework-floor characterization` (lines 19-23, totals) and `§ sprint-009 > What landed (this session)` item 1 (lines 53-54, chunk inventory with hashed IDs).
+
+**Comparison anchor.** Qwik 1 stable (`qwik.dev`) ships the same `core` chunk at 54,680 B; Qwik 2 beta.32 measures 101,968 B — **+86% on the framework floor**. The growth is pre-stable: Qwik 2's size-optimization pass is unbuilt in beta. Source: same `Framework-floor characterization` block (line 23).
+
+**Budget consequence.** The Qwik per-page JS budgets in `packages/perf-harness/cli_helpers.ts` were revised twice against this framework cost (homepage `<155 KB → <165 KB → <175 KB`; article `<150 KB → <155 KB → <168 KB`). The n=10 sweep at sprint-012 confirmed every revised anchor still holds with 1.5–9.7% headroom (full table: `apps/qwik/docs/QWIK2_NOTES.md § M12 Consolidated Audit > Budgets at n=10`, lines 35-43). Framework cost (~136 KB) is ~75% of the homepage budget anchor (180,224 B); the leaf-component refactor (5.2 row 5) recovered −558 bytes / −4 chunks across four conversions — measured against the ~136 KB irreducible floor.
+
+### 5.4 LH-Perf floor relaxation (cross-reference)
+
+The full numeric breakdown of Qwik LH-Perf vs the stretch ≥98 budget — per-page n=10 medians and p95s, the `QWIK_LH_PERF_FLOOR = 80` calibration, and the SMM constraint `d77dd7b4007e` ("Stretch INP<=100ms applies to all targets; on miss accept honest failure or land per-target relaxation with measured numbers — never silently raise") — already lives at §1.7. §5 adds the bisect-history angle that §1.7 cross-references:
+
+The qwik/index 5-run median **dropped from 85 to 81** between sprint-008 and sprint-009 closes despite **no homepage code changes**, attributable to framework-runtime drift in the beta line (sprint-009 split the `lhPerf` gate per-target at 85, then lowered the floor to 80 at sprint-009 capstone). Source: `apps/qwik/docs/QWIK2_NOTES.md § M12 Consolidated Audit > LH-Perf floor relaxation rationale` (lines 25-29) and `§ sprint-009 > What landed` item 4 (line 56).
+
+### 5.5 Re-evaluate at Qwik 2 stable
+
+Two classes of finding, per `apps/qwik/docs/QWIK2_NOTES.md § M12 Consolidated Audit > LH-Perf floor relaxation rationale` (line 29 — "Re-evaluate when Qwik 2 stable ships its size-optimization pass") and `§ sprint-009 > What landed` (line 56 — "Re-evaluate when Qwik 2 stable ships"):
+
+| Finding                              | Class          | What re-evaluates                                                                                                    |
+| ------------------------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Vite 7 pin (5.2 #1)                  | Re-evaluate    | Test on each beta bump; fixed once `collectServerFnModuleIds` reconciles with rolldown's `ModuleInfo` shape          |
+| `allowStale` missing (5.2 #2)        | Re-evaluate    | Drop the manual `setInterval` workaround if `allowStale` lands on `routeLoader$` / `AsyncSignal`                     |
+| `useVisibleTask$` test-hang (5.2 #3) | Re-evaluate    | If qwikLoader bootstraps in `createDOM()`, cross-island side-effects become unit-testable                            |
+| Framework-floor regression (5.3)     | Re-evaluate    | Re-measure chunk inventory + revisit per-page JS budgets in `cli_helpers.ts`                                         |
+| LH-Perf 80 floor (5.4 / §1.7)        | Re-evaluate    | Re-measure n=10 LH-Perf and reconsider whether the floor stays at 80 or returns to the stretch ≥98                   |
+| CSP `'unsafe-inline'` (5.2 #4)       | Likely persist | Strategic security-vs-functionality choice for Qwik 2's resumability container until an auto-hash story ships        |
+| Leaf-component convention (5.2 #5)   | Likely persist | Pattern characterizes the QRL/serialization boundary cost, not a beta bug — reaffirm at stable, don't expect to drop |
+
+The Qwik production-readiness recommendation in §7 / §8 is conditioned on the "re-evaluate" rows landing in Qwik 2 stable; the "likely persist" rows remain inputs to the verdict regardless of stable-ship status.
 
 ## 6. Ecosystem
 
