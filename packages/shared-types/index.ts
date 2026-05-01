@@ -140,12 +140,20 @@ export const LIVEBLOG_PATH_PREFIX = '/news/liveblog/';
 // quiet period) doesn't trip it, short enough to bound waste after deletion.
 export const MAX_CONSECUTIVE_EMPTY_POLLS = 20;
 
+// Sentinel return value from PollLoopOptions.tick that signals "definitive
+// end — stop the loop on this cycle, don't wait through maxConsecutiveEmpty
+// or call onResult/onEmpty." Used for upstream-deletion / blog-ended cases
+// where further polling is provably wasteful (vs `null` which is "no new
+// data this cycle, more may come").
+export const POLL_DONE = 'done' as const;
+
 export interface PollLoopOptions<T> {
   // Returns the polled value, or `null` if "empty" (no new entries / no
   // active banner). Empty results increment the consecutive-empty counter;
   // throwing also counts as empty per the deletion-guard intent (perpetual
-  // 5xx is also a signal to stop).
-  tick: () => Promise<T | null>;
+  // 5xx is also a signal to stop). POLL_DONE is the fast-stop sentinel —
+  // see its export comment.
+  tick: () => Promise<T | null | typeof POLL_DONE>;
   // Called with the polled value when tick returns non-null. Reset point
   // for the consecutive-empty counter.
   onResult: (value: T) => void;
@@ -199,6 +207,16 @@ export function createPollLoop<T>(opts: PollLoopOptions<T>): { stop: () => void 
     polling = true;
     try {
       const value = await opts.tick();
+      // POLL_DONE check before the null check so a future T that allows
+      // null somewhere in its domain doesn't get misrouted. T must NOT
+      // include the literal `'done'` (POLL_DONE's runtime value), or this
+      // discriminator collapses; the type union enforces this at consumer
+      // callsites.
+      if (value === POLL_DONE) {
+        console.info(`${opts.label}: stopping poll on POLL_DONE signal`);
+        stop();
+        return;
+      }
       if (value === null) {
         opts.onEmpty?.();
         recordEmpty();
