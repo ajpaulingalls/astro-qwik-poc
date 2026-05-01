@@ -1,0 +1,19 @@
+/* Orange numerals for ranked lists — used by both apps' MostPopular component
+   so the digit weight/colour stays brand-consistent rather than relying on
+   the browser's native list-decimal marker. */
+.most-popular-list {
+  counter-reset: most-popular;
+}
+.most-popular-list > li {
+  counter-increment: most-popular;
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+.most-popular-list > li::before {
+  content: counter(most-popular);
+  color: var(--color-aj-orange);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

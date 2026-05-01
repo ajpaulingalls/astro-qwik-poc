@@ -42,4 +42,11 @@ describe('MostPopular', () => {
     expect(container.querySelector('section')).toBeNull();
     expect(container.querySelector('ol')).toBeNull();
   });
+
+  it('uses a custom counter (no native list-decimal markers, items separated)', () => {
+    const { container } = render(<MostPopular items={items} />);
+    const ol = container.querySelector('ol')!;
+    expect(ol.className).toContain('list-none');
+    expect(ol.className).toContain('divide-y');
+  });
 });
