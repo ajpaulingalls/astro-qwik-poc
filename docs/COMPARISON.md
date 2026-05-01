@@ -38,7 +38,41 @@ All numbers in §1 come from the n=10 measurement matrix that landed in sprint-0
 
 The stretch column is the acceptance bar per SMM constraint `9cc47cf13aba`. The hard-floor column is the failure threshold below which a milestone fails outright. Qwik's LH-Perf floor relaxation is the only documented per-target deviation (§1.7).
 
-_§1.3–§1.7 follow in subsequent commits._
+### 1.3 Core Web Vitals
+
+Comparison view: rows per page-row, columns per app. Astro number first, Qwik number second (`A / Q`). Numbers transcribed verbatim from `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` (sprint-012 story-003 + story-004 n=10 sweep).
+
+#### 1.3.1 Medians (n=10)
+
+| page-row      | LH-Perf (A / Q) | CLS (A / Q) | LCP real ms (A / Q) | INP real ms (A / Q) | Source                                                           |
+| ------------- | --------------- | ----------- | ------------------- | ------------------- | ---------------------------------------------------------------- |
+| index         | 100 / 83        | 0 / 0       | 76 / 100            | 16 / 16             | `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` |
+| article       | 100 / 88.5      | 0 / 0       | 52 / 58             | 16 / 16             | same                                                             |
+| section-geo   | 100 / 92        | 0 / 0       | 50 / 48             | 16 / 16             | same                                                             |
+| section-topic | 100 / 93        | 0 / 0       | 50 / 48             | 16 / 16             | same                                                             |
+| liveblog      | 100 / 91        | 0 / 0       | 46 / 48             | 16 / 16             | same                                                             |
+
+#### 1.3.2 p95 (n=10)
+
+| page-row      | LH-Perf p95 (A / Q) | CLS p95 (A / Q) | LCP real ms p95 (A / Q) | INP real ms p95 (A / Q) | Source                                                                            |
+| ------------- | ------------------- | --------------- | ----------------------- | ----------------------- | --------------------------------------------------------------------------------- |
+| index         | 100 / 86            | 0 / 0           | 88 / 108                | 24 / 24                 | `packages/perf-harness/reports/RUN_NOTES.md § Measured outcomes` + per-page JSONs |
+| article       | 100 / 90.55         | 0 / 0           | 56 / 64                 | 20 / 24                 | same                                                                              |
+| section-geo   | 100 / 95            | 0 / 0           | 56 / 56                 | 24 / 16                 | same                                                                              |
+| section-topic | 100 / 94.55         | 0 / 0           | 56 / 56                 | 16 / 20                 | same                                                                              |
+| liveblog      | 100 / 92.55         | 0 / 0           | 56 / 58                 | 16 / 20                 | same                                                                              |
+
+Astro LH-Perf p95 cells (100 across all page-rows) come from `packages/perf-harness/reports/astro-{page}.json:metrics.lhPerf.p95` (the RUN_NOTES.md aggregate table shows median only).
+
+**CLS observations.** Both apps land CLS = 0 at median and p95 across all 5 page-rows; both are at the stretch ≤ 0.05 budget with 0.05 of headroom (source: §1.3.1, §1.3.2 above; stretch budget per §1.2).
+
+**Real-browser LCP observations.** Astro real-LCP medians range 46–76 ms across page-rows; Qwik real-LCP medians range 48–100 ms (source: §1.3.1). Both apps clear the stretch ≤ 1500 ms budget by more than an order of magnitude on every page-row at median and at p95.
+
+**INP observations.** Both apps land 16 ms median INP on every page-row; p95 INP ranges 16–24 ms. Both clear the stretch ≤ 100 ms budget by ≥ 4× on every page-row at median.
+
+**LH-Perf observations.** Astro median and p95 LH-Perf is 100 on every page-row, meeting the stretch ≥ 98 budget. Qwik median LH-Perf range is 83–93 across the 5 page-rows; Qwik p95 LH-Perf range is 86–95. Qwik does not meet the stretch ≥ 98 LH-Perf budget on any page-row at median or at p95; Qwik's LH-Perf gate runs against the documented `QWIK_LH_PERF_FLOOR=80` per-target relaxation explained in §1.7.
+
+_§1.4–§1.7 follow in subsequent commits._
 
 ## 2. Developer Experience
 
