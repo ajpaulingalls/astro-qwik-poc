@@ -10,15 +10,16 @@ cheap. Cascade-size budgeting is also computed against `file_domain` —
 over-declaring weakens that gate.
 
 For three consecutive sprints, the agent has expanded `file_domain` mid-flight
-via an `assumption` event when a prior-concern cleanup forced an edit outside
-the declared set:
+when a prior-concern cleanup forced an edit outside the declared set
+(recorded as either an assumption or a decision event depending on which
+review caught the expansion):
 
-| Sprint | Assumption event | What got carved in                                  |
-| ------ | ---------------- | --------------------------------------------------- |
-| 011    | `86a2ec1903ae`   | cascade-budget precedent                            |
-| 012    | `98b9424726cc`   | throughput.ts JSDoc + test (concern `da9c2c3cfd0c`) |
-| 012    | `2168fdbbf01b`   | CSP collector files for story-004                   |
-| 012    | `25649b465732`   | embed sanitizer files for story-004                 |
+| Sprint | SMM event                   | What got carved in                                  |
+| ------ | --------------------------- | --------------------------------------------------- |
+| 011    | `86a2ec1903ae` (decision)   | reporter.ts (extract sortKeys+formatJson)           |
+| 012    | `98b9424726cc` (assumption) | throughput.ts JSDoc + test (concern `da9c2c3cfd0c`) |
+| 012    | `2168fdbbf01b` (assumption) | CSP collector files for story-004                   |
+| 012    | `25649b465732` (assumption) | embed sanitizer files for story-004                 |
 
 Three sprints of the same expansion pattern means the **template is wrong**,
 not the agent.
@@ -60,6 +61,5 @@ rule isn't the right intervention.
 
 ## Related
 
-- Cascade-size budget: decision `86a2ec1903ae`
 - Original Try: `8f567b5121a4` (5th-carry as of sprint-013 kickoff)
-- Prior expansion concerns: `da9c2c3cfd0c`, `2168fdbbf01b`, `25649b465732`
+- Prior expansion events: see table above (1 decision + 3 assumptions across sprints 011–012)
