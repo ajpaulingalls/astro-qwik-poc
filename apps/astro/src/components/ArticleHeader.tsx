@@ -1,5 +1,6 @@
 import type { Article } from '@aje-poc/shared-types';
 import { formatDate } from '../lib/format-date';
+import { DISPLAY_HEADLINE_CLASS } from '../lib/typography';
 import { LeadImage } from './LeadImage';
 
 interface Props {
@@ -20,7 +21,7 @@ export function ArticleHeader({ article }: Props) {
           ))}
         </ul>
       )}
-      <h1 class="text-3xl font-bold leading-tight mb-3">{article.title}</h1>
+      <h1 class={`mb-3 ${DISPLAY_HEADLINE_CLASS}`}>{article.title}</h1>
       {article.subheading && (
         <p class="subheading text-lg text-neutral-700 mb-4">{article.subheading}</p>
       )}

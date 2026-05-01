@@ -33,6 +33,15 @@ describe('ArticleHeader', () => {
     expect(h1.tagName).toBe('H1');
   });
 
+  it('renders the h1 at the same display scale as the homepage hero (text-3xl/md:text-4xl, tight tracking + leading)', () => {
+    const { getByRole } = render(<ArticleHeader article={baseArticle} />);
+    const h1 = getByRole('heading', { level: 1 });
+    expect(h1.className).toContain('text-3xl');
+    expect(h1.className).toContain('md:text-4xl');
+    expect(h1.className).toContain('tracking-tight');
+    expect(h1.className).toContain('leading-[1.05]');
+  });
+
   it('renders the subheading when present', () => {
     const { container } = render(<ArticleHeader article={baseArticle} />);
     expect(container.textContent).toContain('Despite US sanctions waiver');
