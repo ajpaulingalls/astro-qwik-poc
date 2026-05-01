@@ -4,4 +4,4 @@
  * editorial display ratio.
  */
 export const DISPLAY_HEADLINE_CLASS =
-  'text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900';
+  'font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900';

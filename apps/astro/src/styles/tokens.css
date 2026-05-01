@@ -5,6 +5,7 @@
  * Tailwind 4 ships its default neutral palette — don't redefine here. */
 @theme {
   --font-sans: var(--font-inter);
+  --font-serif: var(--font-serif-display);
 
   /* AJ brand — actual color is orange, not red despite some legacy refs */
   --color-aj-orange: #fa9000;

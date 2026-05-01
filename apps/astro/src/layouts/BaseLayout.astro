@@ -25,6 +25,8 @@ const { title, preloadImage } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
     <Font cssVariable="--font-inter" preload />
+    {/* No `preload` — would compete with the LCP image preload above. */}
+    <Font cssVariable="--font-serif-display" />
     {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     <script>
       // Hoisted by Astro into a deferred module chunk in <head>; runs

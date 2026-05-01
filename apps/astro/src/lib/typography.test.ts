@@ -14,4 +14,8 @@ describe('DISPLAY_HEADLINE_CLASS', () => {
       expect(DISPLAY_HEADLINE_CLASS).toContain(cls);
     }
   });
+
+  it('uses the editorial serif (font-serif aliased to Noto Serif Display via tokens.css)', () => {
+    expect(DISPLAY_HEADLINE_CLASS).toContain('font-serif');
+  });
 });
