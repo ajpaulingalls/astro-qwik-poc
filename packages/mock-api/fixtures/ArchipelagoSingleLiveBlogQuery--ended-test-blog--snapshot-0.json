@@ -1,0 +1,29 @@
+{
+  "data": {
+    "article": {
+      "id": "9999001",
+      "title": "Ended test blog (fast-stop fixture)",
+      "slug": "ended-test-blog",
+      "link": "/news/liveblog/2026/4/30/ended-test-blog",
+      "date": "2026-04-30T00:00:00",
+      "content": "<p>Test fixture exercising the LiveBlogUpdater POLL_DONE fast-stop path. Returned shell carries <code>isLive: false</code> with empty <code>children</code>; consumers should signal POLL_DONE on the first poll rather than waiting through max-consecutive-empty cycles.</p>",
+      "subheading": null,
+      "excerpt": null,
+      "replacementHeadline": null,
+      "isBreaking": false,
+      "isLive": false,
+      "isDeveloping": false,
+      "externalUrl": null,
+      "shortUrl": null,
+      "proxyShortUrl": null,
+      "sponsorshipType": null,
+      "socialMediaSummary": null,
+      "postType": "liveblog",
+      "author": [],
+      "categories": [],
+      "featuredImage": null,
+      "children": [],
+      "childrenMeta": []
+    }
+  }
+}

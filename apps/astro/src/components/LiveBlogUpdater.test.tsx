@@ -13,8 +13,22 @@ import {
   LIVEBLOG_POLL_INTERVAL_MS,
   LIVEBLOG_SLUG as SLUG,
   MAX_CONSECUTIVE_EMPTY_POLLS,
+  POLL_DONE,
 } from '@aje-poc/shared-types';
+import type { LiveBlogUpdate } from '@aje-poc/shared-types';
 import { LiveBlogUpdater, fetchPollUpdate } from './LiveBlogUpdater';
+
+// Narrows fetchPollUpdate's discriminated return for tests that expect
+// entries (not the POLL_DONE end-of-blog signal). Failure message names the
+// expectation explicitly so a regression that flips a still-live shell to
+// POLL_DONE points at the right symptom.
+function assertEntries(
+  result: LiveBlogUpdate[] | typeof POLL_DONE,
+): asserts result is LiveBlogUpdate[] {
+  if (result === POLL_DONE) {
+    throw new Error('expected LiveBlogUpdate[], got POLL_DONE end-of-blog signal');
+  }
+}
 
 function shellResponse(childIds: number[]) {
   return {
@@ -85,6 +99,7 @@ describe('fetchPollUpdate', () => {
       updateResponse('4099', 'Brand new'),
     ]);
     const result = await fetchPollUpdate(SLUG, [4001, 4002, 4003]);
+    assertEntries(result);
     expect(result.length).toBe(1);
     expect(result[0]!.id).toBe('4099');
   });
@@ -97,11 +112,29 @@ describe('fetchPollUpdate', () => {
     ]);
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const result = await fetchPollUpdate(SLUG, [4001]);
+    assertEntries(result);
     expect(result.length).toBe(1);
     expect(result[0]!.id).toBe('4099');
     // 404 is intentional (no_posts_found) — must NOT log.
     expect(errSpy).not.toHaveBeenCalled();
     errSpy.mockRestore();
+  });
+
+  it('returns POLL_DONE when shell.isLive is false (definitive end of blog)', async () => {
+    const endedShell = shellResponse([4001, 4002]);
+    endedShell.body.data.article.isLive = false;
+    mock = mockFetchSequence([endedShell]);
+    const result = await fetchPollUpdate(SLUG, [4001, 4002]);
+    expect(result).toBe(POLL_DONE);
+    // No per-update fetches: ended state short-circuits before the diff.
+    expect(mock.calls.length).toBe(1);
+  });
+
+  it('returns POLL_DONE when shell is null (deleted blog / no_posts_found)', async () => {
+    mock = mockFetchSequence([{ body: { data: { article: null } } }]);
+    const result = await fetchPollUpdate(SLUG, []);
+    expect(result).toBe(POLL_DONE);
+    expect(mock.calls.length).toBe(1);
   });
 
   it('logs non-404 per-update rejections to console.error (5xx case)', async () => {
@@ -114,6 +147,7 @@ describe('fetchPollUpdate', () => {
 
     const result = await fetchPollUpdate(SLUG, [4001]);
 
+    assertEntries(result);
     expect(result.length).toBe(1);
     expect(result[0]!.id).toBe('4099');
     expect(errSpy).toHaveBeenCalledWith(
@@ -204,6 +238,21 @@ describe('LiveBlogUpdater', () => {
     // not produce additional shell fetches.
     await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS * 2);
     expect(mock.calls.length).toBe(callsAtThreshold);
+  });
+
+  it('fast-stops polling on the first cycle when shell signals isLive:false (vs the 20-cycle max-empty path above)', async () => {
+    const endedShell = shellResponse([4001, 4002]);
+    endedShell.body.data.article.isLive = false;
+    // Single response queued: if the loop made a 2nd fetch, mockFetchSequence
+    // would throw (out-of-fixture), surfacing the regression directly.
+    mock = mockFetchSequence([endedShell]);
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    render(<LiveBlogUpdater slug={SLUG} initialChildIds={[4001, 4002]} />);
+    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS);
+    await waitFor(() => expect(mock.calls.length).toBe(1));
+    // Five more cadences — interval should be cleared, no new fetches.
+    await vi.advanceTimersByTimeAsync(LIVEBLOG_POLL_INTERVAL_MS * 5);
+    expect(mock.calls.length).toBe(1);
   });
 
   it('polls every 30s, prepends fetched updates, and inserts newest at the top', async () => {

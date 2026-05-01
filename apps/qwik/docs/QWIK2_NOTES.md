@@ -505,6 +505,15 @@ For the rendering-split, fan-out, and `document.hidden` skip details see `apps/q
 
 When `@qwik.dev/core` bumps a beta (or hits stable) and `allowStale`/equivalent cache-revalidate primitive lands, replace the `useVisibleTask$ + setInterval` shape with the framework primitive and re-measure CWV. Tracked alongside the M3-scaffolding divergences-list item 3 reference above.
 
+### Stop conditions (post-2026-05-01 free-mode work)
+
+Two stop conditions wired through the shared `createPollLoop` helper:
+
+- **Fast-stop on definitive end-of-blog** — `fetchPollUpdate` returns the `POLL_DONE` sentinel (from `@aje-poc/shared-types`) when the shell is null (deleted / no_posts_found) or `shell.isLive === false` (concluded). `createPollLoop` clears the interval on the next tick, sparing ~10 minutes of wasted polling. **Primary mechanism** for ended blogs.
+- **Safety net on transient empty** — when the blog is still live but no new ids arrived this cycle, `fetchPollUpdate` returns `[]` and the loop counts toward `MAX_CONSECUTIVE_EMPTY_POLLS = 20` before stopping. Catches any upstream signal we don't model (e.g. shell still live but children stuck for an hour).
+
+Mock-api fixture `ArchipelagoSingleLiveBlogQuery--ended-test-blog--snapshot-0.json` exercises the fast-stop path; integration test in `apps/qwik/src/components/LiveBlogUpdater.test.tsx` (`'tick returns POLL_DONE when the shell signals isLive:false'`) provides the wire-up evidence.
+
 ## sprint-010 — story-004: BreakingTicker mount + reuse of M9 polling shape (2026-04-29)
 
 `apps/qwik/src/components/BreakingTicker.tsx` reuses the `useVisibleTask$ + setInterval` pattern from sprint-009's `LiveBlogUpdater` — no new beta-32 friction. Mounted globally in `apps/qwik/src/routes/layout.tsx` between `<Navigation />` and `<main>` (every route pays the 30s poll cost; the ticker is intentionally site-wide chrome, mirroring production aljazeera.com behavior). Diverges from `LiveBlogUpdater` by firing `tick()` immediately on mount so the banner populates on first paint instead of waiting 30s.

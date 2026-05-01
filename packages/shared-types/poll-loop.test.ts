@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createPollLoop } from './index';
+import { createPollLoop, POLL_DONE } from './index';
 
 describe('createPollLoop', () => {
   beforeEach(() => {
@@ -221,6 +221,33 @@ describe('createPollLoop', () => {
     await Promise.resolve();
     expect(tick).toHaveBeenCalledTimes(1);
     expect(onResult).toHaveBeenCalledWith('eager');
+  });
+
+  it('stops immediately when tick returns POLL_DONE (fast-stop, no waiting through max-empty)', async () => {
+    const tick = vi.fn(async () => POLL_DONE);
+    const onResult = vi.fn();
+    const onEmpty = vi.fn();
+    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
+    createPollLoop<string>({
+      tick,
+      onResult,
+      onEmpty,
+      intervalMs: 100,
+      maxConsecutiveEmpty: 20,
+      label: 'test',
+    });
+    await vi.advanceTimersByTimeAsync(100);
+    expect(tick).toHaveBeenCalledTimes(1);
+    expect(onResult).not.toHaveBeenCalled();
+    expect(onEmpty).not.toHaveBeenCalled();
+    expect(infoSpy).toHaveBeenCalledWith('test: stopping poll on POLL_DONE signal');
+    expect(infoSpy).toHaveBeenCalledTimes(1);
+
+    // Past the POLL_DONE the interval is cleared — further time advances
+    // produce no new ticks.
+    await vi.advanceTimersByTimeAsync(100 * 50);
+    expect(tick).toHaveBeenCalledTimes(1);
+    expect(infoSpy).toHaveBeenCalledTimes(1);
   });
 
   it('stop() clears the interval so no further ticks fire', async () => {

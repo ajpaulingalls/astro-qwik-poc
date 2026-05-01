@@ -377,3 +377,28 @@ Deno.test("handler: LiveBlogUpdateQuery with correct postType returns the fixtur
   const body = await res.json();
   assertEquals(body.data.posts, { id: "4099", title: "Update" });
 });
+
+// Fixture for the ended-blog path that LiveBlogUpdater's POLL_DONE fast-stop
+// branch consumes (apps/{astro,qwik}/src/components/LiveBlogUpdater.tsx).
+// Slug is intentionally distinct from iran-war-live so perf-harness sweeps
+// (which use iran-war-live) keep their reproducibility. Single snapshot
+// (snapshot-0) so the rolling-snapshot-index always picks it.
+Deno.test("handler: ArchipelagoSingleLiveBlogQuery for ended-test-blog returns shell with isLive=false (fast-stop fixture)", async () => {
+  const realFixtures = await loadFixtures("./fixtures");
+  const res = handle(
+    buildRequest({
+      operationName: "ArchipelagoSingleLiveBlogQuery",
+      variables: { name: "ended-test-blog", postType: "liveblog", preview: "" },
+    }),
+    { fixtures: realFixtures },
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assert(
+    body.data.article !== null,
+    "fixture must return a populated shell, not a no_posts_found null — POLL_DONE branch only fires on isLive=false, not on shell=null",
+  );
+  assertEquals(body.data.article.isLive, false);
+  assertEquals(body.data.article.children, []);
+  assertEquals(body.data.article.postType, "liveblog");
+});
