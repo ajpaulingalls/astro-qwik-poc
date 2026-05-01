@@ -299,7 +299,61 @@ The asymmetry is the comparison's most concrete production-readiness data point:
 
 ## 4. Astro 6 platform features
 
-_To be written by sprint-013 story-003._
+§4 covers the four Astro 6 platform features the PoC depends on: Fonts API, CSP (auto-hash via `scriptDirective`), `@deno/astro-adapter` (production runtime + `--allow` audit), and Vite Env API (build-time `PUBLIC_*` substitution). The audit content for each feature is consolidated in `apps/astro/docs/SECURITY.md § M12 Audit`; §4 references that doc as canonical and adds only the comparison-relevant framing plus the configuration-site citations.
+
+### 4.1 Fonts API
+
+The Astro 6 Fonts API auto-emits size-adjusted fallback `@font-face` rules at build time so the browser swaps from system fallback to web font with no observable layout shift — addressing the chronic CLS risk that manual `<link rel="preload">` + `font-display: swap` chains produce on news layouts.
+
+**Configuration site:** `apps/astro/astro.config.mjs:25-36` — `fonts: [...]` block declaring `provider: fontProviders.google()`, `name: 'Inter'`, `cssVariable: '--font-inter'`, `weights: [400, 700]`, `styles: ['normal']`, `subsets: ['latin']`, `display: 'swap'`, `fallbacks: ['system-ui', 'sans-serif']`.
+
+**Measured impact:** CLS = 0 (median + p95) across all 5 Astro page-rows at n=10 — at the stretch ≤ 0.05 budget with 0.05 of headroom (cross-link to §1.3.1 + §1.3.2 CWV tables). Source: `apps/astro/docs/SECURITY.md § M12 Audit > Fonts API CLS validation`.
+
+**Cross-app note:** Qwik 2 has no built-in Fonts API equivalent; the Qwik PoC self-hosts Inter via the standard Vite asset pipeline plus a manually-tuned `size-adjust` + `ascent-override` / `descent-override` / `line-gap-override` fallback face (story-004 elaborates the Qwik-side font story in §5).
+
+### 4.2 CSP — auto-hash via `scriptDirective`
+
+Astro 6 emits per-bundle script + style hashes via the `scriptDirective` field, so inline content is allowed by hash, never by `'unsafe-inline'`. This is the structural difference from the Qwik beta's CSP shape (story-004 §5 elaborates the Qwik `'unsafe-inline'` requirement).
+
+**Source-of-truth:** `packages/shared-csp/index.ts:94` (`buildAstroCspConfig(apiBase: string)`) — both `apps/astro/astro.config.mjs:42` (`csp: buildAstroCspConfig(API_BASE)` inside the `security:` block on lines 37-43) and the M11 demo path import this builder, so directive drift between perf and demo paths is structurally impossible. The function returns `{ scriptDirective: { resources: string[] }, directives: CspDirectivePrefix[] }`.
+
+**Compile-time gate against silent widening:** `_CspDirectivePrefixIsExact` type-equality check at `packages/shared-csp/index.ts:83` (with the `CspDirectivePrefix` union starting at `:67`) breaks `tsc` if the directive list mutates without updating the union — TypeScript fails with "Type 'false' is not assignable to type 'true'." This is the only structural gate against silent CSP widening (source: `apps/astro/docs/SECURITY.md § M12 Audit > Final CSP directive set`, paragraph after the directive table).
+
+**API-base validation:** `assertSafeApiBase` at `packages/shared-csp/index.ts:46` rejects CSP injection characters (whitespace, `;`, `,`, quotes, angle brackets, backslash, control chars) before `apiBase` is baked into `img-src` and `connect-src` directives — guards against header corruption and source-list grammar breakage when the operator points `PUBLIC_API_BASE` at a non-default upstream.
+
+**Measured impact:** Zero CSP violations across all 5 Astro page-rows × n=10 runs — collected by `packages/perf-harness/web_vitals_collector.ts` per SMM constraint `fd770051b407` (runtime collector evidence required, not header-only assertions). Source: `apps/astro/docs/SECURITY.md § M12 Audit > Final CSP directive set` (the audit doc holds the full directive table); cross-link to §1.3.1, §1.6 (`PASS (0)` cells in the verdict matrix).
+
+**Audit-deliverable note:** the n=10 sweep with the collector active surfaced 53 real `style-src-attr ← inline` violations from CMS-rendered `style="..."` attributes on WordPress wp-caption divs and Brightcove embed containers; fixed by `packages/shared-csp/strip-inline-styles.ts` plus the `apps/astro/src/lib/safe-inner-html.ts` seam (commits `9b04f84`, `233aa8d` in sprint-012). The follow-up sweep returned 0 violations across all 5 pages × n=10. Source: `apps/astro/docs/SECURITY.md § M12 Audit > Final CSP directive set` (audit-deliverable paragraph) — citation only; the deep dive lives in SECURITY.md.
+
+### 4.3 `@deno/astro-adapter` — production runtime + `--allow` audit
+
+Astro 6's Deno SSR adapter lets the principle of least privilege apply at request time via Deno's permission model. The narrow `--allow-*` flag set is the largest production-runtime defense in the Astro PoC — the cross-app comparison with Qwik's bun runtime lives in §3.6.
+
+**Configuration site:** `apps/astro/astro.config.mjs:4` (import `deno from '@deno/astro-adapter'`) + `:17-20` (`adapter: deno({ port: Number(process.env.PORT ?? 8080), hostname: '0.0.0.0' })`). Adapter version: `^0.4.0` (peer-deps `astro: ^6.0.0`) per `apps/astro/package.json`.
+
+**Final `--allow` flag set** (sealed at sprint-012 story-004; consumed by both `packages/perf-harness/spawn.ts` and `scripts/demo-launch-astro.ts`):
+
+| Flag                           | Value                                                                        | Source                                                                                                                                                                                      |
+| ------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--allow-net=<derived>`        | `0.0.0.0:8080,${apiBaseHost}:${apiBasePort}` derived from `PUBLIC_API_BASE`  | `packages/perf-harness/spawn.ts:75` (`deriveAllowNet`); `:92` (`buildAstroDenoArgv`); SECURITY.md M11 follow-up                                                                             |
+| `--allow-read=apps/astro/dist` | bundle directory only — no source, no config, no traversal vector            | `packages/perf-harness/spawn.ts:92`                                                                                                                                                         |
+| `--allow-env=<11 vars>`        | `ASTRO_ALLOWED_ENV` — audited whitelist with per-variable rationale comments | `packages/perf-harness/spawn.ts:57-69` (constant + per-var rationale comments); SECURITY.md M12 audit summarizes the 11 vars in one row and redirects to spawn.ts for the per-var rationale |
+
+**Why `-A` rejected:** `-A` (allow-all) would defeat the principle of least privilege — would grant the SSR process unconstrained access to every network interface, the entire filesystem, and every env var in the parent process (including operator-set secrets). Source: `apps/astro/docs/SECURITY.md § M12 Audit > Deno --allow audit > Why -A is rejected`.
+
+**Single source of truth:** both `packages/perf-harness/spawn.ts:104` (`spawnAstro`) and `scripts/demo-launch-astro.ts` consume `buildAstroDenoArgv` so the M11 demo and the perf-harness boot byte-identical args. Cross-link: story-002 §3.6 cross-app runtime comparison; story-005 §7 picks up the production-readiness implication.
+
+### 4.4 Vite Env API — build-time `PUBLIC_*` substitution
+
+Astro 6 inherits Vite's `import.meta.env.PUBLIC_*` substitution — env vars prefixed `PUBLIC_` are inlined at build time as string literals in both SSR and client bundles. No explicit Vite Env API config is required: `apps/astro/astro.config.mjs:22-24` shows the `vite:` block is empty except for the Tailwind plugin.
+
+**Build-time consumer (CSP bake):** `apps/astro/astro.config.mjs:12` reads `process.env.PUBLIC_API_BASE` (or `DEFAULT_API_BASE` fallback from `@aje-poc/shared-csp`) at config-load time and passes it to `buildAstroCspConfig(API_BASE)` on `:42` so the CSP `img-src` and `connect-src` directives are baked with the correct upstream host.
+
+**SSR runtime consumer:** `apps/astro/src/lib/graphql.ts:27` (`resolveApiBase`) reads `import.meta.env.PUBLIC_API_BASE` (Vite-substituted at build) with the same fallback; called by `graphqlFetch()` on `:45`.
+
+**Client island consumer:** `apps/astro/src/components/LiveBlogUpdater.tsx:14-15` reads `import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS` with a fallback constant — Vite replaces the literal at build time before the island chunk ships.
+
+**Measured impact:** Vite Env API correctness is verified by build success + functional acceptance, not by a perf gate. The Astro-side analogue of Qwik's `PUBLIC_API_BASE` build-bake bug (SMM constraint `17bc3961cb61` — Qwik perf build must bake `PUBLIC_API_BASE` matching `MOCK_API_PORT.qwik`) is structurally absent because Astro's adapter spawn pipeline derives `--allow-net` from the same `PUBLIC_API_BASE` (see §4.3 + the `deriveAllowNet` cross-link) — a stale build-bake would surface immediately as a Deno permission denial at request time, not as a silent CSP `connect-src` violation.
 
 ## 5. Qwik 2 beta deep dive
 
