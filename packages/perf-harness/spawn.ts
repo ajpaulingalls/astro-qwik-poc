@@ -99,10 +99,12 @@ export function buildAstroDenoArgv(apiBase: string | undefined, appPort: number)
   ];
 }
 
-export function spawnAstro(): ChildProcess {
+// stdio defaults to 'ignore' for perf-harness silence; demo launcher passes
+// 'inherit' so operators see the runtime's logs. Mirrors spawnQwik.
+export function spawnAstro(stdio: 'ignore' | 'inherit' = 'ignore'): ChildProcess {
   return spawn('deno', buildAstroDenoArgv(process.env.PUBLIC_API_BASE, APP_PORT.astro), {
     cwd: REPO_ROOT,
-    stdio: 'ignore',
+    stdio,
   });
 }
 
