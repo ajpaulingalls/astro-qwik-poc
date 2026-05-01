@@ -174,6 +174,23 @@ describe('runner main()', () => {
     expect(collectWebVitalsMock).toHaveBeenCalledTimes(3);
   });
 
+  it('iterates the listed pages when --page is comma-separated', async () => {
+    runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 99, jsBytes: 100 });
+    collectWebVitalsMock.mockResolvedValue({ samples: [], cspViolations: [] });
+
+    await main([`--target=${TARGET}`, '--runs=1', `--page=index,article`]);
+
+    // 2 pages × 1 run each = 2 lighthouse calls
+    expect(runLighthouseAuditMock).toHaveBeenCalledTimes(2);
+    expect(collectWebVitalsMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('throws when no comma-listed page names match', async () => {
+    await expect(main([`--target=${TARGET}`, '--runs=1', '--page=ghost,phantom'])).rejects.toThrow(
+      /no pages match --page=ghost,phantom/,
+    );
+  });
+
   it('spawns qwik via bun + server.ts with HOST/PORT env in apps/qwik cwd', async () => {
     runLighthouseAuditMock.mockResolvedValue({ lcp: 1000, cls: 0, lhPerf: 99, jsBytes: 100 });
     collectWebVitalsMock.mockResolvedValue({ samples: [], cspViolations: [] });

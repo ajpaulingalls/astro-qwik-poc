@@ -57,7 +57,13 @@ function writeReports(
 
 export async function main(argv: readonly string[] = process.argv.slice(2)): Promise<void> {
   const args = parseArgs(argv);
-  const pages = buildPageList(args.target).filter((p) => !args.page || p.name === args.page);
+  // --page accepts a single name or a comma-separated list. Empty/missing
+  // selects all pages (default behavior).
+  const wanted = args.page
+    ?.split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const pages = buildPageList(args.target).filter((p) => !wanted || wanted.includes(p.name));
   if (pages.length === 0) {
     throw new Error(`runner: no pages match --page=${args.page}`);
   }

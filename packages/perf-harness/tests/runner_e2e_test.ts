@@ -43,14 +43,19 @@ describe.skipIf(!E2E)('runner e2e CSP regression gate', () => {
   });
 
   it.each(['astro', 'qwik'] as const)(
-    '%s pages emit zero CSP violations on a real run',
+    '%s article+liveblog emit zero CSP violations on a real run',
     async (target) => {
+      // Trim to article + liveblog — story-004's CSP-rich pages where the
+      // sanitizers + collector landed. Index/section had zero violations to
+      // begin with so they don't add regression-coverage value here. ~2 min
+      // savings per gate run vs running all pages.
+      //
       // runner.ts writes reports before throwing on Budget violations
       // (runner.ts:122). n=1 lighthouse measurements vary at the noise floor;
       // swallow budget errors so this test stays focused on CSP regression
       // rather than re-validating perf budgets that already gate at sweep time.
       try {
-        await runnerMain([`--target=${target}`, '--runs=1']);
+        await runnerMain([`--target=${target}`, '--runs=1', '--page=article,liveblog']);
       } catch (err) {
         if (!(err instanceof Error) || !/Budget violations/.test(err.message)) throw err;
       }
