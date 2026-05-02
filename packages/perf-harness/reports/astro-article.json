@@ -2,83 +2,66 @@
   "cspViolations": [],
   "metrics": {
     "cls": {
-      "median": 0,
-      "n": 3,
-      "p95": 0
+      "median": 0.0001185,
+      "n": 10,
+      "p95": 0.000237
     },
     "jsBytes": {
-      "median": 13944,
-      "n": 3,
-      "p95": 13944
+      "median": 14288,
+      "n": 10,
+      "p95": 14288
     },
     "lcp": {
-      "median": 2255.0419999999995,
-      "n": 3,
-      "p95": 2932.66379
+      "median": 1805.0686000000003,
+      "n": 10,
+      "p95": 1807.98002
     },
     "lhPerf": {
-      "median": 99,
-      "n": 3,
-      "p95": 99
+      "median": 96,
+      "n": 10,
+      "p95": 99.55
     }
   },
   "page": "article",
-  "runs": 3,
+  "runs": 10,
   "target": "astro",
   "webVitals": {
     "aggregated": {
       "inp": {
         "median": 16,
-        "n": 3,
-        "p95": 23.2
+        "n": 10,
+        "p95": 28.39999999999999
       },
       "lcp": {
-        "median": 140,
-        "n": 6,
-        "p95": 240
+        "median": 60,
+        "n": 10,
+        "p95": 66.19999999999999
       }
     },
     "samples": [
       {
-        "delta": 16,
+        "delta": 56,
         "entries": [
           {}
         ],
-        "id": "v4-1777672258207-1762335149956",
+        "id": "v4-1777678204017-9042598298864",
         "lcpElement": {
-          "className": "lead-image my-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-21T184038Z_724474390_RC2MTKASMQ96_RTRMADP_3_UKRAINE-CRISIS-RUSSIA-OIL-DRONES-1777047509.jpg?w=800&resize=800%2C528",
-          "tagName": "IMG"
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 76
+        "value": 56
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777672258234-5747218035081",
+        "id": "v4-1777678204052-9705883264332",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777672258207-1762335149956",
-        "lcpElement": {
-          "className": "lead-image my-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-21T184038Z_724474390_RC2MTKASMQ96_RTRMADP_3_UKRAINE-CRISIS-RUSSIA-OIL-DRONES-1777047509.jpg?w=800&resize=800%2C528",
-          "tagName": "IMG"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 76
       },
       {
         "delta": 16,
@@ -86,105 +69,35 @@
           {},
           {}
         ],
-        "id": "v4-1777672258207-1886951686148",
+        "id": "v4-1777678204017-8951325336690",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 16
       },
       {
-        "delta": 176,
+        "delta": 64,
         "entries": [
           {}
         ],
-        "id": "v4-1777672267997-7562521250478",
+        "id": "v4-1777678259412-3039329895629",
         "lcpElement": {
-          "className": "lead-image my-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-21T184038Z_724474390_RC2MTKASMQ96_RTRMADP_3_UKRAINE-CRISIS-RUSSIA-OIL-DRONES-1777047509.jpg?w=800&resize=800%2C528",
-          "tagName": "IMG"
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 240
+        "value": 64
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777672268026-9198289430957",
+        "id": "v4-1777678259450-2849544843995",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
-      },
-      {
-        "delta": 176,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777672267997-7562521250478",
-        "lcpElement": {
-          "className": "lead-image my-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-21T184038Z_724474390_RC2MTKASMQ96_RTRMADP_3_UKRAINE-CRISIS-RUSSIA-OIL-DRONES-1777047509.jpg?w=800&resize=800%2C528",
-          "tagName": "IMG"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 240
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777672267997-7750987880117",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 32,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777672279229-6255067466152",
-        "lcpElement": {
-          "className": "lead-image my-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-21T184038Z_724474390_RC2MTKASMQ96_RTRMADP_3_UKRAINE-CRISIS-RUSSIA-OIL-DRONES-1777047509.jpg?w=800&resize=800%2C528",
-          "tagName": "IMG"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 140
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777672279260-1419745886352",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 32,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777672279229-6255067466152",
-        "lcpElement": {
-          "className": "lead-image my-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-21T184038Z_724474390_RC2MTKASMQ96_RTRMADP_3_UKRAINE-CRISIS-RUSSIA-OIL-DRONES-1777047509.jpg?w=800&resize=800%2C528",
-          "tagName": "IMG"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 140
       },
       {
         "delta": 24,
@@ -192,11 +105,299 @@
           {},
           {}
         ],
-        "id": "v4-1777672279230-8259468051438",
+        "id": "v4-1777678259412-6917244681557",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 24
+      },
+      {
+        "delta": 64,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678314757-2775009717958",
+        "lcpElement": {
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 64
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678314797-1232767725474",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678314758-3989266823051",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 60,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678370044-6118315526204",
+        "lcpElement": {
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 60
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678370081-4561012711706",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678370044-7029353718520",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 68,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678425452-9931422818599",
+        "lcpElement": {
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 68
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678425489-8333846144796",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678425453-4174540978841",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 60,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678480784-9660126685048",
+        "lcpElement": {
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 60
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678480825-9684235411118",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678480784-3974996951086",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 60,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678536210-2610380318207",
+        "lcpElement": {
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 60
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678536251-2720367361526",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678536210-1836740977531",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 56,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678593680-3439996166511",
+        "lcpElement": {
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 56
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678593718-1593343223279",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678593681-3560538381111",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 64,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678649320-9771912460759",
+        "lcpElement": {
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 64
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678649364-1817313243345",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 32,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678649320-8195231601809",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 32
+      },
+      {
+        "delta": 56,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678704713-3467059769035",
+        "lcpElement": {
+          "className": "mb-3 font-serif text-3xl md:text-4xl font-bold leading-[1.05] tracking-tight text-neutral-900",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 56
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678704736-5768844634548",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678704713-9961232506251",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
       }
     ]
   }

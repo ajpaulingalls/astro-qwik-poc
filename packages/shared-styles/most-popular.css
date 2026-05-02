@@ -1,6 +1,6 @@
-/* Orange numerals for ranked lists — used by both apps' MostPopular component
-   so the digit weight/colour stays brand-consistent rather than relying on
-   the browser's native list-decimal marker. */
+/* Brand-orange numerals for ranked lists. Astro MostPopular consumes
+   this via apps/astro/src/styles/global.css; Qwik adoption is a planned
+   follow-up. */
 .most-popular-list {
   counter-reset: most-popular;
 }

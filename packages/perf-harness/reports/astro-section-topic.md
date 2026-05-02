@@ -1,14 +1,14 @@
-# perf report — astro/section-topic (n=3)
+# perf report — astro/section-topic (n=10)
 
-| metric  |             median |        p95 |
-| ------- | ------------------ | ---------- |
-| cls     |                  0 |          0 |
-| jsBytes |              16106 |      16106 |
-| lcp     | 2032.1426000000001 | 2500.98104 |
-| lhPerf  |                 99 |         99 |
+| metric  |     median |        p95 |
+| ------- | ---------- | ---------- |
+| cls     |   0.000237 |   0.000237 |
+| jsBytes |      16489 |      16489 |
+| lcp     | 1732.99535 | 1809.74623 |
+| lhPerf  |         99 |        100 |
 
-web-vitals samples: 12
-real-browser lcp median: 116ms p95: 120ms (n=6)
-real-browser inp median: 16ms p95: 30.4ms (n=3)
-lcp element: IMG http://localhost:8080/wp-content/uploads/2026/04/AFP__20260416__A7ZC4WE__v1__HighRes__IranUsIsraelWar-1776341624.jpg?w=400&resize=400%2C267
-csp violations: 0 (across 3 runs)
+web-vitals samples: 30
+real-browser lcp median: 56ms p95: 58.199999999999996ms (n=10)
+real-browser inp median: 16ms p95: 28.39999999999999ms (n=10)
+lcp element: FIGCAPTION
+csp violations: 0 (across 10 runs)

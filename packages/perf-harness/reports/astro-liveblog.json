@@ -3,62 +3,61 @@
   "metrics": {
     "cls": {
       "median": 0,
-      "n": 3,
-      "p95": 0
+      "n": 10,
+      "p95": 0.081747
     },
     "jsBytes": {
-      "median": 17049,
-      "n": 3,
-      "p95": 17049
+      "median": 17390,
+      "n": 10,
+      "p95": 17390
     },
     "lcp": {
-      "median": 2255.4439,
-      "n": 3,
-      "p95": 2256.39736
+      "median": 1731.24495,
+      "n": 10,
+      "p95": 1777.15008
     },
     "lhPerf": {
-      "median": 99,
-      "n": 3,
-      "p95": 99
+      "median": 96,
+      "n": 10,
+      "p95": 100
     }
   },
   "page": "liveblog",
-  "runs": 3,
+  "runs": 10,
   "target": "astro",
   "webVitals": {
     "aggregated": {
       "inp": {
-        "median": 16,
-        "n": 3,
-        "p95": 16
+        "median": 24,
+        "n": 10,
+        "p95": 32
       },
       "lcp": {
-        "median": 132,
-        "n": 6,
-        "p95": 164
+        "median": 48,
+        "n": 10,
+        "p95": 52
       }
     },
     "samples": [
       {
-        "delta": 32,
+        "delta": 48,
         "entries": [
           {}
         ],
-        "id": "v4-1777672350535-7531184407368",
+        "id": "v4-1777679825630-9068913539303",
         "lcpElement": {
-          "className": "lead-image mt-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-20T143625Z_839091749_RC2ZSKA012SO_RTRMADP_3_IRAN-CRISIS-1776765169.jpg?w=800&resize=800%2C533",
-          "tagName": "IMG"
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 132
+        "value": 48
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777672350568-6855373284507",
+        "id": "v4-1777679825664-8081550209091",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -67,18 +66,146 @@
       {
         "delta": 32,
         "entries": [
+          {},
           {}
         ],
-        "id": "v4-1777672350535-7531184407368",
+        "id": "v4-1777679825630-7261351357570",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 32
+      },
+      {
+        "delta": 44,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777679880903-1838808165786",
         "lcpElement": {
-          "className": "lead-image mt-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-20T143625Z_839091749_RC2ZSKA012SO_RTRMADP_3_IRAN-CRISIS-1776765169.jpg?w=800&resize=800%2C533",
-          "tagName": "IMG"
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 132
+        "value": 44
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777679880929-3432558714017",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777679880903-5552139302655",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777679936152-9164168220695",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777679936184-8700646026461",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777679936152-8999813486388",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777679991393-8798728754009",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777679991422-7080351014235",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777679991393-4813835837027",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777680046675-7229137160759",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777680046699-1870407481517",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
       },
       {
         "delta": 16,
@@ -86,52 +213,35 @@
           {},
           {}
         ],
-        "id": "v4-1777672350535-1241649368483",
+        "id": "v4-1777680046676-1487485122142",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 16
       },
       {
-        "delta": 32,
+        "delta": 48,
         "entries": [
           {}
         ],
-        "id": "v4-1777672359961-3394542151511",
+        "id": "v4-1777680101793-7040144581712",
         "lcpElement": {
-          "className": "lead-image mt-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-20T143625Z_839091749_RC2ZSKA012SO_RTRMADP_3_IRAN-CRISIS-1776765169.jpg?w=800&resize=800%2C533",
-          "tagName": "IMG"
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 164
+        "value": 48
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777672359988-1365734252511",
+        "id": "v4-1777680101817-6665686357634",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
-      },
-      {
-        "delta": 32,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777672359961-3394542151511",
-        "lcpElement": {
-          "className": "lead-image mt-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-20T143625Z_839091749_RC2ZSKA012SO_RTRMADP_3_IRAN-CRISIS-1776765169.jpg?w=800&resize=800%2C533",
-          "tagName": "IMG"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 164
       },
       {
         "delta": 16,
@@ -139,32 +249,139 @@
           {},
           {}
         ],
-        "id": "v4-1777672359961-5576078586843",
+        "id": "v4-1777680101793-8128350252465",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 16
       },
       {
-        "delta": 16,
+        "delta": 52,
         "entries": [
           {}
         ],
-        "id": "v4-1777672369120-9961772442396",
+        "id": "v4-1777680157007-7021673247270",
         "lcpElement": {
-          "className": "lead-image mt-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-20T143625Z_839091749_RC2ZSKA012SO_RTRMADP_3_IRAN-CRISIS-1776765169.jpg?w=800&resize=800%2C533",
-          "tagName": "IMG"
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
         },
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 100
+        "value": 52
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777672369159-4972813724225",
+        "id": "v4-1777680157042-4233048320451",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 32,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777680157007-4786537059904",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 32
+      },
+      {
+        "delta": 52,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777680212305-9665041387135",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 52
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777680212341-4226120988432",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777680212305-5424011474143",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 52,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777680267481-8850268295255",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 52
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777680267523-7300464466711",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777680267481-2360829960319",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 40,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777680322687-8840574508209",
+        "lcpElement": {
+          "className": "text-3xl md:text-4xl font-bold leading-tight",
+          "tagName": "H1"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 40
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777680322711-8724721156097",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -173,26 +390,10 @@
       {
         "delta": 16,
         "entries": [
-          {}
-        ],
-        "id": "v4-1777672369120-9961772442396",
-        "lcpElement": {
-          "className": "lead-image mt-4 w-full h-auto rounded",
-          "src": "http://localhost:8080/wp-content/uploads/2026/04/2026-04-20T143625Z_839091749_RC2ZSKA012SO_RTRMADP_3_IRAN-CRISIS-1776765169.jpg?w=800&resize=800%2C533",
-          "tagName": "IMG"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 100
-      },
-      {
-        "delta": 16,
-        "entries": [
           {},
           {}
         ],
-        "id": "v4-1777672369121-6904887493704",
+        "id": "v4-1777680322688-7376744788945",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",

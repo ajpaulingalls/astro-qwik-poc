@@ -25,8 +25,15 @@ const { title, preloadImage } = Astro.props;
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
     <Font cssVariable="--font-inter" preload />
-    {/* No `preload` — would compete with the LCP image preload above. */}
-    <Font cssVariable="--font-serif-display" />
+    {
+      /* Supersedes the earlier no-preload rationale: with display-scale
+        headlines the H1/H2 SPAN, not the lead image, is the LCP element
+        on homepage / article / liveblog (verified in
+        packages/perf-harness/reports/astro-{index,article,liveblog}.md
+        — `lcp element: SPAN/H1`). Without preload, lab LCP waits on
+        the swap from Georgia → Noto Serif Display. */
+    }
+    <Font cssVariable="--font-serif-display" preload />
     {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     <script>
       // Hoisted by Astro into a deferred module chunk in <head>; runs
