@@ -22,6 +22,22 @@ describe('NavigationMenu', () => {
     }
   });
 
+  it('renders Search button with accessible label', () => {
+    const { getByRole } = render(<NavigationMenu />);
+    expect(getByRole('button', { name: /search/i })).toBeTruthy();
+  });
+
+  it('renders LIVE indicator pill with text content', () => {
+    const { getByText } = render(<NavigationMenu />);
+    expect(getByText('LIVE')).toBeTruthy();
+  });
+
+  it('renders home link with accessible name "Al Jazeera English"', () => {
+    const { getByRole } = render(<NavigationMenu />);
+    const home = getByRole('link', { name: /al jazeera english/i });
+    expect(home.getAttribute('href')).toBe('/');
+  });
+
   it('hamburger button toggles aria-expanded and the nav list visibility', () => {
     const { getByRole } = render(<NavigationMenu />);
     const btn = getByRole('button', { name: /menu/i });

@@ -4,22 +4,22 @@
     "cls": {
       "median": 0,
       "n": 10,
-      "p95": 0
+      "p95": 0.000237
     },
     "jsBytes": {
-      "median": 13917,
+      "median": 14288,
       "n": 10,
-      "p95": 13917
+      "p95": 14288
     },
     "lcp": {
-      "median": 1729.1851499999998,
+      "median": 1811.4067375000002,
       "n": 10,
-      "p95": 1772.0264599999998
+      "p95": 1913.35441
     },
     "lhPerf": {
-      "median": 100,
+      "median": 93.5,
       "n": 10,
-      "p95": 100
+      "p95": 97
     }
   },
   "page": "index",
@@ -28,332 +28,23 @@
   "webVitals": {
     "aggregated": {
       "inp": {
-        "median": 24,
+        "median": 16,
         "n": 10,
-        "p95": 24
+        "p95": 32
       },
       "lcp": {
-        "median": 76,
+        "median": 88,
         "n": 17,
-        "p95": 88
+        "p95": 96
       }
     },
     "samples": [
       {
-        "delta": 60,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594375622-4630848569778",
-        "lcpElement": {
-          "tagName": "LI"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 60
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594375652-8991145202772",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594375622-3914298678299",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 56,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594385383-3320310000825",
-        "lcpElement": {
-          "tagName": "LI"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 56
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594385409-6381201375602",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594385383-6585073340475",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 60,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594394105-3606979974691",
-        "lcpElement": {
-          "tagName": "LI"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 60
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594394145-3353469391188",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594394105-3106346006894",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
         "delta": 16,
         "entries": [
           {}
         ],
-        "id": "v4-1777594402807-8676922015232",
-        "lcpElement": {
-          "className": "breaking-ticker-text",
-          "tagName": "SPAN"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 80
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594402850-3879545607551",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594402807-8676922015232",
-        "lcpElement": {
-          "className": "breaking-ticker-text",
-          "tagName": "SPAN"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 80
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594402808-5372684665235",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594411574-6948721307303",
-        "lcpElement": {
-          "className": "breaking-ticker-text",
-          "tagName": "SPAN"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 76
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594411612-5605909594612",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594411574-6948721307303",
-        "lcpElement": {
-          "className": "breaking-ticker-text",
-          "tagName": "SPAN"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 76
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594411575-2496738227446",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594420465-6599634063664",
-        "lcpElement": {
-          "className": "breaking-ticker-text",
-          "tagName": "SPAN"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 80
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594420501-5575844722794",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594420465-6599634063664",
-        "lcpElement": {
-          "className": "breaking-ticker-text",
-          "tagName": "SPAN"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 80
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594420466-7280403532036",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 20,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594429206-8495838949583",
-        "lcpElement": {
-          "className": "breaking-ticker-text",
-          "tagName": "SPAN"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 76
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594429233-7911809136818",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 20,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594429206-8495838949583",
-        "lcpElement": {
-          "className": "breaking-ticker-text",
-          "tagName": "SPAN"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 76
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594429206-6334845212873",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 32,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594437942-1847233366053",
+        "id": "v4-1777677648914-4309742369561",
         "lcpElement": {
           "className": "breaking-ticker-text",
           "tagName": "SPAN"
@@ -366,18 +57,18 @@
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594437977-3877742989812",
+        "id": "v4-1777677648962-9014196439476",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
         "value": 0
       },
       {
-        "delta": 32,
+        "delta": 16,
         "entries": [
           {}
         ],
-        "id": "v4-1777594437942-1847233366053",
+        "id": "v4-1777677648914-4309742369561",
         "lcpElement": {
           "className": "breaking-ticker-text",
           "tagName": "SPAN"
@@ -388,23 +79,59 @@
         "value": 88
       },
       {
-        "delta": 24,
+        "delta": 16,
         "entries": [
           {},
           {}
         ],
-        "id": "v4-1777594437942-4280905219265",
+        "id": "v4-1777677648914-5961340986280",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 24
+        "value": 16
       },
       {
-        "delta": 24,
+        "delta": 64,
         "entries": [
           {}
         ],
-        "id": "v4-1777594446629-5773446170136",
+        "id": "v4-1777677704412-2196906085841",
+        "lcpElement": {
+          "className": "hidden text-base font-bold tracking-tight text-neutral-900 sm:inline",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 64
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777677704438-6748588427095",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 32,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777677704413-6529962087591",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 32
+      },
+      {
+        "delta": 36,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777677759803-6871439665588",
         "lcpElement": {
           "className": "breaking-ticker-text",
           "tagName": "SPAN"
@@ -412,12 +139,63 @@
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 84
+        "value": 96
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594446668-7540048019678",
+        "id": "v4-1777677759827-3933065343058",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 36,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777677759803-6871439665588",
+        "lcpElement": {
+          "className": "breaking-ticker-text",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 96
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777677759803-4562427479403",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777677815428-4856405257023",
+        "lcpElement": {
+          "className": "breaking-ticker-text",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 88
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777677815471-9260166977092",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -428,7 +206,7 @@
         "entries": [
           {}
         ],
-        "id": "v4-1777594446629-5773446170136",
+        "id": "v4-1777677815428-4856405257023",
         "lcpElement": {
           "className": "breaking-ticker-text",
           "tagName": "SPAN"
@@ -436,26 +214,215 @@
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 84
+        "value": 88
       },
       {
-        "delta": 24,
+        "delta": 16,
         "entries": [
           {},
           {}
         ],
-        "id": "v4-1777594446629-9404982012398",
+        "id": "v4-1777677815429-2109676129222",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 24
+        "value": 16
+      },
+      {
+        "delta": 68,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777677871434-2535021905269",
+        "lcpElement": {
+          "className": "hidden text-base font-bold tracking-tight text-neutral-900 sm:inline",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 68
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777677871457-2969412867123",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777677871435-4740588506553",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777677926913-3310425367863",
+        "lcpElement": {
+          "className": "breaking-ticker-text",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 88
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777677926955-2053546020278",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777677926913-3310425367863",
+        "lcpElement": {
+          "className": "breaking-ticker-text",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 88
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777677926913-4441699510592",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777677982531-9330967334638",
+        "lcpElement": {
+          "className": "breaking-ticker-text",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 88
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777677982574-1105114700055",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777677982531-9330967334638",
+        "lcpElement": {
+          "className": "breaking-ticker-text",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 88
+      },
+      {
+        "delta": 32,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777677982531-8968267796316",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 32
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678038043-1439146136415",
+        "lcpElement": {
+          "className": "breaking-ticker-text",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 88
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678038085-5977628518108",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678038043-1439146136415",
+        "lcpElement": {
+          "className": "breaking-ticker-text",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 88
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678038043-6379125648430",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
       },
       {
         "delta": 16,
         "entries": [
           {}
         ],
-        "id": "v4-1777594455373-9907711689746",
+        "id": "v4-1777678093361-8262109813870",
         "lcpElement": {
           "className": "breaking-ticker-text",
           "tagName": "SPAN"
@@ -463,12 +430,12 @@
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 76
+        "value": 80
       },
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594455401-9609502676469",
+        "id": "v4-1777678093402-4724717701691",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -479,7 +446,7 @@
         "entries": [
           {}
         ],
-        "id": "v4-1777594455373-9907711689746",
+        "id": "v4-1777678093361-8262109813870",
         "lcpElement": {
           "className": "breaking-ticker-text",
           "tagName": "SPAN"
@@ -487,7 +454,43 @@
         "name": "LCP",
         "navigationType": "navigate",
         "rating": "good",
-        "value": 76
+        "value": 80
+      },
+      {
+        "delta": 32,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678093361-8014054656603",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 32
+      },
+      {
+        "delta": 68,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678148722-3944896827021",
+        "lcpElement": {
+          "className": "hidden text-base font-bold tracking-tight text-neutral-900 sm:inline",
+          "tagName": "SPAN"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 68
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678148751-3169612811458",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
       },
       {
         "delta": 16,
@@ -495,7 +498,7 @@
           {},
           {}
         ],
-        "id": "v4-1777594455373-7161693162674",
+        "id": "v4-1777678148722-8590424068376",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",

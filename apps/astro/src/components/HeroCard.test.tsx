@@ -33,6 +33,15 @@ describe('HeroCard', () => {
     expect(heading).toBeTruthy();
   });
 
+  it('renders the headline at display scale (text-3xl floor, md:text-4xl, tight leading)', () => {
+    const { getByRole } = render(<HeroCard post={post} />);
+    const h2 = getByRole('heading', { level: 2 });
+    expect(h2.className).toContain('text-3xl');
+    expect(h2.className).toContain('md:text-4xl');
+    expect(h2.className).toContain('tracking-tight');
+    expect(h2.className).toContain('leading-[1.05]');
+  });
+
   it('renders the featuredImage with eager loading + fetchpriority high (LCP element)', () => {
     const { container } = render(<HeroCard post={post} />);
     const img = container.querySelector('img')!;

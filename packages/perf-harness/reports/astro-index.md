@@ -1,14 +1,14 @@
 # perf report — astro/index (n=10)
 
-| metric  |             median |                p95 |
-| ------- | ------------------ | ------------------ |
-| cls     |                  0 |                  0 |
-| jsBytes |              13917 |              13917 |
-| lcp     | 1729.1851499999998 | 1772.0264599999998 |
-| lhPerf  |                100 |                100 |
+| metric  |             median |        p95 |
+| ------- | ------------------ | ---------- |
+| cls     |                  0 |   0.000237 |
+| jsBytes |              14288 |      14288 |
+| lcp     | 1811.4067375000002 | 1913.35441 |
+| lhPerf  |               93.5 |         97 |
 
 web-vitals samples: 37
-real-browser lcp median: 76ms p95: 88ms (n=17)
-real-browser inp median: 24ms p95: 24ms (n=10)
-lcp element: LI
+real-browser lcp median: 88ms p95: 96ms (n=17)
+real-browser inp median: 16ms p95: 32ms (n=10)
+lcp element: SPAN
 csp violations: 0 (across 10 runs)

@@ -5,6 +5,7 @@
   "description": "Shared CSS blocks for visual parity across the Astro and Qwik PoCs",
   "type": "module",
   "exports": {
-    "./breaking-ticker.css": "./breaking-ticker.css"
+    "./breaking-ticker.css": "./breaking-ticker.css",
+    "./most-popular.css": "./most-popular.css"
   }
 }

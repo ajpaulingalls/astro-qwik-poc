@@ -33,6 +33,22 @@ export default defineConfig({
       display: 'swap',
       fallbacks: ['system-ui', 'sans-serif'],
     },
+    {
+      // Editorial display headline. Single weight 700 — used by HeroCard h2
+      // and ArticleHeader h1 only via DISPLAY_HEADLINE_CLASS in lib/typography.ts.
+      // display: 'swap' so the LCP image (which is the actual LCP element on
+      // both surfaces) is never blocked waiting on the font; readers see the
+      // Georgia fallback first, then a swap. Astro auto-generates size-adjust
+      // metrics for the fallback to keep CLS tight.
+      provider: fontProviders.google(),
+      name: 'Noto Serif Display',
+      cssVariable: '--font-serif-display',
+      weights: [700],
+      styles: ['normal'],
+      subsets: ['latin'],
+      display: 'swap',
+      fallbacks: ['Georgia', 'serif'],
+    },
   ],
   security: {
     // Origins (frame-src, script-src resources) live in the shared package

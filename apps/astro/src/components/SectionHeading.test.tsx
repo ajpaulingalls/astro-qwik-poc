@@ -30,6 +30,14 @@ describe('SectionHeading', () => {
     expect(h3.className).toContain('tracking-wider');
   });
 
+  it('shows an editorial accent bar (left border in brand orange)', () => {
+    const { container } = render(<SectionHeading>Topic</SectionHeading>);
+    const h3 = container.querySelector('h3')!;
+    expect(h3.className).toContain('border-l-4');
+    expect(h3.className).toContain('border-aj-orange');
+    expect(h3.className).toContain('pl-2');
+  });
+
   it('renders as h2 when as="h2" (Footer landmark headings)', () => {
     const { getByRole, container } = render(<SectionHeading as="h2">Section</SectionHeading>);
     expect(getByRole('heading', { level: 2, name: 'Section' })).toBeTruthy();

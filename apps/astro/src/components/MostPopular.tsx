@@ -11,10 +11,10 @@ export function MostPopular({ items }: Props) {
   return (
     <section class="most-popular">
       <SectionHeading>Most Popular</SectionHeading>
-      <ol class="space-y-3 list-decimal list-inside">
+      <ol class="most-popular-list list-none divide-y divide-neutral-200">
         {items.map((item) => (
-          <li>
-            <a href={item.link} class="hover:text-aj-orange text-neutral-700">
+          <li class="py-2">
+            <a href={item.link} class="hover:text-aj-orange text-neutral-800">
               {getDisplayHeadline(item)}
             </a>
           </li>

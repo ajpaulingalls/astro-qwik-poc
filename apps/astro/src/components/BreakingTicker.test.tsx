@@ -8,10 +8,21 @@ import {
 } from '@aje-poc/shared-test-helpers';
 import {
   MAX_CONSECUTIVE_EMPTY_POLLS,
+  resolvePollIntervalMs,
   TICKER_POLL_INTERVAL_MS,
   type BreakingTicker as Data,
 } from '@aje-poc/shared-types';
 import { BreakingTicker } from './BreakingTicker';
+
+// Mirror the cadence the component resolves at module load — the PoC test
+// command bakes PUBLIC_LIVEBLOG_POLL_INTERVAL_MS=500, so test cadence must
+// match component cadence or fake-timer advances overshoot by 60×.
+// (Same fix applied to LiveBlogUpdater.test.tsx; both components share the
+// PUBLIC_LIVEBLOG_POLL_INTERVAL_MS env knob.)
+const POLL_INTERVAL_MS = resolvePollIntervalMs(
+  import.meta.env.PUBLIC_LIVEBLOG_POLL_INTERVAL_MS,
+  TICKER_POLL_INTERVAL_MS,
+);
 
 const ACTIVE: Data = {
   post: {
@@ -115,7 +126,7 @@ describe('BreakingTicker', () => {
         ACTIVE.tickerText!,
       ),
     );
-    await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
     await waitFor(() =>
       expect(container.querySelector('[data-breaking-ticker-banner]')?.textContent).toContain(
         ACTIVE_2.tickerText!,
@@ -130,7 +141,7 @@ describe('BreakingTicker', () => {
       expect(container.querySelector('[data-breaking-ticker-banner]')).not.toBeNull(),
     );
     // Next tick: API returns null. Banner must clear, not stay stuck.
-    await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
     await waitFor(() =>
       expect(container.querySelector('[data-breaking-ticker-banner]')).toBeNull(),
     );
@@ -147,12 +158,12 @@ describe('BreakingTicker', () => {
     render(<BreakingTicker />);
 
     for (let i = 0; i < MAX_CONSECUTIVE_EMPTY_POLLS; i++) {
-      await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS);
+      await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
     }
     await waitFor(() => expect(mock!.calls.length).toBe(MAX_CONSECUTIVE_EMPTY_POLLS));
 
     const callsAtThreshold = mock!.calls.length;
-    await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS * 2);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS * 2);
     expect(mock!.calls.length).toBe(callsAtThreshold);
   });
 
@@ -161,7 +172,7 @@ describe('BreakingTicker', () => {
     render(<BreakingTicker />);
     await waitFor(() => expect(mock!.calls).toHaveLength(1));
     Object.defineProperty(document, 'hidden', { value: true, configurable: true });
-    await vi.advanceTimersByTimeAsync(TICKER_POLL_INTERVAL_MS);
+    await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
     expect(mock!.calls).toHaveLength(1);
   });
 });

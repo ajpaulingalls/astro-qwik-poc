@@ -2,22 +2,22 @@
   "cspViolations": [],
   "metrics": {
     "cls": {
-      "median": 0,
+      "median": 0.0001185,
       "n": 10,
-      "p95": 0
+      "p95": 0.000237
     },
     "jsBytes": {
-      "median": 16079,
+      "median": 16489,
       "n": 10,
-      "p95": 16079
+      "p95": 16489
     },
     "lcp": {
-      "median": 1806.05965,
+      "median": 1736.0043,
       "n": 10,
-      "p95": 1881.30203
+      "p95": 1882.639655
     },
     "lhPerf": {
-      "median": 100,
+      "median": 97.5,
       "n": 10,
       "p95": 100
     }
@@ -30,301 +30,21 @@
       "inp": {
         "median": 24,
         "n": 10,
-        "p95": 28.39999999999999
+        "p95": 32
       },
       "lcp": {
-        "median": 50,
+        "median": 54,
         "n": 10,
-        "p95": 54.199999999999996
+        "p95": 62.199999999999996
       }
     },
     "samples": [
-      {
-        "delta": 48,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594551062-5858419238794",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594551096-2738577626740",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594551063-6884713106142",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 48,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594559782-1433456760089",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594559809-1459285958619",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594559782-7151942700018",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 44,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594568313-9364653571675",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 44
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594568336-4311625420609",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 32,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594568313-5096763198826",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 32
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594576901-2568036003554",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594576934-7595100647389",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594576901-5595652035033",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
-      {
-        "delta": 44,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594585558-5509559697384",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 44
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594585580-5844683777889",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594585559-1201267242824",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594594246-5584713251424",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594594283-2428191986760",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594594246-2854166181097",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 48,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594602513-1378047806333",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 48
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594602546-1589308390382",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594602513-9463812991866",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594611118-2369446244115",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594611154-6187117920348",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 16,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594611119-6589270942336",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 16
-      },
       {
         "delta": 56,
         "entries": [
           {}
         ],
-        "id": "v4-1777594619348-4731560312172",
+        "id": "v4-1777678760010-4542792684932",
         "lcpElement": {
           "tagName": "FIGCAPTION"
         },
@@ -336,42 +56,7 @@
       {
         "delta": 0,
         "entries": [],
-        "id": "v4-1777594619387-5648939108644",
-        "name": "CLS",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 0
-      },
-      {
-        "delta": 24,
-        "entries": [
-          {},
-          {}
-        ],
-        "id": "v4-1777594619348-3865522758299",
-        "name": "INP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 24
-      },
-      {
-        "delta": 52,
-        "entries": [
-          {}
-        ],
-        "id": "v4-1777594627961-6231582769222",
-        "lcpElement": {
-          "tagName": "FIGCAPTION"
-        },
-        "name": "LCP",
-        "navigationType": "navigate",
-        "rating": "good",
-        "value": 52
-      },
-      {
-        "delta": 0,
-        "entries": [],
-        "id": "v4-1777594627994-7985899045599",
+        "id": "v4-1777678760048-7195735854641",
         "name": "CLS",
         "navigationType": "navigate",
         "rating": "good",
@@ -383,11 +68,326 @@
           {},
           {}
         ],
-        "id": "v4-1777594627961-1506346971060",
+        "id": "v4-1777678760010-9301105705926",
         "name": "INP",
         "navigationType": "navigate",
         "rating": "good",
         "value": 16
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678815334-5906194033786",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678815366-9488663407255",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678815335-1451728248122",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 56,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678870846-3053632147121",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 56
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678870883-7722491895160",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 32,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678870846-4728575708242",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 32
+      },
+      {
+        "delta": 64,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678926073-6843705586896",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 64
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678926111-6752492321480",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678926073-5136274033636",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777678981273-7065110733473",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777678981304-5253589753815",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777678981274-3414375372138",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 60,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777679036557-3761039504520",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 60
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777679036597-5963910887934",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777679036557-6584290140762",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 52,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777679091708-1825824087133",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 52
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777679091742-4231938244906",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777679091708-8633903546779",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 48,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777679146936-4038258520940",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 48
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777679146961-4254281567729",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 24,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777679146936-4982862628161",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 24
+      },
+      {
+        "delta": 56,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777679202172-5516171156278",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 56
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777679202204-1200405400449",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 16,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777679202172-5168351038937",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 16
+      },
+      {
+        "delta": 52,
+        "entries": [
+          {}
+        ],
+        "id": "v4-1777679257392-9582666893481",
+        "lcpElement": {
+          "tagName": "FIGCAPTION"
+        },
+        "name": "LCP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 52
+      },
+      {
+        "delta": 0,
+        "entries": [],
+        "id": "v4-1777679257427-7959318786793",
+        "name": "CLS",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 0
+      },
+      {
+        "delta": 32,
+        "entries": [
+          {},
+          {}
+        ],
+        "id": "v4-1777679257392-6232359996670",
+        "name": "INP",
+        "navigationType": "navigate",
+        "rating": "good",
+        "value": 32
       }
     ]
   }
