@@ -30,6 +30,15 @@ describe('SectionHeading', () => {
     expect(h3.className).toContain('tracking-wider');
   });
 
+  it('renders a left orange accent bar (editorial section marker)', async () => {
+    const { screen, render } = await createDOM();
+    await render(<SectionHeading>Topic</SectionHeading>);
+    const h3 = getByHeading(screen, 3, /Topic/i);
+    expect(h3.className).toContain('border-l-4');
+    expect(h3.className).toContain('border-aj-orange');
+    expect(h3.className).toContain('pl-2');
+  });
+
   it('renders as h2 when as="h2" (Footer landmark headings)', async () => {
     const { screen, render } = await createDOM();
     await render(<SectionHeading as="h2">Section</SectionHeading>);

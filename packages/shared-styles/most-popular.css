@@ -1,6 +1,5 @@
-/* Brand-orange numerals for ranked lists. Astro MostPopular consumes
-   this via apps/astro/src/styles/global.css; Qwik adoption is a planned
-   follow-up. */
+/* Brand-orange numerals for ranked lists. Consumed by both apps via
+   their respective global.css imports. */
 .most-popular-list {
   counter-reset: most-popular;
 }
