@@ -3,6 +3,7 @@ import { createDOM } from '@qwik.dev/core/testing';
 import { HeroCard } from './HeroCard';
 import { getByHeading } from '../test-utils/dom';
 import { resolveImageUrl } from '../lib/image-url';
+import { DISPLAY_HEADLINE_CLASS } from '../lib/typography';
 import { LIVEBLOG_DATE_PREFIX, type HomepagePost } from '@aje-poc/shared-types';
 
 const HERO_LINK = `/news/liveblog/${LIVEBLOG_DATE_PREFIX}/iran-war-live`;
@@ -29,6 +30,13 @@ describe('HeroCard', () => {
     expect(getByHeading(screen, 2, /Iran war live/i)).toBeTruthy();
     const link = screen.querySelector('a')!;
     expect(link.getAttribute('href')).toBe(HERO_LINK);
+  });
+
+  it('renders the h2 with the shared DISPLAY_HEADLINE_CLASS', async () => {
+    const { screen, render } = await createDOM();
+    await render(<HeroCard post={post} />);
+    const h2 = getByHeading(screen, 2, /Iran war live/i);
+    expect(h2.className).toContain(DISPLAY_HEADLINE_CLASS);
   });
 
   it('renders the featuredImage with eager loading + fetchpriority high (LCP element)', async () => {

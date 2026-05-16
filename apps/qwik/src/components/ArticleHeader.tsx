@@ -1,4 +1,5 @@
 import { formatDate } from '../lib/format-date';
+import { DISPLAY_HEADLINE_CLASS } from '../lib/typography';
 import { LeadImage } from './LeadImage';
 import type { Article } from '@aje-poc/shared-types';
 
@@ -21,7 +22,7 @@ export function ArticleHeader({ article }: Props) {
           ))}
         </ul>
       )}
-      <h1 class="text-3xl md:text-4xl font-bold leading-tight">{title}</h1>
+      <h1 class={`mb-3 ${DISPLAY_HEADLINE_CLASS}`}>{title}</h1>
       {subheading && <p class="subheading mt-3 text-lg text-neutral-700">{subheading}</p>}
       {featuredImage && (
         <LeadImage
