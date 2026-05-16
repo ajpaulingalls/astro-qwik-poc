@@ -241,6 +241,14 @@ Updated `global.css` `font-weight: 100 900` → `400 700` to match the new axis 
 
 Concerns 374ced212854 (font 352KB) and 0b2b9912957d (font subset) are addressed by this work. Concern 63bb15262674 (Qwik LCP 2410ms) remains real but the lever isn't font — it's framework-graph reduction (out of scope for story-004).
 
+### Noto Serif Display 700 (free-2026-05-04-qwik-ui-polish, C5)
+
+`apps/qwik/public/fonts/noto-serif-display-700.woff2` is **not** a fresh fontTools/pyftsubset session — it is a verbatim copy of the Latin subset Astro's Fonts API produced at `apps/astro/.astro/fonts/font-serif-display-700-normal-latin-c0a6a426ad118de0.woff2` (14,484 bytes, sha matches by file size + bytewise equality). Both apps consume the same upstream Google Fonts subset; copying instead of re-subsetting avoids running a fontTools pipeline a second time for an identical output.
+
+The metric-matched fallback overrides in `apps/qwik/src/styles/global.css` (`size-adjust: 124.5538%`, `ascent-override: 85.8263%`, `descent-override: 23.524%`, `line-gap-override: 0%`, `src: local('Times New Roman')`) are **also** copied from Astro's auto-generated CSS for the same woff2 — derived once by Astro's tooling, reused so both apps measure CLS against the same fallback geometry.
+
+**Regen recipe:** if Astro's `.astro/fonts/` cache is pruned, re-run `bun --cwd apps/astro --bun astro build` to repopulate, then `cp apps/astro/.astro/fonts/font-serif-display-700-normal-latin-*.woff2 apps/qwik/public/fonts/noto-serif-display-700.woff2`. The hashed filename is content-addressed by Astro Fonts API — bumping Noto Serif Display upstream will produce a new hash.
+
 ### Story-009 framework cost characterization (sprint-005)
 
 Customer reaffirmed `<15 KB` Homepage JS as a hard goal but asked: "Is this just the cost of Qwik, is there a way to lazy load some of that, or other options? Make sure we know all the details." This section answers all three.
