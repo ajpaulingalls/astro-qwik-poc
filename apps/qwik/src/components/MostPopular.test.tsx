@@ -44,4 +44,19 @@ describe('MostPopular', () => {
     expect(screen.querySelector('section')).toBeFalsy();
     expect(screen.querySelector('ol')).toBeFalsy();
   });
+
+  it('uses the shared most-popular-list CSS with divide-y rules and tightened link color', async () => {
+    const { screen, render } = await createDOM();
+    await render(<MostPopular items={items} />);
+    const ol = screen.querySelector('ol') as HTMLElement | null;
+    expect(ol).toBeTruthy();
+    expect(ol?.className).toContain('most-popular-list');
+    expect(ol?.className).toContain('list-none');
+    expect(ol?.className).toContain('divide-y');
+    expect(ol?.className).toContain('divide-neutral-200');
+    const li = screen.querySelector('ol li') as HTMLElement | null;
+    expect(li?.className).toContain('py-2');
+    const link = screen.querySelector('ol li a') as HTMLElement | null;
+    expect(link?.className).toContain('text-neutral-800');
+  });
 });

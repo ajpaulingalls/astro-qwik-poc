@@ -4,7 +4,7 @@ This file is scoped to the **Qwik 2 (beta) PoC**. For monorepo-wide guidance (sh
 
 ## App state
 
-Spec-only. No `src/`, no `vite.config.ts`, no `package.json` deps installed. Implementation begins at M1 (`docs/MILESTONES.md`). Don't grep for components yet.
+Implementation complete through M-12 (final performance validation; per-app code is fully shipped — M-13 is the monorepo-level `docs/COMPARISON.md` capstone, which consumes this app's output). Live layout: `src/components/`, `src/routes/`, `src/lib/`, `src/styles/`, `src/test-utils/`, `vite.config.ts`, `public/fonts/`, `tests/`. Per-app milestone scope (M1–M10) lives in `docs/MILESTONES.md`; the extended M-11..M-13 numbering is monorepo-level. Codebase is no longer scaffold-pending — grep freely.
 
 ## Qwik-specific decisions
 
@@ -64,4 +64,4 @@ Useful entry points on `build/v2`:
 
 ### Preflight
 
-`node_modules/` and LSP only work after M1 has scaffolded the app and `bun install` has run. Before then, only `gh api` is available — and even then, on `build/v2` only.
+`node_modules/` and LSP work after `bun install`. The app is scaffolded; both are available. For docs that aren't in `node_modules`, still use `gh api` against `build/v2` only.

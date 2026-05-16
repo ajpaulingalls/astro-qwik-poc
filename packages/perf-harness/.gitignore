@@ -1,1 +1,7 @@
-reports/
+# Run output — regenerated every harness invocation. Re-add with `git add -f`
+# only at milestone-validation boundaries (see reports/RUN_NOTES.md for the policy).
+# RUN_NOTES.md is excluded from the ignore because it carries methodology + policy text,
+# not regenerated output.
+reports/*.json
+reports/*.md
+!reports/RUN_NOTES.md

@@ -19,6 +19,13 @@ export default component$(() => {
           crossOrigin="anonymous"
           href="/fonts/inter.woff2"
         />
+        <link
+          rel="preload"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+          href="/fonts/noto-serif-display-700.woff2"
+        />
         <DocumentHeadTags />
         <link rel="canonical" href={url.href} />
       </head>

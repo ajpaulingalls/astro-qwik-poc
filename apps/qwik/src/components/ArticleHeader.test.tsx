@@ -3,6 +3,7 @@ import { createDOM } from '@qwik.dev/core/testing';
 import { ArticleHeader } from './ArticleHeader';
 import { resolveImageUrl } from '../lib/image-url';
 import { getByHeading } from '../test-utils/dom';
+import { DISPLAY_HEADLINE_CLASS } from '../lib/typography';
 import type { Article } from '@aje-poc/shared-types';
 
 const baseArticle: Article = {
@@ -25,6 +26,13 @@ describe('ArticleHeader', () => {
     const { screen, render } = await createDOM();
     await render(<ArticleHeader article={baseArticle} />);
     expect(getByHeading(screen, 1, /Russian oil exports slump/i)).toBeTruthy();
+  });
+
+  it('renders the h1 with the shared DISPLAY_HEADLINE_CLASS', async () => {
+    const { screen, render } = await createDOM();
+    await render(<ArticleHeader article={baseArticle} />);
+    const h1 = getByHeading(screen, 1, /Russian oil exports slump/i);
+    expect(h1.className).toContain(DISPLAY_HEADLINE_CLASS);
   });
 
   it('renders the subheading when present and omits the element when missing', async () => {

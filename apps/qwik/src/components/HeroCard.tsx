@@ -1,5 +1,6 @@
 import type { StoryCardData } from '@aje-poc/shared-types';
 import { getDisplayHeadline } from '../lib/headline';
+import { DISPLAY_HEADLINE_CLASS } from '../lib/typography';
 import { LeadImage } from './LeadImage';
 import { LiveBadge } from './LiveBadge';
 
@@ -16,9 +17,11 @@ export function HeroCard({ post }: Props) {
           <LeadImage image={img} priority="eager" sizes="(min-width: 1024px) 1024px, 100vw" />
         )}
         <div class="px-4 py-3">
-          <LiveBadge isLive={post.isLive} />
-          <h2 class="text-2xl font-bold mt-1">{getDisplayHeadline(post)}</h2>
-          {post.excerpt && <p class="excerpt mt-2 text-neutral-700">{post.excerpt}</p>}
+          <LiveBadge isLive={post.isLive} size="lg" />
+          <h2 class={`mt-1 ${DISPLAY_HEADLINE_CLASS}`}>{getDisplayHeadline(post)}</h2>
+          {post.excerpt && (
+            <p class="excerpt mt-3 text-base leading-relaxed text-neutral-800">{post.excerpt}</p>
+          )}
         </div>
       </a>
     </article>

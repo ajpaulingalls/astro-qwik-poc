@@ -4,7 +4,7 @@ This file is scoped to the **Astro 6 PoC**. For monorepo-wide guidance (shared m
 
 ## App state
 
-Spec-only. No `src/`, no `astro.config.mjs`, no `package.json` deps installed. Implementation begins at M1 (`docs/MILESTONES.md`). Don't grep for components yet.
+Implementation complete through M-12 (final performance validation; per-app code is fully shipped — M-13 is the monorepo-level `docs/COMPARISON.md` capstone, which consumes this app's output). Live layout: `src/components/`, `src/layouts/`, `src/pages/`, `src/lib/`, `src/styles/`, `astro.config.mjs`, `tests/`. Fonts are emitted by the Astro Fonts API into `.astro/fonts/` (not `public/`). Per-app milestone scope (M1–M10) lives in `docs/MILESTONES.md`; the extended M-11..M-13 numbering is monorepo-level. Codebase is no longer scaffold-pending — grep freely.
 
 ## Astro-specific decisions
 
@@ -65,4 +65,4 @@ Useful entry points:
 
 ### Preflight
 
-`node_modules/` and LSP only work after M1 has scaffolded the app and `bun install` has run. Before then, only `gh api` is available.
+`node_modules/` and LSP work after `bun install`. The app is scaffolded; both are available.
