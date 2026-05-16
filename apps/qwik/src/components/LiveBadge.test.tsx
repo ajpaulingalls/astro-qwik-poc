@@ -23,4 +23,22 @@ describe('LiveBadge', () => {
     await render(<LiveBadge />);
     expect(screen.querySelector('span.text-aj-orange')).toBeFalsy();
   });
+
+  it('defaults to small typography (text-xs font-bold tracking-wider)', async () => {
+    const { screen, render } = await createDOM();
+    await render(<LiveBadge isLive={true} />);
+    const badge = screen.querySelector('span.text-aj-orange')!;
+    expect(badge.className).toContain('text-xs');
+    expect(badge.className).toContain('font-bold');
+    expect(badge.className).toContain('tracking-wider');
+  });
+
+  it('opts into display typography when size="lg" (text-sm font-extrabold tracking-widest)', async () => {
+    const { screen, render } = await createDOM();
+    await render(<LiveBadge isLive={true} size="lg" />);
+    const badge = screen.querySelector('span.text-aj-orange')!;
+    expect(badge.className).toContain('text-sm');
+    expect(badge.className).toContain('font-extrabold');
+    expect(badge.className).toContain('tracking-widest');
+  });
 });

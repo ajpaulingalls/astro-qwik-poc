@@ -48,6 +48,23 @@ describe('HeroCard', () => {
     expect(screen.querySelector('p.excerpt')?.textContent).toContain('Lebanon raises death toll');
   });
 
+  it('renders the excerpt with editorial typography (leading-relaxed, neutral-800)', async () => {
+    const { screen, render } = await createDOM();
+    await render(<HeroCard post={post} />);
+    const excerpt = screen.querySelector('p.excerpt') as HTMLElement | null;
+    expect(excerpt?.className).toContain('text-neutral-800');
+    expect(excerpt?.className).toContain('leading-relaxed');
+  });
+
+  it('opts the LIVE badge into display size when isLive', async () => {
+    const { screen, render } = await createDOM();
+    await render(<HeroCard post={post} />);
+    const badge = screen.querySelector('span.text-aj-orange') as HTMLElement | null;
+    expect(badge?.className).toContain('text-sm');
+    expect(badge?.className).toContain('font-extrabold');
+    expect(badge?.className).toContain('tracking-widest');
+  });
+
   it('omits excerpt cleanly when missing', async () => {
     const { screen, render } = await createDOM();
     await render(<HeroCard post={{ ...post, excerpt: undefined }} />);
